@@ -157,7 +157,7 @@ public final class Platform {
 	}
 
 	public static void openVanillaOptions(Screen parent) {
-//#if MC >= 26.1
+//#if MC >= 26.1 && MC < 26.3
 		setScreen(new OptionsScreen(parent, mc().options, mc().level != null));
 //#else
 		setScreen(new OptionsScreen(parent, mc().options));
