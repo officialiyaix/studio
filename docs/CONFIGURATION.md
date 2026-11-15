@@ -18,8 +18,8 @@ Needed for Microsoft sign-in and therefore for launching Minecraft.
    - Supported account types: **Personal Microsoft accounts only** (Stabled uses the `consumers` tenant).
    - Platform: **Mobile and desktop applications**, redirect URI **`http://localhost`** (any port is accepted for loopback).
    - Allow public client flows: **Yes**. No client secret is used (PKCE).
-2. New applications must be approved by Mojang before they can call the Minecraft services API (`api.minecraftservices.com`). Request access through Mojang's current process for third-party launchers before release — check Mojang's/Microsoft's developer guidance for the up-to-date form, as it has moved over time. Until approval, sign-in reaches Microsoft and Xbox Live but `login_with_xbox` is rejected; Stabled reports this as an error explaining that the application may not be approved.
-3. Put the Application (client) ID — a GUID — in `MICROSOFT_CLIENT_ID`.
+2. New applications must be approved by Mojang before they can call the Minecraft services API (`api.minecraftservices.com`). Submit the application (client) ID with Mojang's review form for third-party Minecraft apps, [aka.ms/mce-reviewappid](https://aka.ms/mce-reviewappid), describing Stabled as a third-party launcher for Minecraft: Java Edition. Review takes days to weeks and isn't guaranteed. Until approval, sign-in reaches Microsoft and Xbox Live but `login_with_xbox` answers 403 ("Invalid app registration"); Stabled reports this as an error explaining that the application may not be approved. Don't reuse another launcher's client ID.
+3. Put the Application (client) ID — a GUID — in `MICROSOFT_CLIENT_ID`: either in `config/stabled.config.json`, or as a repository variable (GitHub → Settings → Secrets and variables → Actions → Variables) so CI builds the installer with it. It is a public identifier, not a secret.
 
 Scopes requested: `XboxLive.signin offline_access`.
 
