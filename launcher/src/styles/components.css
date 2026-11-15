@@ -38,6 +38,9 @@
   background: color-mix(in srgb, var(--surface-alt) 80%, transparent);
   image-rendering: auto;
 }
+.save-icon.default {
+  background: none;
+}
 
 /* ---------- Home ---------- */
 .home-grid {

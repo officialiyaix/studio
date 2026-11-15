@@ -31,7 +31,7 @@ impl Default for LauncherBehaviour {
             after_launch: "minimize".into(),
             expand_nav_on_hover: true,
             reduce_motion: false,
-            start_page: "home".into(),
+            start_page: "saves".into(),
             show_minecraft_news: true,
         }
     }
@@ -76,12 +76,23 @@ impl Default for Advanced {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+/// Current settings format. Older files are migrated in `sanitized`.
+const SETTINGS_VERSION: u32 = 2;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct Settings {
+    /// Settings format version (0 for files written before versions were recorded).
+    pub version: u32,
     pub launcher: LauncherBehaviour,
     pub save_defaults: SaveDefaults,
     pub advanced: Advanced,
+}
+
+impl Default for Settings {
+    fn default() -> Self {
+        Self { version: SETTINGS_VERSION, launcher: LauncherBehaviour::default(), save_defaults: SaveDefaults::default(), advanced: Advanced::default() }
+    }
 }
 
 impl Settings {
@@ -94,11 +105,19 @@ impl Settings {
     }
 
     fn sanitized(mut self) -> Settings {
+        if self.version < 2 {
+            // Version 2 made Saves the default start page. An older file can't tell an explicit "Home" from the old
+            // default, so it moves to the new default once; choosing Home again afterwards is kept.
+            if self.launcher.start_page == "home" {
+                self.launcher.start_page = "saves".into();
+            }
+        }
+        self.version = SETTINGS_VERSION;
         if !["keep", "minimize", "hide"].contains(&self.launcher.after_launch.as_str()) {
             self.launcher.after_launch = "minimize".into();
         }
         if !["home", "saves"].contains(&self.launcher.start_page.as_str()) {
-            self.launcher.start_page = "home".into();
+            self.launcher.start_page = "saves".into();
         }
         self.save_defaults.memory_mb = self.save_defaults.memory_mb.clamp(1024, 32768);
         if !["performance", "balanced", "quality", "custom"].contains(&self.save_defaults.performance_preset.as_str()) {
@@ -200,8 +219,9 @@ pub fn update_appearance(patch: &Value) -> AppResult<Value> {
     Ok(v)
 }
 
-/// Replace the single Custom Background slot with a managed copy of the chosen image.
-pub fn set_custom_background(source: &std::path::Path) -> AppResult<Value> {
+/// Replace the single Custom Background slot with a managed copy of the chosen image. `origin` records where it
+/// came from: "upload" or "gallery:<category>/<image>" (the UI marks the selected gallery image).
+pub fn set_custom_background(source: &std::path::Path, origin: &str) -> AppResult<Value> {
     let png = crate::images::prepare_background(source)?;
     let dir = paths::backgrounds_dir();
     std::fs::create_dir_all(&dir)?;
@@ -209,12 +229,14 @@ pub fn set_custom_background(source: &std::path::Path) -> AppResult<Value> {
     let mut v = load_appearance();
     let revision = v["customBackground"]["revision"].as_i64().unwrap_or(0) + 1;
     let keep = |k: &str, d: f64| v["customBackground"][k].as_f64().unwrap_or(d);
+    // A new image starts centred; the dimming the player chose is kept.
     let bg = serde_json::json!({
         "file": "backgrounds/custom.png",
-        "focusX": keep("focusX", 0.5),
-        "focusY": keep("focusY", 0.5),
+        "focusX": 0.5,
+        "focusY": 0.5,
         "dim": keep("dim", 0.45),
         "revision": revision,
+        "source": origin,
     });
     v["customBackground"] = bg;
     v["theme"] = "custom".into();

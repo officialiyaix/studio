@@ -57,7 +57,7 @@ export function SignInDialog() {
         <button type="button" className="icon-btn plain sm signin-close" aria-label="Close" onClick={close}>
           ×
         </button>
-        <img src="/mark.svg" alt="" width={56} height={56} />
+        <img src="/logo.png" alt="" width={56} height={56} />
         <h2 id="signin-title">Sign in to Stabled</h2>
         <p className="muted">
           {signIn.reason ?? 'Sign in with your Microsoft account to play Minecraft: Java Edition.'} You can still browse Stabled, create and edit Saves, manage mods, change themes, read news and use the PC Optimiser without signing in.

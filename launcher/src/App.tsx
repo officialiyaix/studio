@@ -19,7 +19,7 @@ function Backdrop() {
     <div className="app-bg" aria-hidden="true">
       {custom && (
         <>
-          <img src={appearance!.customBackground!} alt="" style={{ objectPosition: `${(a!.customBackground?.focusX ?? 0.5) * 100}% ${(a!.customBackground?.focusY ?? 0.5) * 100}%` }} />
+          <img key={a!.customBackground?.revision ?? 0} className="bg-fade" src={appearance!.customBackground!} alt="" style={{ objectPosition: `${(a!.customBackground?.focusX ?? 0.5) * 100}% ${(a!.customBackground?.focusY ?? 0.5) * 100}%` }} />
           <div className="dim" style={{ opacity: a!.customBackground?.dim ?? 0.45 }} />
         </>
       )}
@@ -48,7 +48,7 @@ export function App() {
   if (!appearance) {
     return (
       <div className="boot">
-        <img src="/mark.svg" alt="" width={64} height={64} />
+        <img src="/logo.png" alt="" width={64} height={64} />
       </div>
     );
   }

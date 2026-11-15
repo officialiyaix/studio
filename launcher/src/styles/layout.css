@@ -122,8 +122,152 @@
 .rail-spacer {
   flex: 1;
 }
-.rail-pin {
-  height: 36px;
+
+/* Footer: Discord and About, each with a hover card. */
+.rail-foot {
+  height: 40px;
+}
+.rail-discord:hover,
+.rail-discord[aria-expanded='true'] {
+  color: #ffffff;
+  background: #5865f2;
+  border-color: color-mix(in srgb, #ffffff 18%, transparent);
+}
+.rail-discord svg {
+  transition: transform 420ms var(--ease-spring);
+}
+.rail-discord:hover svg {
+  transform: rotate(-8deg) scale(1.12);
+}
+.rail-about:hover,
+.rail-about[aria-expanded='true'] {
+  color: var(--text);
+  background: var(--hover-bg);
+}
+
+/* InfoGlyph: an open ring that sweeps closed on hover while the slanted "i" lifts into the accent colour. */
+.info-glyph {
+  overflow: visible;
+}
+.info-glyph-ring {
+  stroke-dasharray: 78 22;
+  stroke-dashoffset: -9;
+  transform-origin: 12px 12px;
+  transition: stroke-dasharray 520ms var(--ease), stroke-dashoffset 520ms var(--ease), transform 520ms var(--ease);
+}
+.info-glyph-dot,
+.info-glyph-stem {
+  transition: transform 380ms var(--ease-spring), fill 240ms var(--ease);
+}
+.rail-about:hover .info-glyph-ring,
+.rail-about[aria-expanded='true'] .info-glyph-ring {
+  stroke-dasharray: 100 0;
+  stroke-dashoffset: 0;
+  transform: rotate(140deg);
+  stroke: var(--accent);
+}
+.rail-about:hover .info-glyph-dot,
+.rail-about[aria-expanded='true'] .info-glyph-dot {
+  transform: translate(0.6px, -1.3px);
+  fill: var(--accent);
+}
+.rail-about:hover .info-glyph-stem,
+.rail-about[aria-expanded='true'] .info-glyph-stem {
+  transform: translateY(-0.4px);
+}
+
+.rail-card {
+  position: fixed;
+  z-index: 210;
+  transform: translateY(-50%);
+  min-width: 220px;
+  max-width: 320px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--surface) max(var(--surface-pct), 88%), transparent);
+  box-shadow: var(--shadow-lg);
+  display: grid;
+  gap: 10px;
+  animation: rail-card-in 260ms var(--ease-spring) both;
+}
+.glass .rail-card {
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+}
+/* Invisible bridge so the pointer can cross the gap between the rail and the card. */
+.rail-card::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 0;
+  bottom: 0;
+  width: 16px;
+}
+@keyframes rail-card-in {
+  from {
+    opacity: 0;
+    transform: translate(-8px, -50%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, -50%) scale(1);
+  }
+}
+.rail-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rail-card-title {
+  font-weight: 700;
+  font-size: 14px;
+}
+.rail-card-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.rail-card-badge.discord {
+  background: #5865f2;
+  color: #ffffff;
+}
+.rail-card-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex: none;
+}
+.rail-card-version {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.rail-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, #5865f2 16%, transparent);
+  border: 1px solid color-mix(in srgb, #5865f2 40%, transparent);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none;
+  word-break: break-all;
+  user-select: text;
+  transition: background var(--speed) var(--ease), transform var(--speed) var(--ease);
+}
+.rail-card-link:hover {
+  background: color-mix(in srgb, #5865f2 30%, transparent);
+  text-decoration: underline;
+}
+.rail-card-link:active {
+  transform: scale(0.98);
 }
 
 /* ---------- Header ---------- */

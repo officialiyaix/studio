@@ -4,6 +4,7 @@ mod auth;
 mod commands;
 mod config;
 mod error;
+mod gallery;
 mod images;
 mod minecraft;
 mod mods;
@@ -23,6 +24,17 @@ use tauri::Manager;
 
 #[cfg(windows)]
 pub use optimiser::run_elevated_helper;
+
+fn locate_gallery(app: &tauri::App) -> Option<std::path::PathBuf> {
+    if let Ok(dir) = app.path().resource_dir() {
+        let p = dir.join("backgrounds");
+        if p.is_dir() {
+            return Some(p);
+        }
+    }
+    let dev = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("resources").join("backgrounds");
+    dev.is_dir().then_some(dev)
+}
 
 fn locate_bundled_clients(app: &tauri::App) -> Option<std::path::PathBuf> {
     if let Ok(dir) = app.path().resource_dir() {
@@ -60,6 +72,10 @@ pub fn run() {
                 None => log_warn!("No Stabled client builds are bundled; launching Saves will be unavailable"),
             }
             log_info!("Bundled Stabled client builds: {:?}", saves::managed::bundled_versions());
+            match locate_gallery(app) {
+                Some(p) => gallery::set_dir(p),
+                None => log_warn!("The background gallery isn't bundled"),
+            }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -71,6 +87,7 @@ pub fn run() {
             commands::appearance_get,
             commands::appearance_set,
             commands::appearance_set_background,
+            commands::appearance_set_gallery_background,
             commands::appearance_reset_background,
             commands::image_inspect,
             commands::versions_list,

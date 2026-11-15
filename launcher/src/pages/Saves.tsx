@@ -50,7 +50,7 @@ export function SavesPage() {
         <div className="saves-detail scroll">
           {selected ? (
             <>
-              <SaveHero save={selected} onOpenMods={() => setTab('mods')} />
+              <SaveHero key={selected.id} save={selected} onOpenMods={() => setTab('mods')} />
               <div className="tabs" role="tablist" aria-label="Save sections">
                 {(['overview', 'mods', 'settings'] as Tab[]).map((t) => (
                   <button key={t} type="button" role="tab" aria-selected={tab === t} className={cx('tab', tab === t && 'active')} onClick={() => setTab(t)}>

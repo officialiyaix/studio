@@ -22,11 +22,11 @@ export function HomePage() {
       <div className="home-grid">
         <div className="home-main scroll">
           {selected ? (
-            <SaveHero save={selected} onOpenMods={() => setPage('saves')} />
+            <SaveHero key={selected.id} save={selected} onOpenMods={() => setPage('saves')} />
           ) : (
             savesLoaded && (
               <section className="hero panel welcome">
-                <img src="/mark.svg" alt="" width={72} height={72} />
+                <img src="/logo.png" alt="" width={72} height={72} />
                 <div>
                   <h2>Create your first Save</h2>
                   <p className="muted">

@@ -1,0 +1,103 @@
+/* Surface style beyond the main panels.
+   Simple: everything solid and flat. Frosted Glass (root class .glass): the background shows through every
+   surface by the Transparency setting, floating surfaces blur what is behind them, and edges get a light rim
+   and top highlight. Text and icons are never made translucent. */
+
+:root {
+  --glass-rim: color-mix(in srgb, var(--text) 14%, transparent);
+  --glass-sheen: inset 0 1px 0 rgb(255 255 255 / 0.07);
+  /* Floating surfaces (menus, toasts, popovers) stay readable over busy backgrounds. */
+  --float-bg: color-mix(in srgb, var(--surface) 97%, transparent);
+}
+.glass {
+  --float-bg: color-mix(in srgb, var(--surface) max(var(--surface-pct), 72%), transparent);
+}
+
+/* Controls and inner cards: translucent fills follow the Transparency setting, with a rim and sheen. */
+.glass .input,
+.glass .segmented {
+  background: color-mix(in srgb, var(--bg) calc(var(--surface-pct) * 0.6), transparent);
+}
+.glass .panel-alt,
+.glass .btn:not(.btn-ghost),
+.glass .icon-btn:not(.plain),
+.glass .input,
+.glass .segmented,
+.glass .theme-tile:not(.selected),
+.glass .bg-gallery,
+.glass .news-card,
+.glass .save-card:not(.selected),
+.glass .saves-item:not([aria-current='true']):not([aria-selected='true']),
+.glass .version-list,
+.glass .mod-row,
+.glass .stat,
+.glass .surface-choice:not(.selected),
+.glass .profile-btn {
+  border-color: var(--glass-rim);
+  box-shadow: var(--glass-sheen);
+}
+.glass .btn-cta {
+  box-shadow: var(--glass-sheen), 0 8px 22px -10px color-mix(in srgb, var(--cta) 75%, transparent);
+}
+/* Hover and focus keep their accent edge over the rim. */
+.glass :is(.btn:not(.btn-ghost):not(:disabled), .icon-btn:not(.plain), .theme-tile, .news-card, .save-card, .saves-item, .surface-choice, .profile-btn):hover {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--glass-rim));
+}
+.glass .input:focus {
+  border-color: var(--accent);
+}
+
+/* Things that sit straight on the app background (header controls, footer) blur it like panels do. */
+.glass .header .icon-btn,
+.glass .profile-btn,
+.glass .toolbar .btn,
+.glass .tabs,
+.glass .bg-gallery {
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.15);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.15);
+}
+
+/* Floating surfaces. */
+.menu,
+.toast,
+.specs-pop {
+  background: var(--float-bg);
+}
+.glass .menu,
+.glass .toast,
+.glass .specs-pop,
+.glass .tip {
+  backdrop-filter: blur(calc(var(--glass-blur) + 6px)) saturate(1.25);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 6px)) saturate(1.25);
+  border-color: var(--glass-rim);
+  box-shadow: var(--glass-sheen), var(--shadow-lg);
+}
+.glass .tip {
+  background: color-mix(in srgb, var(--text) 82%, transparent);
+}
+.glass .modal {
+  border-color: var(--glass-rim);
+  box-shadow: var(--glass-sheen), 0 30px 80px -20px rgb(0 0 0 / 0.6);
+}
+/* Behind dialogs, Frosted Glass softens the whole launcher instead of only darkening it. */
+.glass .modal-backdrop {
+  backdrop-filter: blur(6px) saturate(1.1);
+  -webkit-backdrop-filter: blur(6px) saturate(1.1);
+  background: color-mix(in srgb, #000 32%, transparent);
+}
+
+/* The navigation rail: a rim on its edge and a soft light along the top in glass mode. */
+.glass .rail {
+  border-right-color: var(--glass-rim);
+  box-shadow: var(--glass-sheen);
+}
+.glass .rail.open {
+  box-shadow: var(--glass-sheen), 18px 0 40px -18px rgb(0 0 0 / 0.55);
+}
+
+/* Simple: no blur anywhere, flat edges. */
+:root:not(.glass) .bg-cat-count {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: rgb(0 0 0 / 0.6);
+}

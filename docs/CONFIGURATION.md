@@ -1,6 +1,6 @@
 # Configuration
 
-Stabled reads four external values. They are public identifiers, not secrets, and belong to whoever publishes Stabled. `MICROSOFT_CLIENT_ID` is filled in (Stabled's registered Microsoft app); the other three are still empty.
+Stabled reads four external values. They are public identifiers, not secrets, and belong to whoever publishes Stabled. `MICROSOFT_CLIENT_ID`, `DISCORD_APPLICATION_ID` and `DISCORD_INVITE_URL` are filled in; `NEWS_FEED_URL` is still empty.
 
 Set them in one of three places (later wins):
 
@@ -28,7 +28,7 @@ Scopes requested: `XboxLive.signin offline_access`.
 Needed for Discord Rich Presence.
 
 1. Create an application in the [Discord Developer Portal](https://discord.com/developers/applications) named **Stabled Client** — Discord shows the application's name as the activity title ("Playing Stabled Client").
-2. Under Rich Presence → Art Assets, upload the Stabled mark (`branding/mark-1024.png`) with the key **`stabled`**; the client uses it as the large image.
+2. Under Rich Presence → Art Assets, upload the round Stabled logo (`branding/mark-1024.png`) with the key **`stabled`**; the client uses it as the large image.
 3. Put the Application ID (a 17–20 digit number) in `DISCORD_APPLICATION_ID`.
 
 The launcher passes it to the game as `-Dstabled.discordAppId`. No Discord login, token or password is ever involved — presence talks only to the Discord desktop app on the same PC.

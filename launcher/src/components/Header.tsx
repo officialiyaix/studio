@@ -44,8 +44,12 @@ export function Header() {
   return (
     <header className="header">
       <div style={{ minWidth: 0 }}>
-        <h1>{t.title}</h1>
-        <p className="subtitle">{t.subtitle}</p>
+        <h1 key={`t-${page}`} className="title-anim">
+          {t.title}
+        </h1>
+        <p key={`s-${page}`} className="subtitle title-anim delayed">
+          {t.subtitle}
+        </p>
       </div>
       <div className="header-actions" ref={wrap} style={{ position: 'relative' }}>
         <button type="button" className="icon-btn" aria-label="Settings" title="Settings" onClick={() => setPage('settings')}>

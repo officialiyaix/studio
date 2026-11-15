@@ -106,7 +106,19 @@ pub fn appearance_set(patch: Value) -> AppResult<AppearanceView> {
 
 #[tauri::command]
 pub async fn appearance_set_background(path: String) -> AppResult<AppearanceView> {
-    let v = tauri::async_runtime::spawn_blocking(move || settings::set_custom_background(std::path::Path::new(&path)))
+    let v = tauri::async_runtime::spawn_blocking(move || settings::set_custom_background(std::path::Path::new(&path), "upload"))
+        .await
+        .map_err(|e| AppError::new("IMAGE", e.to_string()))??;
+    Ok(appearance_view(v))
+}
+
+/// Use a background from the bundled gallery ("<category>/<image>"). It becomes the Custom Background, so the
+/// in-game client shows it too.
+#[tauri::command]
+pub async fn appearance_set_gallery_background(id: String) -> AppResult<AppearanceView> {
+    let path = crate::gallery::path_for(&id)?;
+    let source = format!("gallery:{id}");
+    let v = tauri::async_runtime::spawn_blocking(move || settings::set_custom_background(&path, &source))
         .await
         .map_err(|e| AppError::new("IMAGE", e.to_string()))??;
     Ok(appearance_view(v))

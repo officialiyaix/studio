@@ -209,15 +209,17 @@ export function Callout({ tone = 'info', children }: { tone?: 'info' | 'warning'
   );
 }
 
+/** A Save's own icon (rounded square), or the round Stabled logo when it has none. */
 export function SaveIcon({ save, size = 48 }: { save: Pick<Save, 'icon' | 'name'>; size?: number }) {
+  const isDefault = !save.icon;
   return (
     <img
-      className="save-icon"
-      src={save.icon ?? '/mark.svg'}
+      className={cx('save-icon', isDefault && 'default')}
+      src={save.icon ?? '/logo.png'}
       alt=""
       width={size}
       height={size}
-      style={{ width: size, height: size, borderRadius: Math.round(size * 0.24) }}
+      style={{ width: size, height: size, borderRadius: isDefault ? '50%' : Math.round(size * 0.24) }}
       draggable={false}
     />
   );

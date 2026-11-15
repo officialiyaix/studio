@@ -63,6 +63,8 @@ export interface SystemDynamic {
 }
 
 export interface Settings {
+  /** Settings format version; sent back unchanged. */
+  version: number;
   launcher: {
     afterLaunch: 'keep' | 'minimize' | 'hide';
     expandNavOnHover: boolean;
@@ -104,7 +106,7 @@ export interface Appearance {
   theme: string;
   surface: 'simple' | 'glass';
   glassTransparency: number;
-  customBackground: { file: string; focusX: number; focusY: number; dim: number; revision: number } | null;
+  customBackground: { file: string; focusX: number; focusY: number; dim: number; revision: number; source?: string } | null;
 }
 export interface AppearanceView {
   appearance: Appearance;
@@ -270,6 +272,7 @@ export const api = {
   appearanceSet: (patch: Partial<Appearance> | Record<string, unknown>) => call<AppearanceView>('appearance_set', { patch }),
   appearanceSetBackground: (path: string) => call<AppearanceView>('appearance_set_background', { path }),
   appearanceResetBackground: () => call<AppearanceView>('appearance_reset_background'),
+  appearanceSetGalleryBackground: (id: string) => call<AppearanceView>('appearance_set_gallery_background', { id }),
   imageInspect: (path: string) => call<{ dataUrl: string; width: number; height: number }>('image_inspect', { path }),
 
   versionsList: () => call<VersionList>('versions_list'),

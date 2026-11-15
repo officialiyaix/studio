@@ -88,6 +88,10 @@ See [CONTRACTS.md](CONTRACTS.md) for the files and properties it reads. Highligh
   Targets are reallocated on resize, reseeded on world change, and released when the effect is off. If the pipeline can't compile, a rendering error occurs, or an Iris shader pack is active, the control is disabled with an explanation.
 - **Discord Presence** — `DiscordIpc` speaks the desktop IPC protocol over `\\.\pipe\discord-ipc-N` (Unix sockets on other platforms). One worker thread per game process, exponential back-off (5 s → 60 s), updates coalesced to one per 2 s, immediate clear on disable, clear and close on exit.
 
+## Background gallery
+
+`tools/build_backgrounds.py <folder>` turns a folder of category sub-folders into the gallery: full images (longest edge 1920 px) bundled as `backgrounds/<category>--<n>.jpg` resources, 480 px thumbnails in `launcher/public/backgrounds/`, and the manifest `launcher/src/lib/backgrounds.json` shared by the UI and the backend. Settings → Appearance shows each category with a blurred peek of two of its images; choosing an image calls `appearance_set_gallery_background`, which checks the id against the manifest and makes that image the Custom Background (`customBackground.source = "gallery:<category>/<n>"`). The in-game client therefore shows it with no extra code, and keeps the `source` field when it saves the appearance.
+
 ## Multi-version client
 
 `client/` builds one jar per Minecraft version (`client/versions/<minecraft>/gradle.properties` holds the Minecraft, Fabric API and Java versions). The code is split in two:

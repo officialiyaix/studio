@@ -113,7 +113,7 @@ export function IconEditor({ handle, onError, initial }: { handle: Ref<IconEdito
         aria-label={img ? 'Icon preview. Drag or use the arrow keys to reposition.' : 'Default Stabled icon'}
         style={{ cursor: img && mode === 'fill' ? 'grab' : 'default' }}
       >
-        {img ? <canvas ref={preview} style={{ width: VIEW, height: VIEW }} /> : <img src="/mark.svg" alt="" width={VIEW} height={VIEW} />}
+        {img ? <canvas ref={preview} style={{ width: VIEW, height: VIEW }} /> : <img src="/logo.png" alt="" width={VIEW} height={VIEW} />}
       </div>
       <div className="icon-controls">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>

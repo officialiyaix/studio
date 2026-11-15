@@ -71,7 +71,9 @@ public final class Appearance {
 		if (this.customBackground == null) {
 			o.add("customBackground", JsonNull.INSTANCE);
 		} else {
-			JsonObject b = new JsonObject();
+			// Keep fields the launcher records (e.g. which gallery image this is) alongside the ones edited here.
+			JsonElement existing = o.get("customBackground");
+			JsonObject b = existing != null && existing.isJsonObject() ? existing.getAsJsonObject() : new JsonObject();
 			b.addProperty("file", this.customBackground.file);
 			b.addProperty("focusX", this.customBackground.focusX);
 			b.addProperty("focusY", this.customBackground.focusY);

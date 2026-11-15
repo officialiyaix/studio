@@ -1,7 +1,7 @@
 {
   "$comment": "Stabled build configuration. See docs/CONFIGURATION.md. Each value can also be supplied as an environment variable of the same name at build time, or overridden at runtime in %APPDATA%\\Stabled\\stabled.config.json. Leave a value empty when it is not available: the related feature then shows an honest 'not configured' state.",
   "MICROSOFT_CLIENT_ID": "2d9392e9-7d8a-4702-9892-1497099cc3af",
-  "DISCORD_APPLICATION_ID": "",
-  "DISCORD_INVITE_URL": "",
+  "DISCORD_APPLICATION_ID": "1571021965009879150",
+  "DISCORD_INVITE_URL": "https://discord.gg/NWBcbahhTB",
   "NEWS_FEED_URL": ""
 }

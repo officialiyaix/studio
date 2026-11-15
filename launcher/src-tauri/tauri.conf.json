@@ -57,7 +57,8 @@
       "icons/icon.png"
     ],
     "resources": {
-      "resources/clients/*": "clients/"
+      "resources/clients/*": "clients/",
+      "resources/backgrounds/*": "backgrounds/"
     },
     "windows": {
       "webviewInstallMode": {

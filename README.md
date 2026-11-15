@@ -6,7 +6,7 @@ Stabled is a performance-focused Windows launcher for **Minecraft: Java Edition*
 - **Stabled Client** — a Fabric mod that adds the Stabled main and pause menus, Stabled Settings, a five-step first-launch introduction, a real FPS display, real motion blur and Discord Rich Presence.
 - **PC Optimiser** — a small set of reversible, game-relevant Windows settings that change only when you choose Apply.
 - **Microsoft sign-in** through the system browser (no password form), with the session encrypted by Windows DPAPI.
-- **Nine themes** (eight built-in plus Custom Background) and **Simple / Frosted Glass** surfaces, shared by the launcher and the in-game menus.
+- **Nine themes** (eight built-in plus Custom Background), a **background gallery** of 24 images in 8 categories, and **Simple / Frosted Glass** surfaces, shared by the launcher and the in-game menus.
 
 Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.
 
@@ -44,7 +44,7 @@ Four values are configured in [`config/stabled.config.json`](config/stabled.conf
 | `DISCORD_INVITE_URL` | Settings → Socials → Join Discord | The button is disabled with an explanation |
 | `NEWS_FEED_URL` | Stabled news in the news panel | Minecraft release notes and built-in guides are shown |
 
-`MICROSOFT_CLIENT_ID` is set in `config/stabled.config.json` (Stabled's own Microsoft app; Minecraft sign-in also needs Mojang's approval of it). The other three are not set yet. See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for how to obtain each one.
+`MICROSOFT_CLIENT_ID` (Stabled's own Microsoft app; Minecraft sign-in also needs Mojang's approval of it), `DISCORD_APPLICATION_ID` and `DISCORD_INVITE_URL` are set in `config/stabled.config.json`; `NEWS_FEED_URL` is not. See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for how to obtain each one.
 
 ## Building
 

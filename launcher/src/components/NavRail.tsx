@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { ChevronsLeft, ChevronsRight, Cpu, Home, Layers, Settings as SettingsIcon } from 'lucide-react';
+import { Cpu, ExternalLink, Home, Layers, Settings as SettingsIcon } from 'lucide-react';
 import { useStore, type Page } from '../lib/store';
+import { api, asError } from '../lib/api';
 import { cx } from '../lib/format';
+import { DiscordGlyph, InfoGlyph } from './icons';
 
 const ITEMS: Array<{ id: Page; label: string; icon: typeof Home }> = [
   { id: 'home', label: 'Home', icon: Home },
@@ -10,22 +12,44 @@ const ITEMS: Array<{ id: Page; label: string; icon: typeof Home }> = [
   { id: 'settings', label: 'Settings', icon: SettingsIcon },
 ];
 
+/** Widths from --rail-w / --rail-w-open in base.css; hover cards sit just right of the rail. */
+const RAIL_W = 68;
+const RAIL_W_OPEN = 224;
+
+type CardKind = 'discord' | 'about';
+
 /**
- * Compact icon rail that expands over the content (never pushing it sideways):
- * on hover (with a short intent delay), while keyboard focus is inside, or when pinned with the toggle at the bottom.
+ * Compact icon rail that expands over the content (never pushing it sideways) on hover, with a short intent
+ * delay, or while keyboard focus is inside. At the bottom: the Stabled Discord and About items, each with a
+ * hover card (the Discord card holds the clickable invite link).
  */
 export function NavRail() {
-  const { page, setPage, settings } = useStore();
+  const { page, setPage, settings, info, toast } = useStore();
   const hoverEnabled = settings?.launcher.expandNavOnHover ?? true;
   const [hover, setHover] = useState(false);
   const [keyboardFocus, setKeyboardFocus] = useState(false);
-  const [pinned, setPinned] = useState(false);
   const [tip, setTip] = useState<{ text: string; x: number; y: number } | null>(null);
+  const [card, setCard] = useState<{ kind: CardKind; y: number } | null>(null);
   const timer = useRef<number | undefined>(undefined);
+  const cardTimer = useRef<number | undefined>(undefined);
   const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const open = pinned || keyboardFocus || (hoverEnabled && hover);
+  const open = keyboardFocus || (hoverEnabled && hover);
+  const invite = info?.config.discordInviteUrl ?? null;
 
-  useEffect(() => () => window.clearTimeout(timer.current), []);
+  useEffect(
+    () => () => {
+      window.clearTimeout(timer.current);
+      window.clearTimeout(cardTimer.current);
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!card) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setCard(null);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [card]);
 
   const enter = () => {
     window.clearTimeout(timer.current);
@@ -33,7 +57,7 @@ export function NavRail() {
   };
   const leave = () => {
     window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => setHover(false), 140);
+    timer.current = window.setTimeout(() => setHover(false), 160);
     setTip(null);
   };
 
@@ -41,6 +65,23 @@ export function NavRail() {
     if (open) return;
     const r = el.getBoundingClientRect();
     setTip({ text, x: r.right + 10, y: r.top + r.height / 2 - 14 });
+  };
+
+  const showCard = (el: HTMLElement, kind: CardKind) => {
+    window.clearTimeout(cardTimer.current);
+    const r = el.getBoundingClientRect();
+    setTip(null);
+    setCard({ kind, y: r.top + r.height / 2 });
+  };
+  const keepCard = () => window.clearTimeout(cardTimer.current);
+  const hideCard = (delay = 180) => {
+    window.clearTimeout(cardTimer.current);
+    cardTimer.current = window.setTimeout(() => setCard(null), delay);
+  };
+
+  const openInvite = () => {
+    if (!invite) return;
+    api.openExternal(invite).catch((e) => toast(asError(e).message, 'error'));
   };
 
   const onKeyDown = (e: React.KeyboardEvent, i: number) => {
@@ -56,6 +97,17 @@ export function NavRail() {
     }
   };
 
+  const footerProps = (kind: CardKind) => ({
+    onMouseEnter: (e: React.MouseEvent<HTMLButtonElement>) => showCard(e.currentTarget, kind),
+    onMouseLeave: () => hideCard(),
+    onFocus: (e: React.FocusEvent<HTMLButtonElement>) => e.currentTarget.matches(':focus-visible') && showCard(e.currentTarget, kind),
+    onBlur: (e: React.FocusEvent<HTMLButtonElement>) => {
+      if (!(e.relatedTarget as HTMLElement | null)?.closest('.rail-card')) hideCard(0);
+    },
+    'aria-expanded': card?.kind === kind,
+    'aria-controls': `rail-card-${kind}`,
+  });
+
   return (
     <div className="rail-slot">
       <nav
@@ -65,11 +117,11 @@ export function NavRail() {
         onMouseLeave={leave}
         onFocus={(e) => setKeyboardFocus((e.target as HTMLElement).matches(':focus-visible'))}
         onBlur={(e) => {
-          if (!e.currentTarget.contains(e.relatedTarget as Node)) setKeyboardFocus(false);
+          if (!e.currentTarget.contains(e.relatedTarget as Node) && !(e.relatedTarget as HTMLElement | null)?.closest('.rail-card')) setKeyboardFocus(false);
         }}
       >
         <div className="rail-brand" aria-label="Stabled">
-          <img src="/mark.svg" alt="" />
+          <img src="/logo.png" alt="" />
           <span className="word rail-label">Stabled</span>
         </div>
         {ITEMS.map((item, i) => {
@@ -97,25 +149,84 @@ export function NavRail() {
           );
         })}
         <div className="rail-spacer" />
+        <button type="button" className="nav-item rail-foot rail-discord" aria-label="Stabled Discord" onClick={openInvite} {...footerProps('discord')}>
+          <DiscordGlyph size={20} />
+          <span className="rail-label">Discord</span>
+        </button>
         <button
           type="button"
-          className="nav-item rail-pin"
-          aria-expanded={open}
-          aria-label={pinned ? 'Collapse navigation' : 'Expand navigation'}
-          onClick={() => {
-            setPinned((p) => !p);
-            setTip(null);
-          }}
-          onMouseEnter={(e) => showTip(e.currentTarget, pinned ? 'Collapse navigation' : 'Expand navigation')}
-          onMouseLeave={() => setTip(null)}
+          className="nav-item rail-foot rail-about"
+          aria-label={`About Stabled${info ? `, version ${info.version}` : ''}`}
+          onClick={(e) => (card?.kind === 'about' ? setCard(null) : showCard(e.currentTarget, 'about'))}
+          {...footerProps('about')}
         >
-          {pinned ? <ChevronsLeft size={20} /> : <ChevronsRight size={20} />}
-          <span className="rail-label">{pinned ? 'Collapse' : 'Keep expanded'}</span>
+          <InfoGlyph size={22} />
+          <span className="rail-label">About</span>
         </button>
       </nav>
-      {tip && !open && (
+
+      {tip && !open && !card && (
         <div className="tip" style={{ left: tip.x, top: tip.y }} role="tooltip">
           {tip.text}
+        </div>
+      )}
+
+      {card && (
+        <div
+          id={`rail-card-${card.kind}`}
+          key={card.kind}
+          className={cx('rail-card', `rail-card-${card.kind}`)}
+          role={card.kind === 'about' ? 'tooltip' : 'dialog'}
+          aria-label={card.kind === 'about' ? 'About Stabled' : 'Stabled Discord'}
+          style={{ left: (open ? RAIL_W_OPEN : RAIL_W) + 12, top: card.y }}
+          onMouseEnter={() => {
+            keepCard();
+            enter();
+          }}
+          onMouseLeave={() => {
+            hideCard();
+            leave();
+          }}
+          onBlur={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget as Node)) hideCard(0);
+          }}
+        >
+          {card.kind === 'discord' ? (
+            <>
+              <div className="rail-card-head">
+                <span className="rail-card-badge discord">
+                  <DiscordGlyph size={18} />
+                </span>
+                <div>
+                  <div className="rail-card-title">Stabled Discord</div>
+                  <div className="tiny muted">Help, updates and the community</div>
+                </div>
+              </div>
+              {invite ? (
+                <a
+                  className="rail-card-link"
+                  href={invite}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    openInvite();
+                  }}
+                >
+                  {invite}
+                  <ExternalLink size={13} />
+                </a>
+              ) : (
+                <div className="tiny muted">The Discord invite isn't configured in this build.</div>
+              )}
+            </>
+          ) : (
+            <div className="rail-card-head">
+              <img className="rail-card-logo" src="/logo.png" alt="" />
+              <div>
+                <div className="rail-card-title">Stabled</div>
+                <div className="rail-card-version">Version {info?.version ?? '…'}</div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
