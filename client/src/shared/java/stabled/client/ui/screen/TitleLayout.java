@@ -3,6 +3,8 @@ package stabled.client.ui.screen;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.lang.reflect.Field;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -23,6 +25,9 @@ import stabled.client.ui.Ui;
  * Re-arranges the vanilla title screen's own widgets into the Stabled layout: a branded menu column on the left
  * and a small Save card on the right. Every vanilla control (including demo, Realms, friends, language and
  * accessibility) keeps its original behaviour; buttons added by other mods are kept in the column.
+ *
+ * <p>The layout runs when the title screen initialises and again after every mod's after-init listener
+ * ({@link #relayout}), because mods such as Mod Menu and In-Game Account Switcher add or move buttons after it.
  */
 public final class TitleLayout {
 	private static int panelX;
@@ -31,6 +36,8 @@ public final class TitleLayout {
 	private static int panelH;
 	private static int logoY;
 	private static int logoH;
+	/** In-Game Account Switcher is loaded: its "Current account" line takes the subtitle's place. */
+	private static boolean accountLine;
 
 	private TitleLayout() {
 	}
@@ -70,26 +77,40 @@ public final class TitleLayout {
 			}
 		}
 
-		Button stabled = Button.builder(Component.translatable("stabled.menu.settings"),
-			b -> Platform.setScreen(new StabledSettingsScreen(screen))).build();
-		add.accept(stabled);
+		// Once per init: the second pass finds the button the first one added.
+		AbstractWidget stabled = extra.stream().filter(w -> "stabled.menu.settings".equals(key(w))).findFirst().orElse(null);
+		if (stabled != null) {
+			extra.remove(stabled);
+		} else {
+			stabled = Button.builder(Component.translatable("stabled.menu.settings"),
+				b -> Platform.setScreen(new StabledSettingsScreen(screen))).build();
+			add.accept(stabled);
+		}
 
 		panelW = Math.max(170, Math.min(230, Math.round(width * 0.3F)));
-		if (width < 420) {
+		if (width < 520) {
+			// Centred layout: there's room for the full width.
 			panelW = Math.min(width - 16, 230);
 		}
 		panelX = width >= 520 ? Math.max(16, width / 18) : (width - panelW) / 2;
 		int pad = 10;
 		int innerW = panelW - pad * 2;
-		int rows = play.size() + 1 + extra.size() + 1 + (icons.isEmpty() ? 0 : 1);
 		boolean compact = height < 300;
+		// On short screens the small icon buttons go beside the logo instead of taking a row of their own.
+		int iconsW = icons.stream().mapToInt(w -> w.getWidth() + 4).sum() - 4;
+		boolean iconsInHeader = compact && !icons.isEmpty() && iconsW <= innerW - 20 * 4 - 8;
+		int rows = play.size() + 1 + extra.size() + 1 + (icons.isEmpty() || iconsInHeader ? 0 : 1);
+		// In-Game Account Switcher draws "Current account: …" where vanilla's buttons end; it's moved to the
+		// subtitle line instead, so the panel doesn't grow.
+		accountLine = FabricLoader.getInstance().isModLoaded("ias");
 		int gap = compact ? 2 : 4;
 		int groupGap = compact ? 4 : 8;
 		logoH = compact ? 20 : 28;
 		int header = logoH + 14 + groupGap;
 		int content = header + rows * (20 + gap) + groupGap * 3;
-		panelH = Math.min(height - 16, content + pad * 2);
-		panelY = Math.max(8, (height - panelH) / 2);
+		// Keep clear of the version and copyright line vanilla draws along the bottom.
+		panelH = Math.min(height - 22, content + pad * 2);
+		panelY = Math.max(6, (height - 12 - panelH) / 2);
 		logoY = panelY + pad;
 
 		int x = panelX + pad;
@@ -114,11 +135,40 @@ public final class TitleLayout {
 			place(quit, options != null ? x + innerW - half : x, y, options != null ? half : innerW);
 		}
 		y += 20 + gap + groupGap;
-		int ix = x;
+		int ix = iconsInHeader ? x + innerW - iconsW : x;
+		int iy = iconsInHeader ? logoY + (logoH - 20) / 2 : y;
 		for (AbstractWidget w : icons) {
-			w.setPosition(ix, y);
+			w.setPosition(ix, iy);
 			ix += w.getWidth() + 4;
 		}
+		if (accountLine) {
+			moveIasText(panelX + 10, logoY + logoH + 3);
+		}
+	}
+
+	private static boolean iasWarned;
+
+	/** Puts In-Game Account Switcher's account line inside the panel (IAS keeps it in two static fields). */
+	private static void moveIasText(int x, int y) {
+		try {
+			Class<?> ias = Class.forName("ru.vidtu.ias.IASMinecraft");
+			Field fx = ias.getDeclaredField("textX");
+			Field fy = ias.getDeclaredField("textY");
+			fx.setAccessible(true);
+			fy.setAccessible(true);
+			fx.setInt(null, x);
+			fy.setInt(null, y);
+		} catch (ReflectiveOperationException | RuntimeException e) {
+			if (!iasWarned) {
+				iasWarned = true;
+				org.slf4j.LoggerFactory.getLogger("Stabled").info("Stabled: couldn't place In-Game Account Switcher's title text ({})", e.toString());
+			}
+		}
+	}
+
+	/** Arranges the title screen again once every mod has added its widgets. */
+	public static void relayout(TitleScreen screen) {
+		apply(screen, w -> Platform.widgets(screen).add(w), screen.width, screen.height);
 	}
 
 	private static void place(AbstractWidget w, int x, int y, int width) {
@@ -140,7 +190,9 @@ public final class TitleLayout {
 		Ui.roundOutline(g, panelX, panelY, panelW, panelH, 5, Ui.outline(t.border()));
 		g.fill(panelX + 1, panelY + 1, panelX + panelW - 1, panelY + 2, Ui.alpha(t.accent(), 0.7F));
 		Ui.logo(g, panelX + 10, logoY, logoH, 0xFFFFFFFF);
-		Ui.textClipped(g, Component.translatable("stabled.menu.subtitle"), panelX + 10, logoY + logoH + 3, panelW - 20, t.textMuted());
+		if (!accountLine) {
+			Ui.textClipped(g, Component.translatable("stabled.menu.subtitle"), panelX + 10, logoY + logoH + 3, panelW - 20, t.textMuted());
+		}
 		saveCard(g, width, height, t);
 	}
 
@@ -150,7 +202,11 @@ public final class TitleLayout {
 		}
 		Minecraft mc = Minecraft.getInstance();
 		Component save = Component.literal(StabledClient.saveName());
-		Component version = Component.translatable("stabled.menu.version", PresenceManager.get().gameVersion());
+		// The game mode the launcher set for this Save (e.g. CPVP), if it adds mods.
+		String mode = System.getProperty("stabled.gameMode", "").trim();
+		Component version = mode.isEmpty() || mode.length() > 16
+			? Component.translatable("stabled.menu.version", PresenceManager.get().gameVersion())
+			: Component.translatable("stabled.menu.version_mode", PresenceManager.get().gameVersion(), mode);
 		// Streamer mode in the launcher (-Dstabled.streamer.hideName) keeps the player's name off screen.
 		Component user = Boolean.getBoolean("stabled.streamer.hideName")
 			? Component.translatable("stabled.menu.signed_in.hidden")

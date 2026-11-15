@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Plus, Search } from 'lucide-react';
-import { api, type Save, type SaveSummary } from '../lib/api';
+import { api, asError, type Save, type SaveSummary } from '../lib/api';
 import { useStore, type SavesTab } from '../lib/store';
 import { cx, formatBytes, formatDate } from '../lib/format';
 import { SaveIcon, StatusBadge } from '../components/ui';
@@ -11,6 +11,7 @@ import { SaveSettingsPanel } from '../features/SaveSettingsPanel';
 import { LogsViewer } from '../features/LogsViewer';
 import { BackupsPanel } from '../features/BackupsPanel';
 import { BisectWizard } from '../features/BisectWizard';
+import { GameModeCards } from '../features/GameMode';
 
 const TABS: Array<{ id: SavesTab; label: string }> = [
   { id: 'overview', label: 'Overview' },
@@ -88,7 +89,18 @@ export function SavesPage() {
 }
 
 function Overview({ save }: { save: Save }) {
+  const { upsertSave, toast } = useStore();
   const [summary, setSummary] = useState<SaveSummary | null>(null);
+  const locked = save.status === 'running' || save.status === 'downloading' || save.status === 'launching';
+  const switchMode = async (mode: string) => {
+    if (mode === save.mode) return;
+    try {
+      upsertSave(await api.saveSetGameMode(save.id, mode));
+      toast(save.status === 'not_installed' ? 'Game mode changed. Its mods are installed on the first launch.' : 'Game mode changed. Switching mods now.', 'success');
+    } catch (e) {
+      toast(asError(e).message, 'error');
+    }
+  };
   useEffect(() => {
     api.saveSummary(save.id).then(setSummary).catch(() => undefined);
   }, [save.id, save.status]);
@@ -119,6 +131,15 @@ function Overview({ save }: { save: Save }) {
           <span className="k">Size on disk</span>
           <span className="v">{summary ? formatBytes(summary.sizeBytes) : '–'}</span>
         </div>
+      </div>
+      <div className="panel-alt" style={{ padding: 14 }}>
+        <div className="section-title" style={{ marginBottom: 10 }}>
+          Game mode
+        </div>
+        <GameModeCards value={save.mode} onChange={switchMode} minecraft={save.minecraftVersion} disabled={locked} />
+        <p className="tiny muted" style={{ marginTop: 8 }}>
+          {locked ? 'Close Minecraft to change the game mode.' : "Switching installs the new mode's mods and removes the old mode's (only files Stabled installed and you haven't changed)."}
+        </p>
       </div>
       <div className="panel-alt" style={{ padding: 14 }}>
         <div className="section-title" style={{ marginBottom: 10 }}>

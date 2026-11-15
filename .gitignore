@@ -27,3 +27,4 @@ Thumbs.db
 
 # tools/client-smoke-test.sh output
 smoke-test/
+__pycache__/

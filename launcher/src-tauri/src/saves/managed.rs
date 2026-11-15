@@ -35,6 +35,11 @@ pub struct Component {
     pub removed_by_user: bool,
     #[serde(default)]
     pub beta: bool,
+    /// The game mode that installed it (removed again when the Save leaves that mode).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mode: Option<String>,
+    #[serde(default)]
+    pub library: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -55,6 +60,9 @@ pub struct ManagedInfo {
     pub purpose: String,
     pub beta: bool,
     pub modified: bool,
+    /// Name of the game mode this mod belongs to (e.g. "CPVP").
+    pub mode: Option<String>,
+    pub library: bool,
 }
 
 static BUNDLED_CLIENTS: OnceLock<PathBuf> = OnceLock::new();
@@ -93,6 +101,8 @@ pub fn info_for(state: &ManagedState, file: &str) -> Option<ManagedInfo> {
         purpose: c.purpose.clone(),
         beta: c.beta,
         modified: false,
+        mode: c.mode.as_ref().map(|m| stack::game_modes().iter().find(|g| &g.id == m).map(|g| g.name.clone()).unwrap_or_else(|| m.clone())),
+        library: c.library,
     })
 }
 
@@ -159,6 +169,8 @@ struct Desired {
     required: bool,
     beta: bool,
     source: Source,
+    mode: Option<String>,
+    library: bool,
 }
 
 enum Source {
@@ -166,7 +178,7 @@ enum Source {
     Remote { url: String, size: u64 },
 }
 
-fn desired(stack: &Stack) -> AppResult<Vec<Desired>> {
+fn desired(stack: &Stack, mode: &str) -> AppResult<Vec<Desired>> {
     let Some(client) = bundled_client(&stack.minecraft) else {
         bail!("CLIENT_MISSING", "This build of Stabled doesn't include the Stabled client for Minecraft {}, so this Save can't be launched. Rebuild the launcher with `npm run bundle-client` (see README).", stack.minecraft);
     };
@@ -181,6 +193,8 @@ fn desired(stack: &Stack) -> AppResult<Vec<Desired>> {
         required: true,
         beta: false,
         source: Source::Bundled(client),
+        mode: None,
+        library: false,
     }];
     for m in &stack.mods {
         out.push(Desired {
@@ -193,13 +207,34 @@ fn desired(stack: &Stack) -> AppResult<Vec<Desired>> {
             required: m.required,
             beta: m.version_type != "release",
             source: Source::Remote { url: m.url.clone(), size: m.size },
+            mode: None,
+            library: false,
+        });
+    }
+    // The Save's game mode adds its own mods (optional, like the performance mods).
+    for m in stack::mode_stack(stack, mode).mods {
+        if out.iter().any(|d| d.mod_id == m.mod_id) {
+            continue;
+        }
+        out.push(Desired {
+            mod_id: m.mod_id.clone(),
+            title: m.title.clone(),
+            purpose: m.purpose.clone(),
+            file: m.filename.clone(),
+            sha512: m.sha512.clone(),
+            version: m.version_number.clone(),
+            required: false,
+            beta: m.version_type != "release",
+            source: Source::Remote { url: m.url.clone(), size: m.size },
+            mode: Some(mode.to_string()),
+            library: m.library,
         });
     }
     Ok(out)
 }
 
 pub async fn sync(meta: &SaveMeta, stack: &Stack, concurrency: usize) -> AppResult<()> {
-    let wanted = desired(stack)?;
+    let wanted = desired(stack, &meta.effective_game_mode())?;
     // Download remote components into the shared, content-addressed cache first.
     let cache = paths::mod_cache_dir();
     let downloads: Vec<Download> = wanted
@@ -292,7 +327,22 @@ pub async fn sync(meta: &SaveMeta, stack: &Stack, concurrency: usize) -> AppResu
             state.components.push(component(d, false));
         }
     }
-    // Components no longer part of the stack stay in place but are no longer tracked as managed.
+    // Mods of a game mode the Save no longer uses are removed, so switching modes switches mods. Files changed
+    // outside Stabled are left alone.
+    let leaving: Vec<Component> = state.components.iter().filter(|c| c.mode.is_some() && !wanted.iter().any(|d| d.mod_id == c.mod_id)).cloned().collect();
+    for c in leaving {
+        for p in [mods_dir.join(&c.file), mods_dir.join(format!("{}.disabled", c.file))] {
+            if !p.is_file() {
+                continue;
+            }
+            if download::file_sha512(&p).is_some_and(|h| h.eq_ignore_ascii_case(&c.sha512)) {
+                std::fs::remove_file(&p)?;
+            } else {
+                state.skipped.push(format!("{} was changed outside Stabled, so it was kept after switching game mode.", c.file));
+            }
+        }
+    }
+    // Other components no longer part of the stack stay in place but are no longer tracked as managed.
     state.components.retain(|c| wanted.iter().any(|d| d.mod_id == c.mod_id));
     store(meta, &state)
 }
@@ -309,6 +359,8 @@ fn component(d: &Desired, disabled: bool) -> Component {
         disabled_by_user: disabled,
         removed_by_user: false,
         beta: d.beta,
+        mode: d.mode.clone(),
+        library: d.library,
     }
 }
 

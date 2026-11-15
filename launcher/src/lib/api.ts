@@ -78,6 +78,7 @@ export interface Settings {
     fpsEnabled: boolean;
     motionBlurEnabled: boolean;
     discordEnabled: boolean;
+    gameMode: string;
   };
   advanced: { jvmArgs: string; concurrentDownloads: number };
   streamer: StreamerMode;
@@ -166,6 +167,23 @@ export interface Save {
   clientBundled: boolean;
   /** Set on hidden test copies made by Find the broken mod. */
   testOf?: string;
+  /** The game mode in effect (e.g. "cpvp"). */
+  mode: string;
+}
+export interface GameModeMod {
+  title: string;
+  purpose: string;
+  version: string;
+  library: boolean;
+  neededBy: string[];
+}
+export interface GameMode {
+  id: string;
+  name: string;
+  description: string;
+  isDefault: boolean;
+  /** Minecraft version → the mods this mode adds there, and what isn't available. */
+  versions: Record<string, { mods: GameModeMod[]; notes: string[] }>;
 }
 export interface SaveSummary {
   worlds: number;
@@ -218,7 +236,7 @@ export interface ModEntry {
   description: string | null;
   loader: string;
   size: number;
-  managed: { title: string; required: boolean; purpose: string; beta: boolean; modified: boolean } | null;
+  managed: { title: string; required: boolean; purpose: string; beta: boolean; modified: boolean; mode: string | null; library: boolean } | null;
   issues: ModIssue[];
 }
 export interface ModList {
@@ -415,7 +433,7 @@ export const api = {
   savesList: () => call<Save[]>('saves_list'),
   saveGet: (id: string) => call<Save>('save_get', { id }),
   saveValidateName: (name: string, except?: string) => call<string>('save_validate_name', { name, except: except ?? null }),
-  saveCreate: (request: { name: string; minecraftVersion: string; iconPngBase64: string | null; memoryMb: number | null; performancePreset: Preset | null }) =>
+  saveCreate: (request: { name: string; minecraftVersion: string; iconPngBase64: string | null; memoryMb: number | null; performancePreset: Preset | null; gameMode: string | null }) =>
     call<Save>('save_create', { request }),
   saveRename: (id: string, name: string) => call<Save>('save_rename', { id, name }),
   saveSetIcon: (id: string, pngBase64: string | null) => call<Save>('save_set_icon', { id, pngBase64 }),
@@ -428,6 +446,8 @@ export const api = {
     call<SaveSettingsView>('save_settings_set', { id, patch }),
   saveResetIntro: (id: string) => call<void>('save_reset_intro', { id }),
   saveInstall: (id: string, repair = false) => call<void>('save_install', { id, repair }),
+  gameModes: () => call<GameMode[]>('game_modes'),
+  saveSetGameMode: (id: string, mode: string) => call<Save>('save_set_game_mode', { id, mode }),
   saveLaunch: (id: string) => call<void>('save_launch', { id }),
   saveStop: (id: string) => call<void>('save_stop', { id }),
   saveClearError: (id: string) => call<void>('save_clear_error', { id }),

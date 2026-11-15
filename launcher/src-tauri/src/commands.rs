@@ -169,6 +169,8 @@ pub struct SaveView {
     supported: bool,
     /// This launcher build includes the Stabled client jar for the Save's Minecraft version.
     client_bundled: bool,
+    /// The game mode in effect (the Save's own, or the default).
+    mode: String,
 }
 
 fn view(state: &AppState, meta: SaveMeta) -> SaveView {
@@ -185,6 +187,7 @@ fn view(state: &AppState, meta: SaveMeta) -> SaveView {
         icon: saves::icon_data_url(&meta),
         supported: stack::is_supported(&meta.minecraft_version),
         client_bundled: managed::bundled_client(&meta.minecraft_version).is_some(),
+        mode: meta.effective_game_mode(),
         status: status.into(),
         phase,
         meta,
@@ -888,4 +891,91 @@ pub async fn optimiser_apply_all() -> AppResult<Vec<optimiser::BatchResult>> {
 #[tauri::command]
 pub async fn optimiser_restore_all() -> AppResult<Vec<optimiser::BatchResult>> {
     tauri::async_runtime::spawn_blocking(|| optimiser::restore_all(&java_runtimes())).await.map_err(|e| AppError::new("OPTIMISER", e.to_string()))
+}
+
+// ---------------- Game modes ----------------
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GameModeMod {
+    title: String,
+    purpose: String,
+    version: String,
+    library: bool,
+    needed_by: Vec<String>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GameModeVersion {
+    mods: Vec<GameModeMod>,
+    notes: Vec<String>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GameModeView {
+    id: String,
+    name: String,
+    description: String,
+    is_default: bool,
+    /// Minecraft version → the mods this mode adds there, and what isn't available.
+    versions: std::collections::BTreeMap<String, GameModeVersion>,
+}
+
+#[tauri::command]
+pub fn game_modes(state: S) -> Vec<GameModeView> {
+    let default = state.settings.lock().unwrap().save_defaults.game_mode.clone();
+    stack::game_modes()
+        .iter()
+        .map(|g| GameModeView {
+            id: g.id.clone(),
+            name: g.name.clone(),
+            description: g.description.clone(),
+            is_default: g.id == default,
+            versions: stack::all()
+                .iter()
+                .map(|st| {
+                    let m = stack::mode_stack(st, &g.id);
+                    (
+                        st.minecraft.clone(),
+                        GameModeVersion {
+                            mods: m
+                                .mods
+                                .iter()
+                                .map(|x| GameModeMod { title: x.title.clone(), purpose: x.purpose.clone(), version: x.version_number.clone(), library: x.library, needed_by: x.needed_by.clone() })
+                                .collect(),
+                            notes: m.notes.clone(),
+                        },
+                    )
+                })
+                .collect(),
+        })
+        .collect()
+}
+
+/// Switches a Save's game mode. If the Save is installed, its mods are switched straight away (no sign-in needed);
+/// otherwise on the first launch.
+#[tauri::command]
+pub async fn save_set_game_mode(app: AppHandle, state: S<'_>, id: String, mode: String) -> AppResult<SaveView> {
+    ensure_idle(&state, &id, "Changing the game mode")?;
+    if !stack::is_game_mode(&mode) {
+        bail!("GAME_MODE", "Unknown game mode");
+    }
+    let mut meta = saves::load(&id)?;
+    meta.game_mode = Some(mode);
+    meta.save()?;
+    if install::is_installed(&meta) {
+        let state = state.inner().clone();
+        set_phase(&app, &state, &id, Some(RunPhase::Downloading { progress: None }));
+        let m = meta.clone();
+        let app2 = app.clone();
+        tauri::async_runtime::spawn(async move {
+            match prepare_save(&app2, &state, &m, false).await {
+                Ok(_) => set_phase(&app2, &state, &m.id, None),
+                Err(e) => set_phase(&app2, &state, &m.id, Some(RunPhase::Error { message: e.to_string() })),
+            }
+        });
+    }
+    Ok(view(&state, saves::load(&id)?))
 }

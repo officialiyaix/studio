@@ -43,6 +43,8 @@ pub struct SaveDefaults {
     pub fps_enabled: bool,
     pub motion_blur_enabled: bool,
     pub discord_enabled: bool,
+    /// Game mode for new Saves (and Saves that never chose one). CPVP when Stabled is first installed.
+    pub game_mode: String,
 }
 
 impl Default for SaveDefaults {
@@ -54,6 +56,7 @@ impl Default for SaveDefaults {
             fps_enabled: true,
             motion_blur_enabled: false,
             discord_enabled: true,
+            game_mode: crate::minecraft::stack::default_game_mode().into(),
         }
     }
 }
@@ -189,6 +192,9 @@ impl Settings {
         self.save_defaults.memory_mb = self.save_defaults.memory_mb.clamp(1024, 32768);
         if !["performance", "balanced", "quality", "custom"].contains(&self.save_defaults.performance_preset.as_str()) {
             self.save_defaults.performance_preset = "balanced".into();
+        }
+        if !crate::minecraft::stack::is_game_mode(&self.save_defaults.game_mode) {
+            self.save_defaults.game_mode = crate::minecraft::stack::default_game_mode().into();
         }
         if !crate::minecraft::stack::is_supported(&self.save_defaults.minecraft_version) {
             self.save_defaults.minecraft_version = crate::minecraft::stack::PRIMARY_VERSION.into();

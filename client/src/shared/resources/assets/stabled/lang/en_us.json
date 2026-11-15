@@ -6,6 +6,7 @@
 	"stabled.menu.settings": "Stabled Settings",
 	"stabled.menu.subtitle": "for Minecraft: Java Edition",
 	"stabled.menu.version": "Minecraft %s · Fabric",
+	"stabled.menu.version_mode": "Minecraft %s · %s",
 	"stabled.menu.signed_in": "Signed in as %s",
 	"stabled.menu.signed_in.hidden": "Signed in · streamer mode",
 	"stabled.menu.discord.connected": "Discord Presence on",

@@ -12,7 +12,9 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
+import net.fabricmc.fabric.api.event.Event;
 //#if MC >= 1.21.5
 import com.mojang.blaze3d.systems.RenderSystem;
 //#endif
@@ -77,6 +79,16 @@ public final class Platform {
 		KeyBindingHelper.registerKeyBinding(mapping);
 //#endif
 		return mapping;
+	}
+
+	/**
+	 * Runs {@code action} after a screen has been initialised, after every other mod's after-init listener, so it
+	 * sees (and can arrange) the widgets other mods added.
+	 */
+	public static void afterScreenInit(Consumer<Screen> action) {
+		var late = Gfx.id("stabled:late");
+		ScreenEvents.AFTER_INIT.addPhaseOrdering(Event.DEFAULT_PHASE, late);
+		ScreenEvents.AFTER_INIT.register(late, (client, screen, width, height) -> action.accept(screen));
 	}
 
 	public static Screen screen() {

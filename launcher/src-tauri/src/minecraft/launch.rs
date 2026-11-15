@@ -79,6 +79,13 @@ pub fn build(
     if let Some(dir) = crate::gallery::dir() {
         args.push(format!("-Dstabled.galleryDir={}", dir.display()));
     }
+    // The Save's game mode, shown on the in-game title screen.
+    let mode = save.effective_game_mode();
+    if let Some(g) = crate::minecraft::stack::game_modes().iter().find(|g| g.id == mode) {
+        if !stack_mode_is_empty(save, &mode) {
+            args.push(format!("-Dstabled.gameMode={}", g.name));
+        }
+    }
     // Streamer mode: the in-game title screen hides the player's name too.
     let streamer = crate::settings::Settings::load().streamer;
     if streamer.enabled && streamer.hide_username {
@@ -98,6 +105,11 @@ pub fn build(
     args.extend(rules::expand_arguments(prepared.version_json["arguments"].get("game"), &features).iter().map(|a| substitute(a)));
     args.extend(rules::expand_arguments(prepared.fabric_profile["arguments"].get("game"), &features).iter().map(|a| substitute(a)));
     Ok((prepared.java.clone(), args))
+}
+
+/// Whether a game mode adds nothing for this Save's version (e.g. Standard), so there's nothing to show.
+fn stack_mode_is_empty(save: &SaveMeta, mode: &str) -> bool {
+    crate::minecraft::stack::for_version(&save.minecraft_version).map(|st| crate::minecraft::stack::mode_stack(st, mode).mods.is_empty()).unwrap_or(true)
 }
 
 pub struct Started {

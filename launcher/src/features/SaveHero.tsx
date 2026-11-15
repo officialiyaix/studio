@@ -5,6 +5,7 @@ import { useStore } from '../lib/store';
 import { formatBytes, pct, relativeTime } from '../lib/format';
 import { Callout, ConfirmDialog, ProgressBar, SaveIcon, StatusBadge } from '../components/ui';
 import { SaveMenu } from './SaveActions';
+import { GameModePill } from './GameMode';
 
 /**
  * The selected Save: identity, real status, progress and launch controls. Launch installs whatever is missing
@@ -29,6 +30,7 @@ export function SaveHero({ save, onOpenMods, onOpenLogs }: { save: Save; onOpenM
           <div className="hero-name-row">
             <h2 className="hero-name">{save.name}</h2>
             <StatusBadge save={save} />
+            <GameModePill save={save} />
           </div>
           <p className="muted">
             Minecraft {save.minecraftVersion} · Fabric {save.loaderVersion} · Stabled client

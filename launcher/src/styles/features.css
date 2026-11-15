@@ -1569,3 +1569,183 @@
     width: 100%;
   }
 }
+
+/* ---------- Game modes ---------- */
+.mode-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+}
+.mode-card {
+  --mode: var(--accent);
+  position: relative;
+  display: grid;
+  gap: 7px;
+  align-content: start;
+  padding: 13px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-soft);
+  background: var(--panel-alt-bg);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  animation: rise-in 380ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 50ms);
+  transition: border-color var(--speed) var(--ease), transform 260ms var(--ease-spring), box-shadow 260ms var(--ease), background var(--speed);
+}
+.mode-card.mode-cpvp {
+  --mode: #ef4444;
+}
+.mode-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--mode) 16%, transparent), transparent 60%);
+  opacity: 0;
+  transition: opacity 300ms var(--ease);
+  pointer-events: none;
+}
+.mode-card:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--mode) 50%, var(--border));
+}
+.mode-card:hover::before,
+.mode-card.selected::before {
+  opacity: 1;
+}
+.mode-card.selected {
+  border-color: var(--mode);
+  box-shadow: 0 0 0 1px var(--mode), 0 14px 30px -22px var(--mode);
+}
+.mode-card:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.mode-card-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.mode-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  color: var(--mode, var(--accent));
+  background: color-mix(in srgb, var(--mode, var(--accent)) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mode, var(--accent)) 35%, transparent);
+}
+.mode-icon.mode-cpvp {
+  --mode: #ef4444;
+}
+.mode-name {
+  font-weight: 750;
+  font-size: 14.5px;
+  letter-spacing: 0.01em;
+}
+.mode-check {
+  margin-left: auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--mode);
+  color: #fff;
+  animation: pop-in 320ms var(--ease-spring) both;
+}
+.mode-mods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.mode-mod {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text);
+  background: color-mix(in srgb, var(--mode) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mode) 30%, transparent);
+}
+.mode-mod svg {
+  color: var(--mode);
+}
+.mode-note {
+  color: color-mix(in srgb, var(--warning) 75%, var(--text));
+}
+.mode-pill-wrap {
+  position: relative;
+}
+.mode-pill {
+  --mode: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.03em;
+  color: var(--text);
+  background: color-mix(in srgb, var(--mode) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mode) 45%, transparent);
+  cursor: pointer;
+  animation: pop-in 360ms var(--ease-spring) both;
+  transition: background var(--speed) var(--ease), transform 220ms var(--ease-spring);
+}
+.mode-pill.mode-cpvp {
+  --mode: #ef4444;
+}
+.mode-pill svg:first-child {
+  color: var(--mode);
+}
+.mode-pill:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--mode) 26%, transparent);
+  transform: translateY(-1px);
+}
+.mode-pill:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+.mode-menu {
+  left: 0;
+  top: 32px;
+  min-width: 300px;
+  max-width: 380px;
+  transform-origin: top left;
+}
+.mode-menu-title {
+  padding: 6px 10px 4px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.menu .mode-menu-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  white-space: normal;
+  text-align: left;
+  height: auto;
+  padding: 9px 10px;
+}
+.mode-menu-item.active {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.mode-menu-check {
+  margin-left: auto;
+  flex: none;
+  color: var(--accent);
+}
+.badge.mode-badge {
+  --badge: #ef4444;
+}

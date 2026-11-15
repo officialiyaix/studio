@@ -48,6 +48,9 @@ pub struct SaveMeta {
     /// from the Saves list and never backed up.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub test_of: Option<String>,
+    /// Game mode (a set of extra mods, e.g. "cpvp"). None = the default in Settings → Save defaults.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub game_mode: Option<String>,
 }
 
 fn one() -> u32 {
@@ -71,6 +74,13 @@ impl SaveMeta {
     }
     pub fn save(&self) -> AppResult<()> {
         fsx::write_json(&self.root().join("save.json"), self)
+    }
+    /// The game mode in effect: the Save's own, or the default for Saves that never chose one.
+    pub fn effective_game_mode(&self) -> String {
+        match &self.game_mode {
+            Some(m) if crate::minecraft::stack::is_game_mode(m) => m.clone(),
+            _ => Settings::load().save_defaults.game_mode,
+        }
     }
 }
 
@@ -136,6 +146,9 @@ pub struct CreateRequest {
     pub icon_png_base64: Option<String>,
     pub memory_mb: Option<u32>,
     pub performance_preset: Option<String>,
+    /// Game mode; None = the default in Settings.
+    #[serde(default)]
+    pub game_mode: Option<String>,
 }
 
 pub fn create(req: CreateRequest, settings: &Settings) -> AppResult<SaveMeta> {
@@ -167,6 +180,9 @@ pub fn create(req: CreateRequest, settings: &Settings) -> AppResult<SaveMeta> {
         installed_stack: None,
         launches: 0,
         test_of: None,
+        game_mode: Some(
+            req.game_mode.clone().filter(|m| crate::minecraft::stack::is_game_mode(m)).unwrap_or_else(|| settings.save_defaults.game_mode.clone()),
+        ),
     };
     let root = meta.root();
     for sub in GAME_SUBDIRS {

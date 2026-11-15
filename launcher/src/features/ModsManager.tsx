@@ -160,7 +160,8 @@ function ModRow({ mod, locked, onToggle, onRemove }: { mod: ModEntry; locked: bo
         <div className="mod-title">
           <span className="mod-name">{mod.name}</span>
           {mod.version && <span className="tiny muted">{mod.version}</span>}
-          {mod.managed && <span className="badge accent">{required ? 'Required' : 'Stabled'}</span>}
+          {mod.managed && !mod.managed.mode && <span className="badge accent">{required ? 'Required' : 'Stabled'}</span>}
+          {mod.managed?.mode && <span className="badge mode-badge">{mod.managed.mode}{mod.managed.library ? ' · library' : ''}</span>}
           {mod.managed?.beta && <span className="badge warning">Beta</span>}
           {!mod.enabled && <span className="badge">Disabled</span>}
         </div>

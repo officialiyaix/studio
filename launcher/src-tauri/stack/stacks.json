@@ -110,7 +110,112 @@
      "modVersion": "1.12.1"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "fHCqylQz",
+       "versionNumber": "2.0.0",
+       "versionType": "release",
+       "filename": "ShieldStatus-1.20.1.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/fHCqylQz/ShieldStatus-1.20.1.jar",
+       "sha512": "61e9611521a452d6e6ede462773932ad8f65b5a44f280dbef19abc911223c70b610683b0c640d6604704768039f9fee91b67592f908b3513c0401e6a3caafb19",
+       "size": 23846,
+       "license": null,
+       "modVersion": "1.20.1",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "completedshieldfix",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "eb3t0Cmy",
+       "versionNumber": "1.3.0",
+       "versionType": "release",
+       "filename": "WalksyCompleteShieldFixes-1.20.1.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/eb3t0Cmy/WalksyCompleteShieldFixes-1.20.1.jar",
+       "sha512": "dcbdab30810e7e96e7feae5e7a6e1cc3e2a6d83e37e976a1ae58cb9720141ffefe2118135b5ca94c946a2c9b014f4d0a6c8f5839d72fd72b5a003a63f89d5947",
+       "size": 21617,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "lfBrIBuK",
+       "versionNumber": "1.3.0+mc1.19-1.20.1-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc1.19-1.20.1-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/lfBrIBuK/totemtweaks-1.3.0%2Bmc1.19-1.20.1-fabric.jar",
+       "sha512": "968516655d8836ca0ad7d4b76d17f2d067bbef395e52412364ea5244114e3a8b2e43989c0733f38ec2be98e3d1e655511d36dcda4a105780659ef2f92229475a",
+       "size": 22231,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "6xhKWMFX",
+       "versionNumber": "9.0.8+1.20.1-fabric",
+       "versionType": "release",
+       "filename": "IAS-9.0.8+1.20.1-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/6xhKWMFX/IAS-9.0.8%2B1.20.1-fabric.jar",
+       "sha512": "09366a9235999d6a15065a8ec5adce3eb2f655fe1de3c4dc515017158eb033427ccde2a6b54f2349265049311b22fe880e43ba08e3d2b15483476ed0f84db112",
+       "size": 318890,
+       "license": null,
+       "modVersion": "9.0.8+1.20.1-fabric",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "cloth-config",
+       "title": "Cloth Config API",
+       "purpose": "Library needed by Shield Statuses",
+       "required": false,
+       "project": "9s6osm5g",
+       "versionId": "2xQdCMyG",
+       "versionNumber": "11.1.136+fabric",
+       "versionType": "release",
+       "filename": "cloth-config-11.1.136-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/9s6osm5g/versions/2xQdCMyG/cloth-config-11.1.136-fabric.jar",
+       "sha512": "2da85c071c854223cc30c8e46794391b77e53f28ecdbbde59dc83b3dbbdfc74be9e68da9ed464e7f98b4361033899ba4f681ebff1f35edc2c60e599a59796f1c",
+       "size": 1172214,
+       "license": null,
+       "modVersion": "11.1.136",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses"
+       ]
+      }
+     ],
+     "notes": [
+      "Tier Tagger: its author marks it obsolete on Minecraft 1.20.1"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "1.20.2",
@@ -221,7 +326,112 @@
      "modVersion": "1.12.1"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "7mVNNBUg",
+       "versionNumber": "2.0.0",
+       "versionType": "release",
+       "filename": "ShieldStatus-1.20.2.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/7mVNNBUg/ShieldStatus-1.20.2.jar",
+       "sha512": "281c10b6a43a3e24d80535f01f85df763d9e073f8b3863140553711ff7b3e007a2881d7ad3ef54f9140779ce29bba0fca517f84cbeb71ad2585cfc6c12018088",
+       "size": 23846,
+       "license": null,
+       "modVersion": "1.20.2",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "completedshieldfix",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "bc3jpZxQ",
+       "versionNumber": "1.3.0",
+       "versionType": "release",
+       "filename": "WalksyCompleteShieldFixes-1.20.2.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/bc3jpZxQ/WalksyCompleteShieldFixes-1.20.2.jar",
+       "sha512": "2134ecbde30e1a69bd641b5b5fb90cea6fbbd979122cb0861f3945a5a0f8368c6c4863dd747b91e60a705e8d19d31a05691cddc1cb5266236ab45400d35569f1",
+       "size": 21617,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "FIJSdNBA",
+       "versionNumber": "1.3.0+mc1.20.2-1.20.4-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc1.20.2-1.20.4-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/FIJSdNBA/totemtweaks-1.3.0%2Bmc1.20.2-1.20.4-fabric.jar",
+       "sha512": "96b81a22f546fdea5cc4ecc196159670018d4aea4d73c1c70ad9edb4c4f91440f2e827ab1320b4c1fd6ec59d27f52b40e0a0fe72612bfbf3110349e323e89bd4",
+       "size": 26676,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "MAYyxjXm",
+       "versionNumber": "9.0.8+1.20.2-fabric",
+       "versionType": "release",
+       "filename": "IAS-9.0.8+1.20.2-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/MAYyxjXm/IAS-9.0.8%2B1.20.2-fabric.jar",
+       "sha512": "d68ac986e48ab6d489bc1e674a9d9864a16241fb147972b7225b1736eb5c2b99fdf5290e80c2a31926ac470b4473dff159745dce04da8ed4e0ee2857b62932fe",
+       "size": 314226,
+       "license": null,
+       "modVersion": "9.0.8+1.20.2-fabric",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "cloth-config",
+       "title": "Cloth Config API",
+       "purpose": "Library needed by Shield Statuses",
+       "required": false,
+       "project": "9s6osm5g",
+       "versionId": "9YwAqtuZ",
+       "versionNumber": "12.0.137+fabric",
+       "versionType": "release",
+       "filename": "cloth-config-12.0.137-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/9s6osm5g/versions/9YwAqtuZ/cloth-config-12.0.137-fabric.jar",
+       "sha512": "01b21e32bbe1219dae33696c11c57abeeddb3deeec15ce61003b8065c464a82649328bc43ca732e1e56d79643a38560bd0092fef6a075649460c3e92d13b6713",
+       "size": 1154848,
+       "license": null,
+       "modVersion": "12.0.137",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses"
+       ]
+      }
+     ],
+     "notes": [
+      "Tier Tagger: its author marks it obsolete on Minecraft 1.20.2"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "1.20.3",
@@ -303,7 +513,112 @@
    "notes": [
     "FerriteCore: no compatible Fabric build for 1.20.3",
     "EntityCulling: no compatible Fabric build for 1.20.3"
-   ]
+   ],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "qsMWeqz5",
+       "versionNumber": "2.0.0",
+       "versionType": "release",
+       "filename": "ShieldStatus-1.20.3.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/qsMWeqz5/ShieldStatus-1.20.3.jar",
+       "sha512": "c26709bea95ee309ee8eafb537e31dd1ee0849bb9bec2aa178d0c91cc97fbd4b90bd021153bd7fb82aaf286fc7a232f8d321261c18fe09d8541af1965a226f1c",
+       "size": 23846,
+       "license": null,
+       "modVersion": "1.20.3",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "completedshieldfix",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "lRNUD0hZ",
+       "versionNumber": "1.3.0",
+       "versionType": "release",
+       "filename": "WalksyCompleteShieldFixes-1.20.3.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/lRNUD0hZ/WalksyCompleteShieldFixes-1.20.3.jar",
+       "sha512": "7ac9687d5cd8706358b3c17a2b725aef63d56d65423bd58dd91a0fb99b325721bad3c3a2b0c8ec04b8139c2e5d18cae9c8147ef48a00c95a941cc9d6eb2ddc24",
+       "size": 21617,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "FIJSdNBA",
+       "versionNumber": "1.3.0+mc1.20.2-1.20.4-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc1.20.2-1.20.4-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/FIJSdNBA/totemtweaks-1.3.0%2Bmc1.20.2-1.20.4-fabric.jar",
+       "sha512": "96b81a22f546fdea5cc4ecc196159670018d4aea4d73c1c70ad9edb4c4f91440f2e827ab1320b4c1fd6ec59d27f52b40e0a0fe72612bfbf3110349e323e89bd4",
+       "size": 26676,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "dHZaRsM5",
+       "versionNumber": "9.0.0",
+       "versionType": "release",
+       "filename": "IAS-Fabric-1.20.4-9.0.0.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/dHZaRsM5/IAS-Fabric-1.20.4-9.0.0.jar",
+       "sha512": "546baabac187df2e6ae61276e5b76fe66e4909cd218598235f87d7d4eba0b720d2d725fc367246de55145044182a4677a21d158824c0aec4dcab1e2f2385a1cb",
+       "size": 304789,
+       "license": null,
+       "modVersion": "9.0.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "cloth-config",
+       "title": "Cloth Config API",
+       "purpose": "Library needed by Shield Statuses",
+       "required": false,
+       "project": "9s6osm5g",
+       "versionId": "2deYQULk",
+       "versionNumber": "13.0.138+fabric",
+       "versionType": "release",
+       "filename": "cloth-config-13.0.138-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/9s6osm5g/versions/2deYQULk/cloth-config-13.0.138-fabric.jar",
+       "sha512": "3863fb95cc57526c6876cb60600f2e4282a5fa8d997d981e984da48f34be654cd0c5fc09e7d77079a393b2d7e3e48baabb756ad84ea58881b22ea771f43baa4a",
+       "size": 1154870,
+       "license": null,
+       "modVersion": "13.0.138",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses"
+       ]
+      }
+     ],
+     "notes": [
+      "Tier Tagger: its author marks it obsolete on Minecraft 1.20.3"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "1.20.4",
@@ -414,7 +729,112 @@
      "modVersion": "1.12.1"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "Y9W3X8lY",
+       "versionNumber": "2.0.0",
+       "versionType": "release",
+       "filename": "ShieldStatus-1.20.4.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/Y9W3X8lY/ShieldStatus-1.20.4.jar",
+       "sha512": "6f0d0b158f90aaf85a4687086c708e69b9afeb068c1bdd6040f9ba20794fbffc26a7bfcd8fe4f368565ec269e921440348ff69e304defce23c0cd5b2e3fdeea2",
+       "size": 23846,
+       "license": null,
+       "modVersion": "1.20.4",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "completedshieldfix",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "v4EjRotu",
+       "versionNumber": "1.3.0",
+       "versionType": "release",
+       "filename": "WalksyCompleteShieldFixes-1.20.4.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/v4EjRotu/WalksyCompleteShieldFixes-1.20.4.jar",
+       "sha512": "8bb0233e6cf8377c34d4275ca2d53c9b4ff5c1a249269a6da88529fa4fcd2173f9f1b355cf981f7b966c894af34e09f14caa0f40602d103982989e2657f0251a",
+       "size": 21618,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "FIJSdNBA",
+       "versionNumber": "1.3.0+mc1.20.2-1.20.4-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc1.20.2-1.20.4-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/FIJSdNBA/totemtweaks-1.3.0%2Bmc1.20.2-1.20.4-fabric.jar",
+       "sha512": "96b81a22f546fdea5cc4ecc196159670018d4aea4d73c1c70ad9edb4c4f91440f2e827ab1320b4c1fd6ec59d27f52b40e0a0fe72612bfbf3110349e323e89bd4",
+       "size": 26676,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "b76SLggC",
+       "versionNumber": "9.0.8+1.20.4-fabric",
+       "versionType": "release",
+       "filename": "IAS-9.0.8+1.20.4-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/b76SLggC/IAS-9.0.8%2B1.20.4-fabric.jar",
+       "sha512": "88d8f0f1665d1362b774caddd17fe9695acfa786329998a2dc36d783249d776670eab51635dc903cc03c4da332b58e43717dbb74b7b1addd375c221d192e8196",
+       "size": 313927,
+       "license": null,
+       "modVersion": "9.0.8+1.20.4-fabric",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "cloth-config",
+       "title": "Cloth Config API",
+       "purpose": "Library needed by Shield Statuses",
+       "required": false,
+       "project": "9s6osm5g",
+       "versionId": "2deYQULk",
+       "versionNumber": "13.0.138+fabric",
+       "versionType": "release",
+       "filename": "cloth-config-13.0.138-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/9s6osm5g/versions/2deYQULk/cloth-config-13.0.138-fabric.jar",
+       "sha512": "3863fb95cc57526c6876cb60600f2e4282a5fa8d997d981e984da48f34be654cd0c5fc09e7d77079a393b2d7e3e48baabb756ad84ea58881b22ea771f43baa4a",
+       "size": 1154870,
+       "license": null,
+       "modVersion": "13.0.138",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses"
+       ]
+      }
+     ],
+     "notes": [
+      "Tier Tagger: its author marks it obsolete on Minecraft 1.20.4"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "1.20.5",
@@ -525,7 +945,112 @@
      "modVersion": "1.6.4"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "KEQ0yJFz",
+       "versionNumber": "1.20.5",
+       "versionType": "release",
+       "filename": "ShieldStatus-1.20.5.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/KEQ0yJFz/ShieldStatus-1.20.5.jar",
+       "sha512": "b962aafc66163b308604c1d885f584eab3b367ed68d6609edcb449c0fdcd3a54f60edc317dbc906e8b1690a60cb68b02a22f36b4eaa1f91b7fe7fb6bd0d21b03",
+       "size": 22247,
+       "license": null,
+       "modVersion": "1.20.5",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "completedshieldfix",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "qRoqv4tK",
+       "versionNumber": "1.3.0",
+       "versionType": "release",
+       "filename": "WalksyCompleteShieldFixes-1.20.5.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/qRoqv4tK/WalksyCompleteShieldFixes-1.20.5.jar",
+       "sha512": "f91a2a9bb87ad503113d5c7a2fa04eb55a10b70aad904f468dda2a37822f10ff66aee88392f4b938f9b3110fb04e78d5e03b23b9b13ae253c2844810f18b1bed",
+       "size": 21618,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "2z0yEfaU",
+       "versionNumber": "1.3.0+mc1.20.5-1.21.5-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc1.20.5-1.21.5-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/2z0yEfaU/totemtweaks-1.3.0%2Bmc1.20.5-1.21.5-fabric.jar",
+       "sha512": "beb86f525f2b9674fed5707e77c16b99bb4bd449f9ca570a47f9eb6c73ee24590c43137384e67e32258de5a9bc7b7977c9ff1430ea5dfc8106941883e97d6763",
+       "size": 26680,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "xMv4Xw6x",
+       "versionNumber": "9.0.1",
+       "versionType": "release",
+       "filename": "IAS-Fabric-1.20.6-9.0.1.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/xMv4Xw6x/IAS-Fabric-1.20.6-9.0.1.jar",
+       "sha512": "4eb3a6716f2af5ab77d6b2cc5ba894d4066c3239044db9f92f5cd1b0f564665ace896c08a9d0600319078254b6e371d4686b85dc24f5d3e38c241d5bc69760dd",
+       "size": 305496,
+       "license": null,
+       "modVersion": "9.0.1",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "cloth-config",
+       "title": "Cloth Config API",
+       "purpose": "Library needed by Shield Statuses",
+       "required": false,
+       "project": "9s6osm5g",
+       "versionId": "g0uTATyM",
+       "versionNumber": "14.0.139+fabric",
+       "versionType": "release",
+       "filename": "cloth-config-14.0.139-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/9s6osm5g/versions/g0uTATyM/cloth-config-14.0.139-fabric.jar",
+       "sha512": "edfd38319ed73a620a11a8d50a93f8ec8b30cd8cd02819f194589a7d6e7b8b3f6619056856f85de25e6de0d7202d4a8ad3e9c1deabbeb643d15d8610124a03b0",
+       "size": 1157222,
+       "license": null,
+       "modVersion": "14.0.139",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses"
+       ]
+      }
+     ],
+     "notes": [
+      "Tier Tagger: its author marks it obsolete on Minecraft 1.20.5"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "1.20.6",
@@ -636,7 +1161,112 @@
      "modVersion": "1.12.1"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "t7tdlHs1",
+       "versionNumber": "2.0.0",
+       "versionType": "release",
+       "filename": "ShieldStatus-1.20.6.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/t7tdlHs1/ShieldStatus-1.20.6.jar",
+       "sha512": "4fccf35e2248b261170dfa0b9caeaa84181c038d88a95e47b22e9c7de3036e90e30c2d45f552e828ce53da23ae8badbb4600dced4038d8e961da7d504cfceca8",
+       "size": 23759,
+       "license": null,
+       "modVersion": "1.20.6",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "completedshieldfix",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "hpfFF5Dp",
+       "versionNumber": "1.3.0",
+       "versionType": "release",
+       "filename": "WalksyCompleteShieldFixes-1.20.6.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/hpfFF5Dp/WalksyCompleteShieldFixes-1.20.6.jar",
+       "sha512": "21a8544db94818c5e5e0bf354c2538ed86cd0952f9b96df539496f7dd61a500eb5d23fdcc5aca8fcc9cb40183d0aca32da8211a8bb5ca73c1b9b3718a6d6bb0d",
+       "size": 21617,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "2z0yEfaU",
+       "versionNumber": "1.3.0+mc1.20.5-1.21.5-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc1.20.5-1.21.5-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/2z0yEfaU/totemtweaks-1.3.0%2Bmc1.20.5-1.21.5-fabric.jar",
+       "sha512": "beb86f525f2b9674fed5707e77c16b99bb4bd449f9ca570a47f9eb6c73ee24590c43137384e67e32258de5a9bc7b7977c9ff1430ea5dfc8106941883e97d6763",
+       "size": 26680,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "zzd9iMr7",
+       "versionNumber": "9.0.8+1.20.6-fabric",
+       "versionType": "release",
+       "filename": "IAS-9.0.8+1.20.6-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/zzd9iMr7/IAS-9.0.8%2B1.20.6-fabric.jar",
+       "sha512": "39699ad40297628fe35dec0e61cf2ecfaa544e81744ba4b6f22bdbb4cdab16f39cc071dac4752f5e53eb48dc58c56e7c7acde3b33d882355837ced70e728c21d",
+       "size": 314311,
+       "license": null,
+       "modVersion": "9.0.8+1.20.6-fabric",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "cloth-config",
+       "title": "Cloth Config API",
+       "purpose": "Library needed by Shield Statuses",
+       "required": false,
+       "project": "9s6osm5g",
+       "versionId": "g0uTATyM",
+       "versionNumber": "14.0.139+fabric",
+       "versionType": "release",
+       "filename": "cloth-config-14.0.139-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/9s6osm5g/versions/g0uTATyM/cloth-config-14.0.139-fabric.jar",
+       "sha512": "edfd38319ed73a620a11a8d50a93f8ec8b30cd8cd02819f194589a7d6e7b8b3f6619056856f85de25e6de0d7202d4a8ad3e9c1deabbeb643d15d8610124a03b0",
+       "size": 1157222,
+       "license": null,
+       "modVersion": "14.0.139",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses"
+       ]
+      }
+     ],
+     "notes": [
+      "Tier Tagger: its author marks it obsolete on Minecraft 1.20.6"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "1.21",
@@ -747,7 +1377,113 @@
      "modVersion": "1.8.2"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "kcLvJJe0",
+       "versionNumber": "4.2.1+1.21-1.21.1",
+       "versionType": "release",
+       "filename": "ShieldStatus-4.2.1+1.21-1.21.1.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/kcLvJJe0/ShieldStatus-4.2.1%2B1.21-1.21.1.jar",
+       "sha512": "6ce3b82a42cae2f2d1553dab447dd1b7519fc6d5fb0e80434cb295bc068459d9b4e24b604de8d182e93388b89e5a4a399c7a4046d390983325b5f6f81829ae39",
+       "size": 34414,
+       "license": null,
+       "modVersion": "4.2.1+1.21-1.21.1",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldfixes",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "pUJIsCeZ",
+       "versionNumber": "2.1.0+1.21-1.21.1",
+       "versionType": "release",
+       "filename": "ShieldFixes-2.1.0+1.21-1.21.1.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/pUJIsCeZ/ShieldFixes-2.1.0%2B1.21-1.21.1.jar",
+       "sha512": "f7a8c40d05a09131a5d0166d0f0f608b9decdfd203b85a18d390d9fff0b5d2cc3261d05a574397aa1d214a580a6bf741f6003c3cb0e702911510adad948ddc48",
+       "size": 19806,
+       "license": null,
+       "modVersion": "2.1.0+1.21-1.21.1",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "2z0yEfaU",
+       "versionNumber": "1.3.0+mc1.20.5-1.21.5-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc1.20.5-1.21.5-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/2z0yEfaU/totemtweaks-1.3.0%2Bmc1.20.5-1.21.5-fabric.jar",
+       "sha512": "beb86f525f2b9674fed5707e77c16b99bb4bd449f9ca570a47f9eb6c73ee24590c43137384e67e32258de5a9bc7b7977c9ff1430ea5dfc8106941883e97d6763",
+       "size": 26680,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "RQG6VufY",
+       "versionNumber": "9.0.1",
+       "versionType": "release",
+       "filename": "IAS-Fabric-1.21-9.0.1.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/RQG6VufY/IAS-Fabric-1.21-9.0.1.jar",
+       "sha512": "04e770c1044721eed3db1dba86dc3aa76082e93e4e666a3d7c1231a810884c57120a53462e43a05fee41819d360fb70133643c716672747538887ad8920413bb",
+       "size": 305518,
+       "license": null,
+       "modVersion": "9.0.1",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "walksylib",
+       "title": "WalksyLib",
+       "purpose": "Library needed by Shield Statuses and Shield Fixes",
+       "required": false,
+       "project": "7P86n6Vg",
+       "versionId": "voRwz8DZ",
+       "versionNumber": "2.0.5+1.21-1.21.1",
+       "versionType": "release",
+       "filename": "WalksyLib-2.0.5+1.21-1.21.1.jar",
+       "url": "https://cdn.modrinth.com/data/7P86n6Vg/versions/voRwz8DZ/WalksyLib-2.0.5%2B1.21-1.21.1.jar",
+       "sha512": "eebee9e70723741f78720d7456ad762448362f1ca137758f5d06a962b5245591a54324ae92e1b4f32000aebb6d8bd2bd2caa56776158623459ca631c30b5396c",
+       "size": 1822010,
+       "license": null,
+       "modVersion": "2.0.5+1.21-1.21.1",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses",
+        "Shield Fixes"
+       ]
+      }
+     ],
+     "notes": [
+      "Tier Tagger: its author marks it obsolete on Minecraft 1.21"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "1.21.1",
@@ -858,7 +1594,113 @@
      "modVersion": "1.12.1"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "kcLvJJe0",
+       "versionNumber": "4.2.1+1.21-1.21.1",
+       "versionType": "release",
+       "filename": "ShieldStatus-4.2.1+1.21-1.21.1.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/kcLvJJe0/ShieldStatus-4.2.1%2B1.21-1.21.1.jar",
+       "sha512": "6ce3b82a42cae2f2d1553dab447dd1b7519fc6d5fb0e80434cb295bc068459d9b4e24b604de8d182e93388b89e5a4a399c7a4046d390983325b5f6f81829ae39",
+       "size": 34414,
+       "license": null,
+       "modVersion": "4.2.1+1.21-1.21.1",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldfixes",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "pUJIsCeZ",
+       "versionNumber": "2.1.0+1.21-1.21.1",
+       "versionType": "release",
+       "filename": "ShieldFixes-2.1.0+1.21-1.21.1.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/pUJIsCeZ/ShieldFixes-2.1.0%2B1.21-1.21.1.jar",
+       "sha512": "f7a8c40d05a09131a5d0166d0f0f608b9decdfd203b85a18d390d9fff0b5d2cc3261d05a574397aa1d214a580a6bf741f6003c3cb0e702911510adad948ddc48",
+       "size": 19806,
+       "license": null,
+       "modVersion": "2.1.0+1.21-1.21.1",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "2z0yEfaU",
+       "versionNumber": "1.3.0+mc1.20.5-1.21.5-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc1.20.5-1.21.5-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/2z0yEfaU/totemtweaks-1.3.0%2Bmc1.20.5-1.21.5-fabric.jar",
+       "sha512": "beb86f525f2b9674fed5707e77c16b99bb4bd449f9ca570a47f9eb6c73ee24590c43137384e67e32258de5a9bc7b7977c9ff1430ea5dfc8106941883e97d6763",
+       "size": 26680,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "TvdB7Zj5",
+       "versionNumber": "9.0.8+1.21.1-fabric",
+       "versionType": "release",
+       "filename": "IAS-9.0.8+1.21.1-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/TvdB7Zj5/IAS-9.0.8%2B1.21.1-fabric.jar",
+       "sha512": "7523f6fa963c7996270a624d321801e7ace7e237a8a4ab41515c11c528a20dae9111cacf85fdc5c9b19d141fc3ff8fe4f31c8e065fb83a0962af75ce1bbc4ced",
+       "size": 314343,
+       "license": null,
+       "modVersion": "9.0.8+1.21.1-fabric",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "walksylib",
+       "title": "WalksyLib",
+       "purpose": "Library needed by Shield Statuses and Shield Fixes",
+       "required": false,
+       "project": "7P86n6Vg",
+       "versionId": "voRwz8DZ",
+       "versionNumber": "2.0.5+1.21-1.21.1",
+       "versionType": "release",
+       "filename": "WalksyLib-2.0.5+1.21-1.21.1.jar",
+       "url": "https://cdn.modrinth.com/data/7P86n6Vg/versions/voRwz8DZ/WalksyLib-2.0.5%2B1.21-1.21.1.jar",
+       "sha512": "eebee9e70723741f78720d7456ad762448362f1ca137758f5d06a962b5245591a54324ae92e1b4f32000aebb6d8bd2bd2caa56776158623459ca631c30b5396c",
+       "size": 1822010,
+       "license": null,
+       "modVersion": "2.0.5+1.21-1.21.1",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses",
+        "Shield Fixes"
+       ]
+      }
+     ],
+     "notes": [
+      "Tier Tagger: its author marks it obsolete on Minecraft 1.21.1"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "1.21.2",
@@ -940,7 +1782,96 @@
    "notes": [
     "FerriteCore: no compatible Fabric build for 1.21.2",
     "EntityCulling: no compatible Fabric build for 1.21.2"
-   ]
+   ],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "pGdAXyPE",
+       "versionNumber": "4.2.1+1.21.2-1.21.3",
+       "versionType": "release",
+       "filename": "ShieldStatus-4.2.1+1.21.2-1.21.3.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/pGdAXyPE/ShieldStatus-4.2.1%2B1.21.2-1.21.3.jar",
+       "sha512": "14904f17952d1d4d746eb0f1394ac523a1fe7a510e52b1c88b26b4eef9f2d34b97129c381ab2573d239eb8a8761231c6d39e2eeb505074483a62d7364a82ce7f",
+       "size": 34614,
+       "license": null,
+       "modVersion": "4.2.1+1.21.2-1.21.3",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldfixes",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "9WEx4xko",
+       "versionNumber": "2.1.0+1.21.2-1.21.3",
+       "versionType": "release",
+       "filename": "ShieldFixes-2.1.0+1.21.2-1.21.3.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/9WEx4xko/ShieldFixes-2.1.0%2B1.21.2-1.21.3.jar",
+       "sha512": "35b51e0a57567906b4cb3715ef6639ae11e7f6f58fbff0eede656825411cdad1d92e206448ed733561b127cbcf67334751e0b83abffb2aae07b7b1fbda28d43b",
+       "size": 20011,
+       "license": null,
+       "modVersion": "2.1.0+1.21.2-1.21.3",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "2z0yEfaU",
+       "versionNumber": "1.3.0+mc1.20.5-1.21.5-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc1.20.5-1.21.5-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/2z0yEfaU/totemtweaks-1.3.0%2Bmc1.20.5-1.21.5-fabric.jar",
+       "sha512": "beb86f525f2b9674fed5707e77c16b99bb4bd449f9ca570a47f9eb6c73ee24590c43137384e67e32258de5a9bc7b7977c9ff1430ea5dfc8106941883e97d6763",
+       "size": 26680,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "walksylib",
+       "title": "WalksyLib",
+       "purpose": "Library needed by Shield Statuses and Shield Fixes",
+       "required": false,
+       "project": "7P86n6Vg",
+       "versionId": "ZAaSrni0",
+       "versionNumber": "2.0.5+1.21.2-1.21.3",
+       "versionType": "release",
+       "filename": "WalksyLib-2.0.5+1.21.2-1.21.3.jar",
+       "url": "https://cdn.modrinth.com/data/7P86n6Vg/versions/ZAaSrni0/WalksyLib-2.0.5%2B1.21.2-1.21.3.jar",
+       "sha512": "814a67521b6228fb26b639607c872c03c97d2197f6a465b36f5708c6441e579c2f8e08e4b59cc0f5b89b294f5c63956e7d0a2124749c86d0741114aa73b401fd",
+       "size": 1820169,
+       "license": null,
+       "modVersion": "2.0.5+1.21.2-1.21.3",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses",
+        "Shield Fixes"
+       ]
+      }
+     ],
+     "notes": [
+      "Tier Tagger: its author marks it obsolete on Minecraft 1.21.2",
+      "In-Game Account Switcher: no Fabric build for Minecraft 1.21.2"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "1.21.3",
@@ -1051,7 +1982,113 @@
      "modVersion": "1.12.1"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "pGdAXyPE",
+       "versionNumber": "4.2.1+1.21.2-1.21.3",
+       "versionType": "release",
+       "filename": "ShieldStatus-4.2.1+1.21.2-1.21.3.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/pGdAXyPE/ShieldStatus-4.2.1%2B1.21.2-1.21.3.jar",
+       "sha512": "14904f17952d1d4d746eb0f1394ac523a1fe7a510e52b1c88b26b4eef9f2d34b97129c381ab2573d239eb8a8761231c6d39e2eeb505074483a62d7364a82ce7f",
+       "size": 34614,
+       "license": null,
+       "modVersion": "4.2.1+1.21.2-1.21.3",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldfixes",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "9WEx4xko",
+       "versionNumber": "2.1.0+1.21.2-1.21.3",
+       "versionType": "release",
+       "filename": "ShieldFixes-2.1.0+1.21.2-1.21.3.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/9WEx4xko/ShieldFixes-2.1.0%2B1.21.2-1.21.3.jar",
+       "sha512": "35b51e0a57567906b4cb3715ef6639ae11e7f6f58fbff0eede656825411cdad1d92e206448ed733561b127cbcf67334751e0b83abffb2aae07b7b1fbda28d43b",
+       "size": 20011,
+       "license": null,
+       "modVersion": "2.1.0+1.21.2-1.21.3",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "2z0yEfaU",
+       "versionNumber": "1.3.0+mc1.20.5-1.21.5-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc1.20.5-1.21.5-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/2z0yEfaU/totemtweaks-1.3.0%2Bmc1.20.5-1.21.5-fabric.jar",
+       "sha512": "beb86f525f2b9674fed5707e77c16b99bb4bd449f9ca570a47f9eb6c73ee24590c43137384e67e32258de5a9bc7b7977c9ff1430ea5dfc8106941883e97d6763",
+       "size": 26680,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "FUOvfZw4",
+       "versionNumber": "9.0.8+1.21.3-fabric",
+       "versionType": "release",
+       "filename": "IAS-9.0.8+1.21.3-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/FUOvfZw4/IAS-9.0.8%2B1.21.3-fabric.jar",
+       "sha512": "07509db3d78d3ce512eb71247d6b1e825bddc650e7d1631354c67de17fe12490dd30bd1296e2b57a9e3b1b147e8b636256941a4df699c92455ac06ecf668be63",
+       "size": 314399,
+       "license": null,
+       "modVersion": "9.0.8+1.21.3-fabric",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "walksylib",
+       "title": "WalksyLib",
+       "purpose": "Library needed by Shield Statuses and Shield Fixes",
+       "required": false,
+       "project": "7P86n6Vg",
+       "versionId": "ZAaSrni0",
+       "versionNumber": "2.0.5+1.21.2-1.21.3",
+       "versionType": "release",
+       "filename": "WalksyLib-2.0.5+1.21.2-1.21.3.jar",
+       "url": "https://cdn.modrinth.com/data/7P86n6Vg/versions/ZAaSrni0/WalksyLib-2.0.5%2B1.21.2-1.21.3.jar",
+       "sha512": "814a67521b6228fb26b639607c872c03c97d2197f6a465b36f5708c6441e579c2f8e08e4b59cc0f5b89b294f5c63956e7d0a2124749c86d0741114aa73b401fd",
+       "size": 1820169,
+       "license": null,
+       "modVersion": "2.0.5+1.21.2-1.21.3",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses",
+        "Shield Fixes"
+       ]
+      }
+     ],
+     "notes": [
+      "Tier Tagger: its author marks it obsolete on Minecraft 1.21.3"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "1.21.4",
@@ -1162,7 +2199,113 @@
      "modVersion": "1.12.1"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "8RCzCRnh",
+       "versionNumber": "4.2.1+1.21.4",
+       "versionType": "release",
+       "filename": "ShieldStatus-4.2.1+1.21.4.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/8RCzCRnh/ShieldStatus-4.2.1%2B1.21.4.jar",
+       "sha512": "0cc4134c95320b1d272e573ae2368d596c5565c0699fbf912c6304489450972fd9ca96d89f0a69566c45080489128e468f007a562a952a05d0eb17758996af31",
+       "size": 34418,
+       "license": null,
+       "modVersion": "4.2.1+1.21.4",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldfixes",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "cDCvIvjE",
+       "versionNumber": "2.1.0+1.21.4",
+       "versionType": "release",
+       "filename": "ShieldFixes-2.1.0+1.21.4.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/cDCvIvjE/ShieldFixes-2.1.0%2B1.21.4.jar",
+       "sha512": "f328f85549d9116fcb12b5775d239e03cb71ee26ccf49fc30a166287523363e03aa858798bbf602b811f2d230e9d5b613e34b22de3c19c182175ebf736d90a38",
+       "size": 19025,
+       "license": null,
+       "modVersion": "2.1.0+1.21.4",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "2z0yEfaU",
+       "versionNumber": "1.3.0+mc1.20.5-1.21.5-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc1.20.5-1.21.5-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/2z0yEfaU/totemtweaks-1.3.0%2Bmc1.20.5-1.21.5-fabric.jar",
+       "sha512": "beb86f525f2b9674fed5707e77c16b99bb4bd449f9ca570a47f9eb6c73ee24590c43137384e67e32258de5a9bc7b7977c9ff1430ea5dfc8106941883e97d6763",
+       "size": 26680,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "DFnR0F1x",
+       "versionNumber": "9.0.8+1.21.4-fabric",
+       "versionType": "release",
+       "filename": "IAS-9.0.8+1.21.4-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/DFnR0F1x/IAS-9.0.8%2B1.21.4-fabric.jar",
+       "sha512": "deef71b39c227b9422623139f55b028524ed9b8e67f269733111541c3b730cca8b8060c8f693a127c729de3f36ea8c3111a44c25a63c02a556980f1d5ca51b3c",
+       "size": 314518,
+       "license": null,
+       "modVersion": "9.0.8+1.21.4-fabric",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "walksylib",
+       "title": "WalksyLib",
+       "purpose": "Library needed by Shield Statuses and Shield Fixes",
+       "required": false,
+       "project": "7P86n6Vg",
+       "versionId": "DkImJCM8",
+       "versionNumber": "2.0.5+1.21.4",
+       "versionType": "release",
+       "filename": "WalksyLib-2.0.5+1.21.4.jar",
+       "url": "https://cdn.modrinth.com/data/7P86n6Vg/versions/DkImJCM8/WalksyLib-2.0.5%2B1.21.4.jar",
+       "sha512": "271b96f293904d0d3e281252029c69333ee5077cf332a18dac649bf14bfa3ed65b5c3780dd20cd322986e51eef5b7c66bd215e3d4982b05f1f4b475c45e796fb",
+       "size": 1820171,
+       "license": null,
+       "modVersion": "2.0.5+1.21.4",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses",
+        "Shield Fixes"
+       ]
+      }
+     ],
+     "notes": [
+      "Tier Tagger: its author marks it obsolete on Minecraft 1.21.4"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "1.21.5",
@@ -1273,7 +2416,113 @@
      "modVersion": "1.12.1"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "rVy6hycs",
+       "versionNumber": "4.2.1+1.21.5",
+       "versionType": "release",
+       "filename": "ShieldStatus-4.2.1+1.21.5.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/rVy6hycs/ShieldStatus-4.2.1%2B1.21.5.jar",
+       "sha512": "a121841812bd6b1205a606fe8514d3d3a7bc1e10f5f76e52b27f8feb13e5894a6c85cd04bc50ddaefff53615c9aa506eb5489f09972f340925c031970d3764f4",
+       "size": 34613,
+       "license": null,
+       "modVersion": "4.2.1+1.21.5",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldfixes",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "dnAXnp55",
+       "versionNumber": "2.1.0+1.21.5",
+       "versionType": "release",
+       "filename": "ShieldFixes-2.1.0+1.21.5.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/dnAXnp55/ShieldFixes-2.1.0%2B1.21.5.jar",
+       "sha512": "e9407761de6528741b2a1a381028c407268a85c2b0653c98418ccb8e7b681613f190653e7090102f843818159398c6f9a6c1c439bfab41294a8a91c6d9df7e0b",
+       "size": 19054,
+       "license": null,
+       "modVersion": "2.1.0+1.21.5",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "2z0yEfaU",
+       "versionNumber": "1.3.0+mc1.20.5-1.21.5-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc1.20.5-1.21.5-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/2z0yEfaU/totemtweaks-1.3.0%2Bmc1.20.5-1.21.5-fabric.jar",
+       "sha512": "beb86f525f2b9674fed5707e77c16b99bb4bd449f9ca570a47f9eb6c73ee24590c43137384e67e32258de5a9bc7b7977c9ff1430ea5dfc8106941883e97d6763",
+       "size": 26680,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "44wmEU97",
+       "versionNumber": "9.0.8+1.21.5-fabric",
+       "versionType": "release",
+       "filename": "IAS-9.0.8+1.21.5-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/44wmEU97/IAS-9.0.8%2B1.21.5-fabric.jar",
+       "sha512": "285302e05f32f26e919c79b93c376ef5ec02e191d7ed23c45dd58b6bbcaadaa60da59adf6611f23d65a98908e62b9b7475d6c84fea1e9f326cbb18ec4ab40c89",
+       "size": 314518,
+       "license": null,
+       "modVersion": "9.0.8+1.21.5-fabric",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "walksylib",
+       "title": "WalksyLib",
+       "purpose": "Library needed by Shield Statuses and Shield Fixes",
+       "required": false,
+       "project": "7P86n6Vg",
+       "versionId": "QEkznN05",
+       "versionNumber": "2.0.5+1.21.5",
+       "versionType": "release",
+       "filename": "WalksyLib-2.0.5+1.21.5.jar",
+       "url": "https://cdn.modrinth.com/data/7P86n6Vg/versions/QEkznN05/WalksyLib-2.0.5%2B1.21.5.jar",
+       "sha512": "104de502f098350f9edc20f247fd07ba657131f57cfaec1865ce21a4a80a5e96ba35a7cc8f94e4addaa77e72f3884ceea956cba9cc6c1ce97704ea477779e29e",
+       "size": 1822012,
+       "license": null,
+       "modVersion": "2.0.5+1.21.5",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses",
+        "Shield Fixes"
+       ]
+      }
+     ],
+     "notes": [
+      "Tier Tagger: its author marks it obsolete on Minecraft 1.21.5"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "1.21.6",
@@ -1384,7 +2633,113 @@
      "modVersion": "1.8.2"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "vcWoorQG",
+       "versionNumber": "4.2.1+1.21.6",
+       "versionType": "release",
+       "filename": "ShieldStatus-4.2.1+1.21.6.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/vcWoorQG/ShieldStatus-4.2.1%2B1.21.6.jar",
+       "sha512": "63929297882bd076b7702773b5639f700d3af0f1024583501d0ada1b50fe44fda5502b077b73c079dfc15a3a215391d1a8fc2694187fb44ab1a4e3cf9b5ebb1e",
+       "size": 36015,
+       "license": null,
+       "modVersion": "4.2.1+1.21.6",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldfixes",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "Y0pPZg1x",
+       "versionNumber": "2.1.0+1.21.6",
+       "versionType": "release",
+       "filename": "ShieldFixes-2.1.0+1.21.6.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/Y0pPZg1x/ShieldFixes-2.1.0%2B1.21.6.jar",
+       "sha512": "d7770cd41d371f813fda04ff90e1f1c238f1dd06ebdae6d368f59852611a4359cf436440adbdf97105b84982a66fe645f825547628afb9edacb0dff28c1061f6",
+       "size": 19055,
+       "license": null,
+       "modVersion": "2.1.0+1.21.6",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "Y4a9DQe7",
+       "versionNumber": "1.3.0+mc1.21.6-1.21.11-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc1.21.6-1.21.11-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/Y4a9DQe7/totemtweaks-1.3.0%2Bmc1.21.6-1.21.11-fabric.jar",
+       "sha512": "7924e270b2b6b4c7437fafc1e3a18d19cf01a7f92246c174228fd509a03e1011597e458ff88a0c107c576689ff5d8e8845cb5300f8bb90be4eadba351e8f5b62",
+       "size": 26704,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "KivgCS5t",
+       "versionNumber": "9.0.4",
+       "versionType": "release",
+       "filename": "IAS-Fabric-1.21.6-9.0.4.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/KivgCS5t/IAS-Fabric-1.21.6-9.0.4.jar",
+       "sha512": "db50f18fa9167a3987cb8beda16de00abb4ace9f2e9e854120c8d93fb160f5b81840725e64bbe7bd68c71f9811d14d6e0760dff57a6a867607ee6a5b513990b6",
+       "size": 305640,
+       "license": null,
+       "modVersion": "9.0.4",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "walksylib",
+       "title": "WalksyLib",
+       "purpose": "Library needed by Shield Statuses and Shield Fixes",
+       "required": false,
+       "project": "7P86n6Vg",
+       "versionId": "FHg9qLUc",
+       "versionNumber": "2.0.5+1.21.6",
+       "versionType": "release",
+       "filename": "WalksyLib-2.0.5+1.21.6.jar",
+       "url": "https://cdn.modrinth.com/data/7P86n6Vg/versions/FHg9qLUc/WalksyLib-2.0.5%2B1.21.6.jar",
+       "sha512": "39163dd2ef95cf4b9f946359be861fc93e0adb8194e27bd3adaa20392387cee4b71144f594a9083df7322d8a91176ae326fa4fd7e8172c292b8c791dbec4b257",
+       "size": 1799482,
+       "license": null,
+       "modVersion": "2.0.5+1.21.6",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses",
+        "Shield Fixes"
+       ]
+      }
+     ],
+     "notes": [
+      "Tier Tagger: its author marks it obsolete on Minecraft 1.21.6"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "1.21.7",
@@ -1495,7 +2850,113 @@
      "modVersion": "1.8.2"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "88PxnZTx",
+       "versionNumber": "4.2.1+1.21.7-1.21.8",
+       "versionType": "release",
+       "filename": "ShieldStatus-4.2.1+1.21.7-1.21.8.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/88PxnZTx/ShieldStatus-4.2.1%2B1.21.7-1.21.8.jar",
+       "sha512": "88d435117349ecbe304d8d4149b4194b053c021488ce80e7ed32f80fa58e8a7148d24a63bdd77317528f182dd103a4b8013eed64cb3bdfa8853a3a02448cc55a",
+       "size": 36029,
+       "license": null,
+       "modVersion": "4.2.1+1.21.7-1.21.8",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldfixes",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "w0K089o1",
+       "versionNumber": "2.1.0+1.21.7-1.21.8",
+       "versionType": "release",
+       "filename": "ShieldFixes-2.1.0+1.21.7-1.21.8.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/w0K089o1/ShieldFixes-2.1.0%2B1.21.7-1.21.8.jar",
+       "sha512": "dd721ae4130b6e2aa5724a659b0e98edb6b5821fb789f840380c177465ab0273989452e0d33e52878893e79f6a77c3cbc5e25d9ec6d708ea4543d88d097b37c0",
+       "size": 19065,
+       "license": null,
+       "modVersion": "2.1.0+1.21.7-1.21.8",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "Y4a9DQe7",
+       "versionNumber": "1.3.0+mc1.21.6-1.21.11-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc1.21.6-1.21.11-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/Y4a9DQe7/totemtweaks-1.3.0%2Bmc1.21.6-1.21.11-fabric.jar",
+       "sha512": "7924e270b2b6b4c7437fafc1e3a18d19cf01a7f92246c174228fd509a03e1011597e458ff88a0c107c576689ff5d8e8845cb5300f8bb90be4eadba351e8f5b62",
+       "size": 26704,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "Fs2YTzMh",
+       "versionNumber": "9.0.4",
+       "versionType": "release",
+       "filename": "IAS-Fabric-1.21.7-9.0.4.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/Fs2YTzMh/IAS-Fabric-1.21.7-9.0.4.jar",
+       "sha512": "9f000ae490d80974741c12458bea3509dcefa9ca3c321915e180f3f001e093b81bab726b2415b61173a2945e747430d683e7d0636c9109faeaf99cc9381d22bc",
+       "size": 305640,
+       "license": null,
+       "modVersion": "9.0.4",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "walksylib",
+       "title": "WalksyLib",
+       "purpose": "Library needed by Shield Statuses and Shield Fixes",
+       "required": false,
+       "project": "7P86n6Vg",
+       "versionId": "gm8kNIvw",
+       "versionNumber": "2.0.5+1.21.7-1.21.8",
+       "versionType": "release",
+       "filename": "WalksyLib-2.0.5+1.21.7-1.21.8.jar",
+       "url": "https://cdn.modrinth.com/data/7P86n6Vg/versions/gm8kNIvw/WalksyLib-2.0.5%2B1.21.7-1.21.8.jar",
+       "sha512": "4ae1c01117e397c2e54bede3ffdb54c137205e8f7165c288173e633295caba7634695d163325aa7ec037237b0a5ef9a5adf3b15d2c113eda36a431f926f0fea9",
+       "size": 1799457,
+       "license": null,
+       "modVersion": "2.0.5+1.21.7-1.21.8",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses",
+        "Shield Fixes"
+       ]
+      }
+     ],
+     "notes": [
+      "Tier Tagger: its author marks it obsolete on Minecraft 1.21.7"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "1.21.8",
@@ -1606,7 +3067,113 @@
      "modVersion": "1.12.1"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "88PxnZTx",
+       "versionNumber": "4.2.1+1.21.7-1.21.8",
+       "versionType": "release",
+       "filename": "ShieldStatus-4.2.1+1.21.7-1.21.8.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/88PxnZTx/ShieldStatus-4.2.1%2B1.21.7-1.21.8.jar",
+       "sha512": "88d435117349ecbe304d8d4149b4194b053c021488ce80e7ed32f80fa58e8a7148d24a63bdd77317528f182dd103a4b8013eed64cb3bdfa8853a3a02448cc55a",
+       "size": 36029,
+       "license": null,
+       "modVersion": "4.2.1+1.21.7-1.21.8",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldfixes",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "w0K089o1",
+       "versionNumber": "2.1.0+1.21.7-1.21.8",
+       "versionType": "release",
+       "filename": "ShieldFixes-2.1.0+1.21.7-1.21.8.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/w0K089o1/ShieldFixes-2.1.0%2B1.21.7-1.21.8.jar",
+       "sha512": "dd721ae4130b6e2aa5724a659b0e98edb6b5821fb789f840380c177465ab0273989452e0d33e52878893e79f6a77c3cbc5e25d9ec6d708ea4543d88d097b37c0",
+       "size": 19065,
+       "license": null,
+       "modVersion": "2.1.0+1.21.7-1.21.8",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "Y4a9DQe7",
+       "versionNumber": "1.3.0+mc1.21.6-1.21.11-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc1.21.6-1.21.11-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/Y4a9DQe7/totemtweaks-1.3.0%2Bmc1.21.6-1.21.11-fabric.jar",
+       "sha512": "7924e270b2b6b4c7437fafc1e3a18d19cf01a7f92246c174228fd509a03e1011597e458ff88a0c107c576689ff5d8e8845cb5300f8bb90be4eadba351e8f5b62",
+       "size": 26704,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "VEtt6jT2",
+       "versionNumber": "9.0.8+1.21.8-fabric",
+       "versionType": "release",
+       "filename": "IAS-9.0.8+1.21.8-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/VEtt6jT2/IAS-9.0.8%2B1.21.8-fabric.jar",
+       "sha512": "9c6f18af054e9f247e90c2e737e84b8d6a2a3da84e99304afca43e323ad6e2d55caa1e6622d19401f97f548a6e365f89e242facddd1ae2ae8b9c0eef3111334f",
+       "size": 317718,
+       "license": null,
+       "modVersion": "9.0.8+1.21.8-fabric",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "walksylib",
+       "title": "WalksyLib",
+       "purpose": "Library needed by Shield Statuses and Shield Fixes",
+       "required": false,
+       "project": "7P86n6Vg",
+       "versionId": "gm8kNIvw",
+       "versionNumber": "2.0.5+1.21.7-1.21.8",
+       "versionType": "release",
+       "filename": "WalksyLib-2.0.5+1.21.7-1.21.8.jar",
+       "url": "https://cdn.modrinth.com/data/7P86n6Vg/versions/gm8kNIvw/WalksyLib-2.0.5%2B1.21.7-1.21.8.jar",
+       "sha512": "4ae1c01117e397c2e54bede3ffdb54c137205e8f7165c288173e633295caba7634695d163325aa7ec037237b0a5ef9a5adf3b15d2c113eda36a431f926f0fea9",
+       "size": 1799457,
+       "license": null,
+       "modVersion": "2.0.5+1.21.7-1.21.8",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses",
+        "Shield Fixes"
+       ]
+      }
+     ],
+     "notes": [
+      "Tier Tagger: its author marks it obsolete on Minecraft 1.21.8"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "1.21.9",
@@ -1717,7 +3284,96 @@
      "modVersion": "1.9.3"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "ms8TsgkI",
+       "versionNumber": "4.2.1+1.21.9-1.21.10",
+       "versionType": "release",
+       "filename": "ShieldStatus-4.2.1+1.21.9-1.21.10.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/ms8TsgkI/ShieldStatus-4.2.1%2B1.21.9-1.21.10.jar",
+       "sha512": "c3a09a21b574a83281d339765fca28ca59c1f7465bad43b6a1442d7690afa0362bcb754094f437271c3494e66bbe93070bdc9782613a82b250e35e5d2f74b335",
+       "size": 36978,
+       "license": null,
+       "modVersion": "4.2.1+1.21.9-1.21.10",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldfixes",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "M9jKYVhc",
+       "versionNumber": "2.1.0+1.21.9-1.21.10",
+       "versionType": "release",
+       "filename": "ShieldFixes-2.1.0+1.21.9-1.21.10.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/M9jKYVhc/ShieldFixes-2.1.0%2B1.21.9-1.21.10.jar",
+       "sha512": "53c06406fe9d4b2407e604ea6d3f606634a91efb586d73a1a961eb1adc7718b0b0b3db16679cd9c47e56323f79685dca1a882c8d2261530364bc318fec101244",
+       "size": 19115,
+       "license": null,
+       "modVersion": "2.1.0+1.21.9-1.21.10",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "Y4a9DQe7",
+       "versionNumber": "1.3.0+mc1.21.6-1.21.11-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc1.21.6-1.21.11-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/Y4a9DQe7/totemtweaks-1.3.0%2Bmc1.21.6-1.21.11-fabric.jar",
+       "sha512": "7924e270b2b6b4c7437fafc1e3a18d19cf01a7f92246c174228fd509a03e1011597e458ff88a0c107c576689ff5d8e8845cb5300f8bb90be4eadba351e8f5b62",
+       "size": 26704,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "walksylib",
+       "title": "WalksyLib",
+       "purpose": "Library needed by Shield Statuses and Shield Fixes",
+       "required": false,
+       "project": "7P86n6Vg",
+       "versionId": "LIpKOGxB",
+       "versionNumber": "2.0.5+1.21.9-1.21.10",
+       "versionType": "release",
+       "filename": "WalksyLib-2.0.5+1.21.9-1.21.10.jar",
+       "url": "https://cdn.modrinth.com/data/7P86n6Vg/versions/LIpKOGxB/WalksyLib-2.0.5%2B1.21.9-1.21.10.jar",
+       "sha512": "b06aa2be9e4f1f075972b4252f49bfe6715363ae87a0708025f4ca82f3d0c1f1c8ba127153bc24a27c0d170edba55e9ac58c667694c41611a4ddf97b046a5574",
+       "size": 1792884,
+       "license": null,
+       "modVersion": "2.0.5+1.21.9-1.21.10",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses",
+        "Shield Fixes"
+       ]
+      }
+     ],
+     "notes": [
+      "Tier Tagger: its author marks it obsolete on Minecraft 1.21.9",
+      "In-Game Account Switcher: no Fabric build for Minecraft 1.21.9"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "1.21.10",
@@ -1828,7 +3484,113 @@
      "modVersion": "1.12.1"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "ms8TsgkI",
+       "versionNumber": "4.2.1+1.21.9-1.21.10",
+       "versionType": "release",
+       "filename": "ShieldStatus-4.2.1+1.21.9-1.21.10.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/ms8TsgkI/ShieldStatus-4.2.1%2B1.21.9-1.21.10.jar",
+       "sha512": "c3a09a21b574a83281d339765fca28ca59c1f7465bad43b6a1442d7690afa0362bcb754094f437271c3494e66bbe93070bdc9782613a82b250e35e5d2f74b335",
+       "size": 36978,
+       "license": null,
+       "modVersion": "4.2.1+1.21.9-1.21.10",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldfixes",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "M9jKYVhc",
+       "versionNumber": "2.1.0+1.21.9-1.21.10",
+       "versionType": "release",
+       "filename": "ShieldFixes-2.1.0+1.21.9-1.21.10.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/M9jKYVhc/ShieldFixes-2.1.0%2B1.21.9-1.21.10.jar",
+       "sha512": "53c06406fe9d4b2407e604ea6d3f606634a91efb586d73a1a961eb1adc7718b0b0b3db16679cd9c47e56323f79685dca1a882c8d2261530364bc318fec101244",
+       "size": 19115,
+       "license": null,
+       "modVersion": "2.1.0+1.21.9-1.21.10",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "Y4a9DQe7",
+       "versionNumber": "1.3.0+mc1.21.6-1.21.11-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc1.21.6-1.21.11-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/Y4a9DQe7/totemtweaks-1.3.0%2Bmc1.21.6-1.21.11-fabric.jar",
+       "sha512": "7924e270b2b6b4c7437fafc1e3a18d19cf01a7f92246c174228fd509a03e1011597e458ff88a0c107c576689ff5d8e8845cb5300f8bb90be4eadba351e8f5b62",
+       "size": 26704,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "KWFMOHFT",
+       "versionNumber": "9.0.8+1.21.10-fabric",
+       "versionType": "release",
+       "filename": "IAS-9.0.8+1.21.10-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/KWFMOHFT/IAS-9.0.8%2B1.21.10-fabric.jar",
+       "sha512": "a7251584dd42d4b53df66b036c1adbfb45001b9be5baf103d406ae9bb3d26476d984c02dcb94f79040d16df57ee8918a7677fcbdd48fed2d01f9e043d1356c63",
+       "size": 320753,
+       "license": null,
+       "modVersion": "9.0.8+1.21.10-fabric",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "walksylib",
+       "title": "WalksyLib",
+       "purpose": "Library needed by Shield Statuses and Shield Fixes",
+       "required": false,
+       "project": "7P86n6Vg",
+       "versionId": "LIpKOGxB",
+       "versionNumber": "2.0.5+1.21.9-1.21.10",
+       "versionType": "release",
+       "filename": "WalksyLib-2.0.5+1.21.9-1.21.10.jar",
+       "url": "https://cdn.modrinth.com/data/7P86n6Vg/versions/LIpKOGxB/WalksyLib-2.0.5%2B1.21.9-1.21.10.jar",
+       "sha512": "b06aa2be9e4f1f075972b4252f49bfe6715363ae87a0708025f4ca82f3d0c1f1c8ba127153bc24a27c0d170edba55e9ac58c667694c41611a4ddf97b046a5574",
+       "size": 1792884,
+       "license": null,
+       "modVersion": "2.0.5+1.21.9-1.21.10",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses",
+        "Shield Fixes"
+       ]
+      }
+     ],
+     "notes": [
+      "Tier Tagger: its author marks it obsolete on Minecraft 1.21.10"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "1.21.11",
@@ -1939,7 +3701,189 @@
      "modVersion": "1.12.1"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "tier-tagger",
+       "title": "Tier Tagger",
+       "purpose": "Shows players' PvP tiers (MCTiers and SubTiers) on their name tags",
+       "required": false,
+       "project": "dpkYdLu5",
+       "versionId": "S6YDELz7",
+       "versionNumber": "2.4.3+mc1.21.11",
+       "versionType": "release",
+       "filename": "TierTagger-2.4.3+mc1.21.11.jar",
+       "url": "https://cdn.modrinth.com/data/dpkYdLu5/versions/S6YDELz7/TierTagger-2.4.3%2Bmc1.21.11.jar",
+       "sha512": "a2058ff1ec31802075a81a278374dd6040a5cd078ffa736c4b1ca3ae427c111c5a2a39b91f24288d8ef4d77ace7acfe6f4be534e16c3221f65fc16d196faf312",
+       "size": 177886,
+       "license": null,
+       "modVersion": "2.4.3+mc1.21.11",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "gFgqm4Vo",
+       "versionNumber": "4.2.1+1.21.11",
+       "versionType": "release",
+       "filename": "ShieldStatus-4.2.1+1.21.11.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/gFgqm4Vo/ShieldStatus-4.2.1%2B1.21.11.jar",
+       "sha512": "a3728795d09c65b7f69f5a2d09507cd017d90008935cf5f8914db98e2a5672a3b59d990a9e7484545e05cf4e014569ea7f7ca922d554793d0f0d1b02743bd968",
+       "size": 36994,
+       "license": null,
+       "modVersion": "4.2.1+1.21.11",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldfixes",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "U0KdeHqo",
+       "versionNumber": "2.1.0+1.21.11",
+       "versionType": "release",
+       "filename": "ShieldFixes-2.1.0+1.21.11.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/U0KdeHqo/ShieldFixes-2.1.0%2B1.21.11.jar",
+       "sha512": "8480360ff8c504164df4bab02f9f16632d906f239be0b268834079f0903356bf3c71ed580af728cfa1ca2cecbfde1c0c11ccf86f9b04363458f7e08ccd4b1745",
+       "size": 19388,
+       "license": null,
+       "modVersion": "2.1.0+1.21.11",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "C2xuYDRu",
+       "versionNumber": "1.21.11-1.1.0",
+       "versionType": "release",
+       "filename": "totemtweaks-1.21.11-1.1.0.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/C2xuYDRu/totemtweaks-1.21.11-1.1.0.jar",
+       "sha512": "a9e3addeeab33a456263dc2373c4a0f7c0c5024809d6bcb774937cedaf814fde4c0fc08daca646d607ddb2bef2301873ceca17a49fb09ac49cc4f87a79470fd0",
+       "size": 12264,
+       "license": null,
+       "modVersion": "1.1.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "MwO8YI2m",
+       "versionNumber": "9.0.8+1.21.11-fabric",
+       "versionType": "release",
+       "filename": "IAS-9.0.8+1.21.11-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/MwO8YI2m/IAS-9.0.8%2B1.21.11-fabric.jar",
+       "sha512": "bccc850021ffb073eb80f91b906be4c7368c3901c5d027296757e45c18892d4e3050a13a1cb83bc881e0c18284fc5153c53b5ecacf21fcaa4e307cc6d4147a7b",
+       "size": 320896,
+       "license": null,
+       "modVersion": "9.0.8+1.21.11-fabric",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ukulib",
+       "title": "ukulib",
+       "purpose": "Library needed by Tier Tagger",
+       "required": false,
+       "project": "Y8uFrUil",
+       "versionId": "t9ZJ7RPT",
+       "versionNumber": "1.10.2+1.21.11",
+       "versionType": "release",
+       "filename": "ukulib-1.10.2+1.21.11.jar",
+       "url": "https://cdn.modrinth.com/data/Y8uFrUil/versions/t9ZJ7RPT/ukulib-1.10.2%2B1.21.11.jar",
+       "sha512": "b910faa547c636a73d800d1b9afb66fe92fdfd33caf81a535057db04b814370898b36dce784b2fed8237965cea8c1e2f75871b91bf3c205bfd3382b64878c5a3",
+       "size": 464276,
+       "license": null,
+       "modVersion": "1.10.2+1.21.11",
+       "library": true,
+       "neededBy": [
+        "Tier Tagger"
+       ]
+      },
+      {
+       "modId": "walksylib",
+       "title": "WalksyLib",
+       "purpose": "Library needed by Shield Statuses and Shield Fixes",
+       "required": false,
+       "project": "7P86n6Vg",
+       "versionId": "exxN7KBX",
+       "versionNumber": "2.0.5+1.21.11",
+       "versionType": "release",
+       "filename": "WalksyLib-2.0.5+1.21.11.jar",
+       "url": "https://cdn.modrinth.com/data/7P86n6Vg/versions/exxN7KBX/WalksyLib-2.0.5%2B1.21.11.jar",
+       "sha512": "8da17e37eaa6e389b313af83ecd192318d4903d3ceb684f63d981099c4d77957fb9232ca8f8ca722d25b9283d94e6f5fd2d8f806905f23f8d64c70b27f701916",
+       "size": 1792553,
+       "license": null,
+       "modVersion": "2.0.5+1.21.11",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses",
+        "Shield Fixes"
+       ]
+      },
+      {
+       "modId": "modmenu",
+       "title": "Mod Menu",
+       "purpose": "Library needed by Totem Tweaks",
+       "required": false,
+       "project": "mOgUt4GM",
+       "versionId": "cLkYaVuL",
+       "versionNumber": "17.0.1",
+       "versionType": "release",
+       "filename": "modmenu-17.0.1.jar",
+       "url": "https://cdn.modrinth.com/data/mOgUt4GM/versions/cLkYaVuL/modmenu-17.0.1.jar",
+       "sha512": "cb68cc39c8da66d05a1d2054a0e7b62144881e0cdb5fd681bc4f337b1313fafac394246f4e0aa0c4b6343db9e9750250a00c1bb72689b762da685ce1ccfee51f",
+       "size": 960882,
+       "license": null,
+       "modVersion": "17.0.1",
+       "library": true,
+       "neededBy": [
+        "Totem Tweaks"
+       ]
+      },
+      {
+       "modId": "cloth-config",
+       "title": "Cloth Config API",
+       "purpose": "Library needed by Totem Tweaks",
+       "required": false,
+       "project": "9s6osm5g",
+       "versionId": "xuX40TN5",
+       "versionNumber": "21.11.153+fabric",
+       "versionType": "release",
+       "filename": "cloth-config-21.11.153-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/9s6osm5g/versions/xuX40TN5/cloth-config-21.11.153-fabric.jar",
+       "sha512": "8f455489d4b71069e998568cf4e1450116f4360a4eb481cd89117f629c6883164886cf63ca08ac4fc929dd13d1112152755a6216d4a1498ee6406ef102093e51",
+       "size": 1148427,
+       "license": null,
+       "modVersion": "21.11.153",
+       "library": true,
+       "neededBy": [
+        "Totem Tweaks"
+       ]
+      }
+     ],
+     "notes": []
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "26.1",
@@ -2050,7 +3994,96 @@
      "modVersion": "1.12.1"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "beGWzy62",
+       "versionNumber": "4.2.1+26.1-26.1.2",
+       "versionType": "release",
+       "filename": "ShieldStatus-4.2.1+26.1-26.1.2.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/beGWzy62/ShieldStatus-4.2.1%2B26.1-26.1.2.jar",
+       "sha512": "b2cf3215952aafee79b6b3c967a8bbc2f413aca5377019c4c9c5ab636e784e0141af39875440d1da8adbea24c991da99f550fdddc591359ccc5a7692105262eb",
+       "size": 38748,
+       "license": null,
+       "modVersion": "4.2.1+26.1-26.1.2",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldfixes",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "MSyKcCkz",
+       "versionNumber": "2.1.0+26.1-26.1.2",
+       "versionType": "release",
+       "filename": "ShieldFixes-2.1.0+26.1-26.1.2.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/MSyKcCkz/ShieldFixes-2.1.0%2B26.1-26.1.2.jar",
+       "sha512": "0ed75225f1256bf45585a533eeaefa3074016bcb8437791c4d28e940d807de9f88477a89d2202f1c24e46e807b71329a60ce350f6ce017ea2eba69ff3efe3b36",
+       "size": 20092,
+       "license": null,
+       "modVersion": "2.1.0+26.1-26.1.2",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "f7x7NFRi",
+       "versionNumber": "1.3.0+mc26.1-26.1.2-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc26.1-26.1.2-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/f7x7NFRi/totemtweaks-1.3.0%2Bmc26.1-26.1.2-fabric.jar",
+       "sha512": "32708d2518507dad0b9fae1a2acbfd4e43d32137c890af1559657602bdc65f2409d907d2e629ddb36f50e5c7a8f0fc621c864bfd15167b0cada06f5e7ef2e827",
+       "size": 26522,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "walksylib",
+       "title": "WalksyLib",
+       "purpose": "Library needed by Shield Statuses and Shield Fixes",
+       "required": false,
+       "project": "7P86n6Vg",
+       "versionId": "cKgUEZ5V",
+       "versionNumber": "2.0.5+26.1-26.1.2",
+       "versionType": "release",
+       "filename": "WalksyLib-2.0.5+26.1-26.1.2.jar",
+       "url": "https://cdn.modrinth.com/data/7P86n6Vg/versions/cKgUEZ5V/WalksyLib-2.0.5%2B26.1-26.1.2.jar",
+       "sha512": "2720a72bed56b4d48e6b76f6b4c43ef3a2be418e5faee2dadafd4799d1002850cf197c68ac95c6cde1893ad550b0010856a962ddaf1480a0b631e33fffd79a86",
+       "size": 1795024,
+       "license": null,
+       "modVersion": "2.0.5+26.1-26.1.2",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses",
+        "Shield Fixes"
+       ]
+      }
+     ],
+     "notes": [
+      "Tier Tagger: needs ukulib, which isn't available for Minecraft 26.1",
+      "In-Game Account Switcher: no Fabric build for Minecraft 26.1"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "26.1.1",
@@ -2161,7 +4194,133 @@
      "modVersion": "1.12.1"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "tiertagger",
+       "title": "Tier Tagger",
+       "purpose": "Shows players' PvP tiers (MCTiers and SubTiers) on their name tags",
+       "required": false,
+       "project": "dpkYdLu5",
+       "versionId": "qaDE11gi",
+       "versionNumber": "2.5.1+mc26.1-fabric",
+       "versionType": "release",
+       "filename": "tiertagger-fabric-2.5.1+mc26.1.jar",
+       "url": "https://cdn.modrinth.com/data/dpkYdLu5/versions/qaDE11gi/tiertagger-fabric-2.5.1%2Bmc26.1.jar",
+       "sha512": "0a6be87aeebac65d405c29797fd3dc2445e4363c5977bedd3298352eb1489c4b142fbf50da8e62d84b92e34a65696be28fec27db4711e4c34a0f3135adaa32f8",
+       "size": 178714,
+       "license": null,
+       "modVersion": "2.5.1+mc26.1",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "beGWzy62",
+       "versionNumber": "4.2.1+26.1-26.1.2",
+       "versionType": "release",
+       "filename": "ShieldStatus-4.2.1+26.1-26.1.2.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/beGWzy62/ShieldStatus-4.2.1%2B26.1-26.1.2.jar",
+       "sha512": "b2cf3215952aafee79b6b3c967a8bbc2f413aca5377019c4c9c5ab636e784e0141af39875440d1da8adbea24c991da99f550fdddc591359ccc5a7692105262eb",
+       "size": 38748,
+       "license": null,
+       "modVersion": "4.2.1+26.1-26.1.2",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldfixes",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "MSyKcCkz",
+       "versionNumber": "2.1.0+26.1-26.1.2",
+       "versionType": "release",
+       "filename": "ShieldFixes-2.1.0+26.1-26.1.2.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/MSyKcCkz/ShieldFixes-2.1.0%2B26.1-26.1.2.jar",
+       "sha512": "0ed75225f1256bf45585a533eeaefa3074016bcb8437791c4d28e940d807de9f88477a89d2202f1c24e46e807b71329a60ce350f6ce017ea2eba69ff3efe3b36",
+       "size": 20092,
+       "license": null,
+       "modVersion": "2.1.0+26.1-26.1.2",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "f7x7NFRi",
+       "versionNumber": "1.3.0+mc26.1-26.1.2-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc26.1-26.1.2-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/f7x7NFRi/totemtweaks-1.3.0%2Bmc26.1-26.1.2-fabric.jar",
+       "sha512": "32708d2518507dad0b9fae1a2acbfd4e43d32137c890af1559657602bdc65f2409d907d2e629ddb36f50e5c7a8f0fc621c864bfd15167b0cada06f5e7ef2e827",
+       "size": 26522,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ukulib",
+       "title": "ukulib",
+       "purpose": "Library needed by Tier Tagger",
+       "required": false,
+       "project": "Y8uFrUil",
+       "versionId": "asZKdLUQ",
+       "versionNumber": "2.0.0+26.1-fabric",
+       "versionType": "release",
+       "filename": "ukulib-fabric-2.0.0+26.1.jar",
+       "url": "https://cdn.modrinth.com/data/Y8uFrUil/versions/asZKdLUQ/ukulib-fabric-2.0.0%2B26.1.jar",
+       "sha512": "89d5c68354bc7dd712f2fbf4bd612f41e9430684128111cb370b14c9d988e6a8a7d18d5e423533fb78d8181d2908456b61904528c9bf2dcb85e2a76f95465ca1",
+       "size": 445580,
+       "license": null,
+       "modVersion": "2.0.0+26.1",
+       "library": true,
+       "neededBy": [
+        "Tier Tagger"
+       ]
+      },
+      {
+       "modId": "walksylib",
+       "title": "WalksyLib",
+       "purpose": "Library needed by Shield Statuses and Shield Fixes",
+       "required": false,
+       "project": "7P86n6Vg",
+       "versionId": "cKgUEZ5V",
+       "versionNumber": "2.0.5+26.1-26.1.2",
+       "versionType": "release",
+       "filename": "WalksyLib-2.0.5+26.1-26.1.2.jar",
+       "url": "https://cdn.modrinth.com/data/7P86n6Vg/versions/cKgUEZ5V/WalksyLib-2.0.5%2B26.1-26.1.2.jar",
+       "sha512": "2720a72bed56b4d48e6b76f6b4c43ef3a2be418e5faee2dadafd4799d1002850cf197c68ac95c6cde1893ad550b0010856a962ddaf1480a0b631e33fffd79a86",
+       "size": 1795024,
+       "license": null,
+       "modVersion": "2.0.5+26.1-26.1.2",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses",
+        "Shield Fixes"
+       ]
+      }
+     ],
+     "notes": [
+      "In-Game Account Switcher: no Fabric build for Minecraft 26.1.1"
+     ]
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "26.1.2",
@@ -2272,7 +4431,149 @@
      "modVersion": "1.12.1"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "tiertagger",
+       "title": "Tier Tagger",
+       "purpose": "Shows players' PvP tiers (MCTiers and SubTiers) on their name tags",
+       "required": false,
+       "project": "dpkYdLu5",
+       "versionId": "qaDE11gi",
+       "versionNumber": "2.5.1+mc26.1-fabric",
+       "versionType": "release",
+       "filename": "tiertagger-fabric-2.5.1+mc26.1.jar",
+       "url": "https://cdn.modrinth.com/data/dpkYdLu5/versions/qaDE11gi/tiertagger-fabric-2.5.1%2Bmc26.1.jar",
+       "sha512": "0a6be87aeebac65d405c29797fd3dc2445e4363c5977bedd3298352eb1489c4b142fbf50da8e62d84b92e34a65696be28fec27db4711e4c34a0f3135adaa32f8",
+       "size": 178714,
+       "license": null,
+       "modVersion": "2.5.1+mc26.1",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "beGWzy62",
+       "versionNumber": "4.2.1+26.1-26.1.2",
+       "versionType": "release",
+       "filename": "ShieldStatus-4.2.1+26.1-26.1.2.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/beGWzy62/ShieldStatus-4.2.1%2B26.1-26.1.2.jar",
+       "sha512": "b2cf3215952aafee79b6b3c967a8bbc2f413aca5377019c4c9c5ab636e784e0141af39875440d1da8adbea24c991da99f550fdddc591359ccc5a7692105262eb",
+       "size": 38748,
+       "license": null,
+       "modVersion": "4.2.1+26.1-26.1.2",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldfixes",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "MSyKcCkz",
+       "versionNumber": "2.1.0+26.1-26.1.2",
+       "versionType": "release",
+       "filename": "ShieldFixes-2.1.0+26.1-26.1.2.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/MSyKcCkz/ShieldFixes-2.1.0%2B26.1-26.1.2.jar",
+       "sha512": "0ed75225f1256bf45585a533eeaefa3074016bcb8437791c4d28e940d807de9f88477a89d2202f1c24e46e807b71329a60ce350f6ce017ea2eba69ff3efe3b36",
+       "size": 20092,
+       "license": null,
+       "modVersion": "2.1.0+26.1-26.1.2",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "f7x7NFRi",
+       "versionNumber": "1.3.0+mc26.1-26.1.2-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc26.1-26.1.2-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/f7x7NFRi/totemtweaks-1.3.0%2Bmc26.1-26.1.2-fabric.jar",
+       "sha512": "32708d2518507dad0b9fae1a2acbfd4e43d32137c890af1559657602bdc65f2409d907d2e629ddb36f50e5c7a8f0fc621c864bfd15167b0cada06f5e7ef2e827",
+       "size": 26522,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "A1mL7Jnq",
+       "versionNumber": "9.0.8+26.1.2-fabric",
+       "versionType": "release",
+       "filename": "IAS-9.0.8+26.1.2-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/A1mL7Jnq/IAS-9.0.8%2B26.1.2-fabric.jar",
+       "sha512": "4e20dc243c0f2ca1d46042cd533059a216381fcb88e8306755507e212acf73fe2c51b63542f788a60a8f77baca3bf831beadd8ba78b695b2565a62179b6f41b9",
+       "size": 322321,
+       "license": null,
+       "modVersion": "9.0.8+26.1.2-fabric",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ukulib",
+       "title": "ukulib",
+       "purpose": "Library needed by Tier Tagger",
+       "required": false,
+       "project": "Y8uFrUil",
+       "versionId": "asZKdLUQ",
+       "versionNumber": "2.0.0+26.1-fabric",
+       "versionType": "release",
+       "filename": "ukulib-fabric-2.0.0+26.1.jar",
+       "url": "https://cdn.modrinth.com/data/Y8uFrUil/versions/asZKdLUQ/ukulib-fabric-2.0.0%2B26.1.jar",
+       "sha512": "89d5c68354bc7dd712f2fbf4bd612f41e9430684128111cb370b14c9d988e6a8a7d18d5e423533fb78d8181d2908456b61904528c9bf2dcb85e2a76f95465ca1",
+       "size": 445580,
+       "license": null,
+       "modVersion": "2.0.0+26.1",
+       "library": true,
+       "neededBy": [
+        "Tier Tagger"
+       ]
+      },
+      {
+       "modId": "walksylib",
+       "title": "WalksyLib",
+       "purpose": "Library needed by Shield Statuses and Shield Fixes",
+       "required": false,
+       "project": "7P86n6Vg",
+       "versionId": "cKgUEZ5V",
+       "versionNumber": "2.0.5+26.1-26.1.2",
+       "versionType": "release",
+       "filename": "WalksyLib-2.0.5+26.1-26.1.2.jar",
+       "url": "https://cdn.modrinth.com/data/7P86n6Vg/versions/cKgUEZ5V/WalksyLib-2.0.5%2B26.1-26.1.2.jar",
+       "sha512": "2720a72bed56b4d48e6b76f6b4c43ef3a2be418e5faee2dadafd4799d1002850cf197c68ac95c6cde1893ad550b0010856a962ddaf1480a0b631e33fffd79a86",
+       "size": 1795024,
+       "license": null,
+       "modVersion": "2.0.5+26.1-26.1.2",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses",
+        "Shield Fixes"
+       ]
+      }
+     ],
+     "notes": []
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "26.2",
@@ -2383,7 +4684,149 @@
      "modVersion": "1.12.1"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "tiertagger",
+       "title": "Tier Tagger",
+       "purpose": "Shows players' PvP tiers (MCTiers and SubTiers) on their name tags",
+       "required": false,
+       "project": "dpkYdLu5",
+       "versionId": "7aC77lC6",
+       "versionNumber": "2.6.1+mc26.2-fabric",
+       "versionType": "release",
+       "filename": "tiertagger-fabric-2.6.1+mc26.2.jar",
+       "url": "https://cdn.modrinth.com/data/dpkYdLu5/versions/7aC77lC6/tiertagger-fabric-2.6.1%2Bmc26.2.jar",
+       "sha512": "2cb66e47aaeb05f9b7fae175b56c1d8ee780db63c385fc0bee8b8e87d46799c362aa700b3570f84be8974a007518a0f50e80a4441cc0243608af341d89efe866",
+       "size": 180794,
+       "license": null,
+       "modVersion": "2.6.1+mc26.2",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "wSjfylLI",
+       "versionNumber": "4.2.1+26.2",
+       "versionType": "release",
+       "filename": "ShieldStatus-4.2.1+26.2.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/wSjfylLI/ShieldStatus-4.2.1%2B26.2.jar",
+       "sha512": "30f0b9990650aa0927e78d251af5b5328cc14bd7cc1cddeee165eeed275d328e163d476983934217b6e60267a7498e4233efcd50ff494814d291fff69f300cfb",
+       "size": 37782,
+       "license": null,
+       "modVersion": "4.2.1+26.2",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldfixes",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "iSy9AEAS",
+       "versionNumber": "2.1.0+26.2",
+       "versionType": "release",
+       "filename": "ShieldFixes-2.1.0+26.2.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/iSy9AEAS/ShieldFixes-2.1.0%2B26.2.jar",
+       "sha512": "d34c6af78726afb890cb5135a51ff361c5cb8646db9a64967a7b6f49b15a8e561fb26dd83170e57f21c1e4a62cb28597272e37e117147a50cde16de49864fab5",
+       "size": 20083,
+       "license": null,
+       "modVersion": "2.1.0+26.2",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "RLkVSERV",
+       "versionNumber": "1.3.0+mc26.2-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc26.2-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/RLkVSERV/totemtweaks-1.3.0%2Bmc26.2-fabric.jar",
+       "sha512": "1942de9726983fd61c0eafdbeaa0f717047c567c9deb79b56e6ff87eb325fc4a33bce2fb1c790b505c33d9ac46b249ff197967d10c8189c66338cef654e71e88",
+       "size": 26556,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "GseYYTDa",
+       "versionNumber": "9.0.8+26.2-fabric",
+       "versionType": "release",
+       "filename": "IAS-9.0.8+26.2-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/GseYYTDa/IAS-9.0.8%2B26.2-fabric.jar",
+       "sha512": "1c10fc547bd7d19219713276d968678e87befe3c0ae7db14694f575a68f9e6d22a9b37f8bd1cb59213cfee3e5a3d0765a8e2ce3541953fbf870790b4132ef659",
+       "size": 323128,
+       "license": null,
+       "modVersion": "9.0.8+26.2-fabric",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ukulib",
+       "title": "ukulib",
+       "purpose": "Library needed by Tier Tagger",
+       "required": false,
+       "project": "Y8uFrUil",
+       "versionId": "olOAyH3N",
+       "versionNumber": "2.1.1+26.2-fabric",
+       "versionType": "release",
+       "filename": "ukulib-fabric-2.1.1+26.2.jar",
+       "url": "https://cdn.modrinth.com/data/Y8uFrUil/versions/olOAyH3N/ukulib-fabric-2.1.1%2B26.2.jar",
+       "sha512": "d996515191c6c36343607e28706c3036a5887f1be7fa1d0e59c09127fbd22e2be3da9a990be73196defd8ef4d75ac32d51b641bb17a51d19950ca9497e0702d7",
+       "size": 456607,
+       "license": null,
+       "modVersion": "2.1.1+26.2",
+       "library": true,
+       "neededBy": [
+        "Tier Tagger"
+       ]
+      },
+      {
+       "modId": "walksylib",
+       "title": "WalksyLib",
+       "purpose": "Library needed by Shield Statuses and Shield Fixes",
+       "required": false,
+       "project": "7P86n6Vg",
+       "versionId": "7QXyIV4a",
+       "versionNumber": "2.0.5+26.2",
+       "versionType": "release",
+       "filename": "WalksyLib-2.0.5+26.2.jar",
+       "url": "https://cdn.modrinth.com/data/7P86n6Vg/versions/7QXyIV4a/WalksyLib-2.0.5%2B26.2.jar",
+       "sha512": "68b9afac7505843625daffeb1969d563942b79df1ac2846dde3c8e006967e7182977426e16d878078c0eb6906f0e52f579e987887657c39f6e0a976ec83351b5",
+       "size": 1794839,
+       "license": null,
+       "modVersion": "2.0.5+26.2",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses",
+        "Shield Fixes"
+       ]
+      }
+     ],
+     "notes": []
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   },
   {
    "minecraft": "26.3",
@@ -2494,7 +4937,162 @@
      "modVersion": "1.12.1"
     }
    ],
-   "notes": []
+   "notes": [],
+   "modes": {
+    "cpvp": {
+     "mods": [
+      {
+       "modId": "tiertagger",
+       "title": "Tier Tagger",
+       "purpose": "Shows players' PvP tiers (MCTiers and SubTiers) on their name tags",
+       "required": false,
+       "project": "dpkYdLu5",
+       "versionId": "8KK5od3B",
+       "versionNumber": "2.7.1+mc26.3-fabric",
+       "versionType": "release",
+       "filename": "tiertagger-fabric-2.7.1+mc26.3.jar",
+       "url": "https://cdn.modrinth.com/data/dpkYdLu5/versions/8KK5od3B/tiertagger-fabric-2.7.1%2Bmc26.3.jar",
+       "sha512": "3f5b5aaf3e2920ffbef7735363fb54d5067a9ba1060591fbc892ed4d5e4f3af8ff39ab5465fd4c61963a36ad9f716d4ca568777a266034aa6a50a9d652f6ee01",
+       "size": 180880,
+       "license": null,
+       "modVersion": "2.7.1+mc26.3",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldstatus",
+       "title": "Shield Statuses",
+       "purpose": "Shows shield states by colour",
+       "required": false,
+       "project": "GfoMZ9Ly",
+       "versionId": "9hfOHdp3",
+       "versionNumber": "4.2.1+26.3",
+       "versionType": "release",
+       "filename": "ShieldStatus-4.2.1+26.3.jar",
+       "url": "https://cdn.modrinth.com/data/GfoMZ9Ly/versions/9hfOHdp3/ShieldStatus-4.2.1%2B26.3.jar",
+       "sha512": "ec012c0b5bc3b99731806a1d206d00f1c2e8257578746252557d2fe60c43752e1ea87f7bd4e134841462319d4451c702a3c9e78be7c148d4fbb24d5b1292fb56",
+       "size": 37727,
+       "license": null,
+       "modVersion": "4.2.1+26.3",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "shieldfixes",
+       "title": "Shield Fixes",
+       "purpose": "Fixes shield sounds and the blocking animation",
+       "required": false,
+       "project": "HfLFMeJe",
+       "versionId": "jGIpa9ET",
+       "versionNumber": "2.1.0+26.3",
+       "versionType": "release",
+       "filename": "ShieldFixes-2.1.0+26.3.jar",
+       "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/jGIpa9ET/ShieldFixes-2.1.0%2B26.3.jar",
+       "sha512": "16a85555235357c0c71b3106a236d53871a03d5560db060a7756d83e5cd05ab5da5a22b8e7bf81d8107fd2e62e2e7843832aa9fd64864cb6ac8a93f857293b5c",
+       "size": 20083,
+       "license": null,
+       "modVersion": "2.1.0+26.3",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "totemtweaks",
+       "title": "Totem Tweaks",
+       "purpose": "Smaller totem pops and a customisable pop animation",
+       "required": false,
+       "project": "1cfO6J6t",
+       "versionId": "yTsVz6Kt",
+       "versionNumber": "1.3.0+mc26.3-fabric",
+       "versionType": "release",
+       "filename": "totemtweaks-1.3.0+mc26.3-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/1cfO6J6t/versions/yTsVz6Kt/totemtweaks-1.3.0%2Bmc26.3-fabric.jar",
+       "sha512": "3fd20317ec545b7ff2f5596fdb7b4eb7adf4c0d562bf04513ab75988bb859c7d738d678d8b3f92b79196185eb612b5647a205ca01c76226b9c7cab38e3acdc9a",
+       "size": 26455,
+       "license": null,
+       "modVersion": "1.3.0",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ias",
+       "title": "In-Game Account Switcher",
+       "purpose": "Change the logged-in account without restarting Minecraft",
+       "required": false,
+       "project": "cudtvDnd",
+       "versionId": "oS3Q4s88",
+       "versionNumber": "9.0.8+26.3-fabric",
+       "versionType": "release",
+       "filename": "IAS-9.0.8+26.3-fabric.jar",
+       "url": "https://cdn.modrinth.com/data/cudtvDnd/versions/oS3Q4s88/IAS-9.0.8%2B26.3-fabric.jar",
+       "sha512": "6621d7a45434d386f4eb5a643a7cf1c0147672c74df137d52216c554d81edd395e2c6b3b2057accabe2bc192bf53536707c012e25d5e44889ef5fe23391f551d",
+       "size": 323087,
+       "license": null,
+       "modVersion": "9.0.8+26.3-fabric",
+       "library": false,
+       "neededBy": []
+      },
+      {
+       "modId": "ukulib",
+       "title": "ukulib",
+       "purpose": "Library needed by Tier Tagger",
+       "required": false,
+       "project": "Y8uFrUil",
+       "versionId": "CzNkLp0r",
+       "versionNumber": "2.2.1+26.3-fabric",
+       "versionType": "release",
+       "filename": "ukulib-fabric-2.2.1+26.3.jar",
+       "url": "https://cdn.modrinth.com/data/Y8uFrUil/versions/CzNkLp0r/ukulib-fabric-2.2.1%2B26.3.jar",
+       "sha512": "dfbab76c1f42bc16f07d01a0a92a5bc480e70e2d80ed013f1ebf5885609c8b716b2c44830c992b1f74c710d1fa1e2153a54a84c7c94e83c63201bb6031bde10d",
+       "size": 450742,
+       "license": null,
+       "modVersion": "2.2.1+26.3",
+       "library": true,
+       "neededBy": [
+        "Tier Tagger"
+       ]
+      },
+      {
+       "modId": "walksylib",
+       "title": "WalksyLib",
+       "purpose": "Library needed by Shield Statuses and Shield Fixes",
+       "required": false,
+       "project": "7P86n6Vg",
+       "versionId": "xWphfskv",
+       "versionNumber": "2.0.5+26.3",
+       "versionType": "release",
+       "filename": "WalksyLib-2.0.5+26.3.jar",
+       "url": "https://cdn.modrinth.com/data/7P86n6Vg/versions/xWphfskv/WalksyLib-2.0.5%2B26.3.jar",
+       "sha512": "b7b77dd6201b36c81280271ca2b64cec2ddba4ecfb7ec1987ee4b74a331dc07c4643e8f082bea7284ab93e78178e8d783b7f11fb08f95c7f62341f28c3fcee4e",
+       "size": 1797682,
+       "license": null,
+       "modVersion": "2.0.5+26.3",
+       "library": true,
+       "neededBy": [
+        "Shield Statuses",
+        "Shield Fixes"
+       ]
+      }
+     ],
+     "notes": []
+    },
+    "standard": {
+     "mods": [],
+     "notes": []
+    }
+   }
   }
- ]
+ ],
+ "gameModes": [
+  {
+   "id": "cpvp",
+   "name": "CPVP",
+   "description": "Crystal PvP: PvP tiers on name tags, shield and totem tweaks, and an in-game account switcher."
+  },
+  {
+   "id": "standard",
+   "name": "Standard",
+   "description": "Only the Stabled client and its performance mods."
+  }
+ ],
+ "defaultGameMode": "cpvp"
 }

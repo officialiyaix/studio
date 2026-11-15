@@ -12,7 +12,8 @@ pub fn main(args: &[String]) -> i32 {
             Some("create") => {
                 let name = args.get(1).cloned().unwrap_or_else(|| "Dev Save".into());
                 let version = args.get(2).cloned().unwrap_or_else(|| stack::PRIMARY_VERSION.into());
-                let req = saves::CreateRequest { name, minecraft_version: version, icon_png_base64: None, memory_mb: Some(2048), performance_preset: None };
+                let game_mode = args.get(3).cloned();
+                let req = saves::CreateRequest { name, minecraft_version: version, icon_png_base64: None, memory_mb: Some(2048), performance_preset: None, game_mode };
                 match saves::create(req, &crate::settings::Settings::load()) {
                     Ok(m) => { println!("{}", m.id); 0 }
                     Err(e) => { eprintln!("{e}"); 1 }
@@ -37,7 +38,7 @@ pub fn main(args: &[String]) -> i32 {
                 }
                 0
             }
-            _ => { eprintln!("usage: --dev create <name> [minecraft version] | install <id> | command <id>"); 2 }
+            _ => { eprintln!("usage: --dev create <name> [minecraft version] [game mode] | install <id> | command <id>"); 2 }
         }
     })
 }

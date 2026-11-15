@@ -4,6 +4,7 @@ Stabled is a performance-focused Windows launcher for **Minecraft: Java Edition*
 
 - **Saves** — isolated Minecraft installations, each with its own mods, settings, worlds, resource packs, shader packs, screenshots and logs.
 - **Stabled Client** — a Fabric mod that adds the Stabled main and pause menus, Stabled Settings, a five-step first-launch introduction, a real FPS display, real motion blur, an emote wheel (hold B) and Discord Rich Presence.
+- **Game modes** — a Save switches between sets of mods with one click. **CPVP** (the default for new Saves) adds Tier Tagger, Shield Statuses, Shield Fixes, Totem Tweaks and In-Game Account Switcher, plus the libraries they need, in the right build for each Minecraft version; **Standard** adds nothing. Switching installs one mode's mods and removes the other's.
 - **Store** — mods, resource packs and shader packs from Modrinth, installed into a Save in one click: the right version for that Save, checksum-verified, with required mods (and Iris for shaders) added automatically.
 - **Logs and crash help** — a log viewer with search (Ctrl+F), level filters and a live tail; crash explanations with suggested fixes and confidence levels; **Find the broken mod**, which tests groups of mods in a hidden copy of the Save; **Repair**, which checks every game file's hash without touching worlds; and a mod compatibility check before every launch.
 - **Automatic world backups** before Stabled updates a Save and after each session, restorable as a copy from the Save's Backups tab.

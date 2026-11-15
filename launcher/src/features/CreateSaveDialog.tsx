@@ -4,6 +4,7 @@ import { api, asError, type Preset, type VersionList } from '../lib/api';
 import { useStore } from '../lib/store';
 import { cx, formatDate } from '../lib/format';
 import { Callout, Modal, Range, Segmented } from '../components/ui';
+import { GameModeCards } from './GameMode';
 import { IconEditor, type IconEditorHandle } from './IconEditor';
 
 const PRESETS: Array<{ value: Preset; label: string }> = [
@@ -28,6 +29,7 @@ export function CreateSaveDialog({ onClose }: { onClose: () => void }) {
   const [advanced, setAdvanced] = useState(false);
   const [memory, setMemory] = useState(settings?.saveDefaults.memoryMb ?? 4096);
   const [preset, setPreset] = useState<Preset>(settings?.saveDefaults.performancePreset ?? 'balanced');
+  const [gameMode, setGameMode] = useState(settings?.saveDefaults.gameMode ?? 'cpvp');
   const [busy, setBusy] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const icon = useRef<IconEditorHandle>(null);
@@ -81,6 +83,7 @@ export function CreateSaveDialog({ onClose }: { onClose: () => void }) {
         iconPngBase64: icon.current?.exportPng() ?? null,
         memoryMb: advanced ? memory : null,
         performancePreset: advanced ? preset : null,
+        gameMode,
       });
       upsertSave(save);
       select(save.id);
@@ -209,7 +212,14 @@ export function CreateSaveDialog({ onClose }: { onClose: () => void }) {
           {versions?.source === 'offline' && <span className="hint">Mojang's version list couldn't be reached, so only versions known to this build are shown.</span>}
         </div>
 
-        {/* 3. Icon (optional) */}
+        {/* 3. Game mode */}
+        <div className="field">
+          <span className="field-label">Game mode</span>
+          <GameModeCards value={gameMode} onChange={setGameMode} minecraft={version} />
+          <span className="hint">Switch any time from the Save's header. Stabled installs and removes the mode's mods for you.</span>
+        </div>
+
+        {/* 4. Icon (optional) */}
         <div className="field">
           <span className="field-label">
             Icon <span className="muted" style={{ fontWeight: 500 }}>(optional)</span>

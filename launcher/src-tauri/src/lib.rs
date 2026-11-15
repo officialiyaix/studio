@@ -150,6 +150,8 @@ pub fn run() {
             commands::store_project,
             commands::store_installed,
             commands::store_install,
+            commands::game_modes,
+            commands::save_set_game_mode,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Stabled");

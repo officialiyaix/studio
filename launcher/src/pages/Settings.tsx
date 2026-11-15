@@ -8,6 +8,7 @@ import { Callout, ConfirmDialog, Range, Segmented, SettingRow, Toggle } from '..
 import { CustomBackgroundEditor, SurfaceStyle, ThemeGrid } from '../features/Appearance';
 import { DiscordGlyph } from '../components/icons';
 import { BackgroundGallery } from '../features/BackgroundGallery';
+import { GameModeCards } from '../features/GameMode';
 
 export function SettingsPage() {
   const { settings, updateSettings, info, auth, openSignIn, setAuth, toast, askDiscord } = useStore();
@@ -176,6 +177,11 @@ export function SettingsPage() {
         </h2>
         <div className="panel settings-panel">
           <p className="tiny muted">Used for new Saves. Each Save can change these in its own settings.</p>
+          <div className="field">
+            <span className="field-label">Game mode</span>
+            <span className="tiny muted">The mods new Saves start with, and the mode Saves use until you pick one for them. CPVP is the default.</span>
+            <GameModeCards value={settings.saveDefaults.gameMode} onChange={(v) => set('saveDefaults', { gameMode: v })} minecraft={settings.saveDefaults.minecraftVersion} />
+          </div>
           <SettingRow label="Minecraft version" desc="Preselected in Create Save.">
             <select className="input" style={{ width: 200 }} value={settings.saveDefaults.minecraftVersion} onChange={(e) => set('saveDefaults', { minecraftVersion: e.target.value })} aria-label="Default Minecraft version">
               {(versions.length ? versions : [{ id: settings.saveDefaults.minecraftVersion } as VersionOption]).map((v) => (

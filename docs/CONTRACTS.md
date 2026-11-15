@@ -10,6 +10,7 @@ The launcher and the Stabled Client share a few JSON files and JVM properties. B
 | `stabled.saveDir` | `%APPDATA%\Stabled\saves\<id>` |
 | `stabled.galleryDir` | The launcher's bundled background gallery (`index.json` + images), for pre-themes in game |
 | `stabled.discordAppId` | `DISCORD_APPLICATION_ID`, only when configured |
+| `stabled.gameMode` | Name of the Save's game mode (e.g. `CPVP`) when it adds mods; shown on the title screen |
 | `stabled.streamer.hideName` | `true` while streamer mode hides the username; the title screen then doesn't show it |
 
 Without them (e.g. `gradlew runClient`) the client uses folders beside the game directory and says it is running in development mode.

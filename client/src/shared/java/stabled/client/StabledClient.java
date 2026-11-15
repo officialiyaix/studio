@@ -27,6 +27,8 @@ import stabled.client.theme.ThemeManager;
 import stabled.client.ui.screen.EmoteWheelScreen;
 import stabled.client.ui.screen.IntroScreen;
 import stabled.client.ui.screen.StabledSettingsScreen;
+import stabled.client.ui.screen.TitleLayout;
+import stabled.client.ui.StabledStyle;
 
 /** Stabled Client entry point. */
 public final class StabledClient implements ClientModInitializer {
@@ -68,6 +70,12 @@ public final class StabledClient implements ClientModInitializer {
 		PresenceManager.get().start(settings.discordEnabled, settings.discordShowElapsed);
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> applyPresetIfNeeded());
 		ClientTickEvents.END_CLIENT_TICK.register(StabledClient::onTick);
+		// Mods like Mod Menu and In-Game Account Switcher add title-screen buttons after Stabled's layout ran.
+		Platform.afterScreenInit(screen -> {
+			if (screen instanceof TitleScreen title && StabledStyle.menusStyled()) {
+				TitleLayout.relayout(title);
+			}
+		});
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
 			PresenceManager.get().shutdown();
 			RuntimeStatus.write("stopped", null, MotionBlur.unavailableReason(), false);
