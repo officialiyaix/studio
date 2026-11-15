@@ -21,6 +21,7 @@ pub fn main(args: &[String]) -> i32 {
             Some("install") | Some("command") => {
                 let id = args.get(1).cloned().unwrap_or_default();
                 saves::managed::set_bundled_clients_dir(std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("resources").join("clients"));
+                crate::gallery::set_dir(std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("resources").join("backgrounds"));
                 let meta = match saves::load(&id) { Ok(m) => m, Err(e) => { eprintln!("{e}"); return 1; } };
                 let emit = |p: install::Progress| eprintln!("[{}] {} {}/{} files {}/{} bytes", p.phase, p.label, p.files_done, p.files_total, p.bytes_done, p.bytes_total);
                 let prepared = match install::prepare(&meta, 8, &emit).await { Ok(p) => p, Err(e) => { eprintln!("install failed: {e}"); return 1; } };

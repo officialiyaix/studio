@@ -37,6 +37,8 @@ export function applyAppearance(view: AppearanceView, reduceMotion: boolean): vo
   // Higher transparency = more background visible: 10% transparency → 90% surface opacity.
   const opacity = glass ? 100 - view.appearance.glassTransparency : 100;
   root.style.setProperty('--surface-pct', `${opacity}%`);
+  // The raw setting, for areas that sit a fixed amount more solid than it (surfaces.css).
+  root.style.setProperty('--transparency', glass ? `${view.appearance.glassTransparency}%` : '0%');
   root.style.setProperty('--glass-blur', glass ? '14px' : '0px');
   root.classList.toggle('glass', glass);
   root.dataset.light = String(theme.light && view.appearance.theme !== 'custom');

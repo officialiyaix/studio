@@ -63,9 +63,9 @@ export function BackgroundGallery() {
     <div className="bg-gallery" ref={root}>
       <div className="bg-gallery-head">
         <div>
-          <div className="field-label">Background themes</div>
+          <div className="field-label">Pre-themes</div>
           <p className="tiny muted">
-            {category ? `${category.name} · ${plural(category.images.length)}. Pick one to use it as your background.` : 'Pick a category to see its backgrounds.'}
+            {category ? `${category.name} · ${plural(category.images.length)}. Pick one to use it as your background.` : 'Backgrounds that come with Stabled. Pick a category to see them.'}
           </p>
         </div>
         {category && (

@@ -48,3 +48,9 @@ export function pct(done: number, total: number): number {
 export function cx(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(' ');
 }
+
+/** Where `value` sits within [min, max], as a whole percentage (sliders always read 0–100%). */
+export function rangePct(value: number, min: number, max: number): number {
+  if (max <= min) return 0;
+  return Math.round(Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100)));
+}

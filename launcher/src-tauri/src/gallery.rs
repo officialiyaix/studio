@@ -33,6 +33,11 @@ pub fn set_dir(dir: PathBuf) {
     let _ = DIR.set(dir);
 }
 
+/// The bundled gallery folder (images and `index.json`), passed to the game so its menus offer the same pre-themes.
+pub fn dir() -> Option<&'static PathBuf> {
+    DIR.get()
+}
+
 fn manifest() -> Manifest {
     serde_json::from_str(MANIFEST).unwrap_or(Manifest { categories: Vec::new() })
 }

@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "categories": [
+    {
+      "id": "anime",
+      "name": "Anime",
+      "images": [
+        {
+          "id": "01",
+          "width": 1536,
+          "height": 1036
+        }
+      ]
+    },
+    {
+      "id": "dragon-ball",
+      "name": "Dragon Ball",
+      "images": [
+        {
+          "id": "01",
+          "width": 1536,
+          "height": 864
+        },
+        {
+          "id": "02",
+          "width": 1536,
+          "height": 863
+        },
+        {
+          "id": "03",
+          "width": 1536,
+          "height": 863
+        }
+      ]
+    },
+    {
+      "id": "jujutsu-kaisen",
+      "name": "Jujutsu Kaisen",
+      "images": [
+        {
+          "id": "01",
+          "width": 1536,
+          "height": 864
+        },
+        {
+          "id": "02",
+          "width": 1536,
+          "height": 768
+        },
+        {
+          "id": "03",
+          "width": 1536,
+          "height": 864
+        },
+        {
+          "id": "04",
+          "width": 1536,
+          "height": 610
+        },
+        {
+          "id": "05",
+          "width": 1536,
+          "height": 864
+        },
+        {
+          "id": "06",
+          "width": 1536,
+          "height": 864
+        },
+        {
+          "id": "07",
+          "width": 1536,
+          "height": 864
+        },
+        {
+          "id": "08",
+          "width": 1536,
+          "height": 864
+        },
+        {
+          "id": "09",
+          "width": 1536,
+          "height": 864
+        },
+        {
+          "id": "10",
+          "width": 1536,
+          "height": 865
+        },
+        {
+          "id": "11",
+          "width": 1536,
+          "height": 864
+        }
+      ]
+    },
+    {
+      "id": "naruto",
+      "name": "Naruto",
+      "images": [
+        {
+          "id": "01",
+          "width": 1536,
+          "height": 610
+        },
+        {
+          "id": "02",
+          "width": 1536,
+          "height": 864
+        },
+        {
+          "id": "03",
+          "width": 1536,
+          "height": 1025
+        },
+        {
+          "id": "04",
+          "width": 1536,
+          "height": 768
+        }
+      ]
+    },
+    {
+      "id": "one-piece",
+      "name": "One Piece",
+      "images": [
+        {
+          "id": "01",
+          "width": 1536,
+          "height": 863
+        }
+      ]
+    },
+    {
+      "id": "the-apothecary-diaries",
+      "name": "The Apothecary Diaries",
+      "images": [
+        {
+          "id": "01",
+          "width": 1536,
+          "height": 864
+        }
+      ]
+    },
+    {
+      "id": "undertale",
+      "name": "Undertale",
+      "images": [
+        {
+          "id": "01",
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "02",
+          "width": 1536,
+          "height": 864
+        }
+      ]
+    },
+    {
+      "id": "general",
+      "name": "General",
+      "images": [
+        {
+          "id": "01",
+          "width": 1536,
+          "height": 864
+        }
+      ]
+    }
+  ]
+}

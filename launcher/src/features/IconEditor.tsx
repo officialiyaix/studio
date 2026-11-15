@@ -2,7 +2,8 @@ import { useCallback, useEffect, useImperativeHandle, useRef, useState, type Ref
 import { ImagePlus, RotateCcw } from 'lucide-react';
 import { open } from '@tauri-apps/plugin-dialog';
 import { api, asError } from '../lib/api';
-import { Range, Segmented } from '../components/ui';
+import { rangePct } from '../lib/format';
+import { PercentRange, Segmented } from '../components/ui';
 
 export interface IconEditorHandle {
   /** PNG (base64, no prefix) of the framed icon, or null when the default Stabled icon is used. */
@@ -146,8 +147,8 @@ export function IconEditor({ handle, onError, initial }: { handle: Ref<IconEdito
             />
             {mode === 'fill' && (
               <label className="field" style={{ gap: 2 }}>
-                <span className="tiny muted">Zoom {zoom}%</span>
-                <Range label="Zoom" min={100} max={300} step={5} value={zoom} onChange={setZoom} />
+                <span className="tiny muted">Zoom {rangePct(zoom, 100, 300)}%</span>
+                <PercentRange label="Zoom" min={100} max={300} value={zoom} onChange={setZoom} />
               </label>
             )}
             <span className="tiny muted">{mode === 'fill' ? 'Drag the preview to choose what stays in frame.' : 'The whole image is shown with transparent edges.'}</span>

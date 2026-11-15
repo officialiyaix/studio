@@ -21,12 +21,13 @@ Written by the launcher (Settings → Appearance) and by the game (introduction 
   "version": 1,
   "theme": "stabled-night",        // one of the eight ids in shared/themes.json, or "custom"
   "surface": "simple",             // "simple" | "glass"
-  "glassTransparency": 35,         // 10–90; higher = more background visible; kept while "simple"
+  "glassTransparency": 35,         // 10–90 (shown as 0–100%); higher = more background visible; kept while "simple"
   "customBackground": {            // null when no image has been uploaded
     "file": "backgrounds/custom.png",
     "focusX": 0.5, "focusY": 0.5,  // focal point for cover-fitting, 0–1
     "dim": 0.45,                   // readability overlay, 0–0.85
-    "revision": 3                  // bumped on each upload so the game reloads the texture
+    "revision": 3,                 // bumped on each upload so the game reloads the texture
+    "source": "gallery:naruto/02"  // optional: set when the image is a pre-theme; absent for the user's own image
   }
 }
 ```

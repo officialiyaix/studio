@@ -9,8 +9,10 @@ The source folder has one sub-folder per category ("Dragon Ball", "Naruto", "gen
   launcher/src-tauri/resources/backgrounds/<category>--<n>.jpg   full background, longest edge <= 1920 px
   launcher/public/backgrounds/<category>--<n>.jpg                 thumbnail, 480 px wide, for the gallery UI
 
-and launcher/src/lib/backgrounds.json, the manifest read by both the UI and the Rust backend. Existing
-output is replaced, so the gallery always matches the source folder. Requires Pillow.
+and launcher/src/lib/backgrounds.json, the manifest read by both the UI and the Rust backend. A copy goes
+next to the full images as index.json for the in-game client, which receives that folder as
+-Dstabled.galleryDir. Existing output is replaced, so the gallery always matches the source folder.
+Requires Pillow.
 """
 import json
 import re
@@ -73,7 +75,9 @@ def main() -> int:
         categories.append({"id": cat_id, "name": NAMES.get(folder.name.lower(), folder.name), "images": images})
         print(f"{folder.name}: {len(images)} image(s)")
 
-    MANIFEST.write_text(json.dumps({"version": 1, "categories": categories}, indent=2) + "\n")
+    manifest = json.dumps({"version": 1, "categories": categories}, indent=2) + "\n"
+    MANIFEST.write_text(manifest)
+    (FULL_DIR / "index.json").write_text(manifest)
     total = sum(f.stat().st_size for f in FULL_DIR.iterdir()) + sum(f.stat().st_size for f in THUMB_DIR.iterdir())
     print(f"{sum(len(c['images']) for c in categories)} images in {len(categories)} categories, {total / 1e6:.1f} MB")
     return 0

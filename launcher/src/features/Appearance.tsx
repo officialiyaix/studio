@@ -3,8 +3,8 @@ import { Check, ImagePlus, Loader2, RotateCcw } from 'lucide-react';
 import { open } from '@tauri-apps/plugin-dialog';
 import { api, asError, type ThemeDef } from '../lib/api';
 import { useStore } from '../lib/store';
-import { cx } from '../lib/format';
-import { Callout, Range, Toggle } from '../components/ui';
+import { cx, rangePct } from '../lib/format';
+import { Callout, PercentRange, Toggle } from '../components/ui';
 
 function Swatch({ theme, image, dim }: { theme: ThemeDef; image?: string | null; dim?: number }) {
   const c = theme.colors;
@@ -187,12 +187,11 @@ export function CustomBackgroundEditor() {
             <span className="focus-dot" style={{ left: `${bg.focusX * 100}%`, top: `${bg.focusY * 100}%` }} />
           </div>
           <div className="field">
-            <span className="field-label">Dimming {Math.round(bg.dim * 100)}%</span>
-            <Range
+            <span className="field-label">Dimming {rangePct(bg.dim * 100, 0, 85)}%</span>
+            <PercentRange
               label="Background dimming"
               min={0}
               max={85}
-              step={5}
               value={Math.round(bg.dim * 100)}
               onChange={(v) => setAppearanceView({ ...appearance, appearance: { ...appearance.appearance, customBackground: { ...bg, dim: v / 100 } } })}
               onCommit={(v) => updateAppearance({ customBackground: { dim: v / 100 } })}
@@ -238,20 +237,19 @@ export function SurfaceStyle() {
                 Transparency
               </label>
               <output htmlFor="transparency" className="pct-label" aria-live="polite">
-                {a.glassTransparency}%
+                {rangePct(a.glassTransparency, 10, 90)}%
               </output>
             </div>
-            <Range
+            <PercentRange
               id="transparency"
               label="Transparency"
               min={10}
               max={90}
-              step={1}
               value={a.glassTransparency}
               onChange={(v) => setAppearanceView({ ...appearance, appearance: { ...a, glassTransparency: v } })}
               onCommit={(v) => updateAppearance({ glassTransparency: v })}
             />
-            <span className="hint">Higher transparency shows more of the background: 10% is nearly solid, 90% is nearly clear. Text and icons always stay fully opaque.</span>
+            <span className="hint">Higher transparency shows more of the background: 0% is the most solid, 100% the clearest. Text and icons always stay fully opaque.</span>
           </div>
           <div className="live-preview" aria-label="Live preview">
             <div className="lp-panel panel">
@@ -272,7 +270,7 @@ export function SurfaceStyle() {
           </div>
         </div>
       ) : (
-        <p className="tiny muted">Your Frosted Glass transparency ({a.glassTransparency}%) is kept for when you switch back.</p>
+        <p className="tiny muted">Your Frosted Glass transparency ({rangePct(a.glassTransparency, 10, 90)}%) is kept for when you switch back.</p>
       )}
       <p className="tiny muted">Theme and surface style are global: they apply to this launcher and to the in-game Stabled menus of every Save.</p>
     </div>

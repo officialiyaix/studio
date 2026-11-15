@@ -2,6 +2,7 @@ package stabled.client.ui.widget;
 
 import java.util.function.IntConsumer;
 import java.util.function.IntFunction;
+import java.util.function.IntUnaryOperator;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
@@ -36,6 +37,19 @@ public class SliderWidget extends BaseWidget {
 		this.onChange = onChange;
 		this.onCommit = onCommit;
 		this.value = this.snap(initial);
+	}
+
+	/**
+	 * A slider shown as 0–100% across its whole travel, whatever the stored range is (e.g. transparency is stored
+	 * as 10–90): 0% is the minimum, 100% the maximum, in steps of 1% like the launcher's sliders, so both show the same number.
+	 * Callbacks receive the stored value.
+	 */
+	public static SliderWidget percentOfRange(int x, int y, int w, int h, Component label, int min, int max, int value,
+		IntConsumer onChange, IntConsumer onCommit) {
+		IntUnaryOperator toStored = p -> Math.round(min + (max - min) * p / 100F);
+		int initial = Math.round((value - min) * 100F / Math.max(1, max - min));
+		return new SliderWidget(x, y, w, h, label, 0, 100, 1, initial, p -> Component.literal(p + "%"),
+			p -> onChange.accept(toStored.applyAsInt(p)), p -> onCommit.accept(toStored.applyAsInt(p)));
 	}
 
 	public int intValue() {

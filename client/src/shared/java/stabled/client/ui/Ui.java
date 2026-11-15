@@ -153,18 +153,21 @@ public final class Ui {
 	}
 
 	public static void coverBlit(Gfx g, String tex, int x, int y, int w, int h, int texW, int texH) {
-		if (texW <= 0 || texH <= 0) {
+		Appearance.CustomBackground bg = appearance().customBackground;
+		coverBlit(g, tex, x, y, w, h, texW, texH, bg != null ? bg.focusX : 0.5, bg != null ? bg.focusY : 0.5, 0xFFFFFFFF);
+	}
+
+	/** Draws a texture cropped to fill (x, y, w, h), keeping the point (fx, fy) of the image in view. */
+	public static void coverBlit(Gfx g, String tex, int x, int y, int w, int h, int texW, int texH, double fx, double fy, int argb) {
+		if (texW <= 0 || texH <= 0 || w <= 0 || h <= 0) {
 			return;
 		}
-		Appearance.CustomBackground bg = appearance().customBackground;
-		double fx = bg != null ? bg.focusX : 0.5;
-		double fy = bg != null ? bg.focusY : 0.5;
 		double scale = Math.max(w / (double) texW, h / (double) texH);
 		int srcW = Math.max(1, (int) Math.round(w / scale));
 		int srcH = Math.max(1, (int) Math.round(h / scale));
 		float u = (float) ((texW - srcW) * fx);
 		float v = (float) ((texH - srcH) * fy);
-		g.texture(tex, x, y, w, h, u, v, srcW, srcH, texW, texH, 0xFFFFFFFF);
+		g.texture(tex, x, y, w, h, u, v, srcW, srcH, texW, texH, argb);
 	}
 
 	public static void text(Gfx g, Component text, int x, int y, int color) {

@@ -29,6 +29,8 @@ public final class Appearance {
 		public double focusY = 0.5;
 		public double dim = 0.45;
 		public long revision;
+		/** Where the image came from: "upload" or "gallery:<category>/<image>" (null if unknown). */
+		public String source;
 	}
 
 	public boolean isGlass() {
@@ -57,6 +59,7 @@ public final class Appearance {
 			c.focusY = clamp01(JsonFiles.getNumber(b, "focusY", 0.5));
 			c.dim = Math.max(0.0, Math.min(0.85, JsonFiles.getNumber(b, "dim", 0.45)));
 			c.revision = (long) JsonFiles.getNumber(b, "revision", 0);
+			c.source = JsonFiles.getString(b, "source", null);
 			a.customBackground = c.file != null ? c : null;
 		}
 		return a;
@@ -79,6 +82,9 @@ public final class Appearance {
 			b.addProperty("focusY", this.customBackground.focusY);
 			b.addProperty("dim", this.customBackground.dim);
 			b.addProperty("revision", this.customBackground.revision);
+			if (this.customBackground.source != null) {
+				b.addProperty("source", this.customBackground.source);
+			}
 			o.add("customBackground", b);
 		}
 		return JsonFiles.writeObject(StabledPaths.appearanceFile(), o);

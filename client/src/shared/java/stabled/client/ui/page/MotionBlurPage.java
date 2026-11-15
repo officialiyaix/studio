@@ -32,9 +32,8 @@ public final class MotionBlurPage implements Page {
 				b.rebuild().run();
 			}));
 		b.advance(PageBuilder.ROW + 6);
-		SliderWidget strength = b.add(new SliderWidget(b.x(), b.y(), b.width(), 22, Component.translatable("stabled.motion_blur.strength"),
-			ClientSettings.MIN_BLUR, ClientSettings.MAX_BLUR, 5, StabledClient.settings().motionBlurStrength,
-			v -> Component.literal(v + "%"),
+		SliderWidget strength = b.add(SliderWidget.percentOfRange(b.x(), b.y(), b.width(), 22, Component.translatable("stabled.motion_blur.strength"),
+			ClientSettings.MIN_BLUR, ClientSettings.MAX_BLUR, StabledClient.settings().motionBlurStrength,
 			v -> StabledClient.settings().motionBlurStrength = v,
 			v -> StabledClient.update(s -> s.motionBlurStrength = v)));
 		strength.active = StabledClient.settings().motionBlurEnabled && unavailable == null;

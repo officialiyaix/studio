@@ -76,6 +76,9 @@ pub fn build(
     // Contract with the in-game client (docs/CONTRACTS.md).
     args.push(format!("-Dstabled.home={}", paths::root().display()));
     args.push(format!("-Dstabled.saveDir={}", save.root().display()));
+    if let Some(dir) = crate::gallery::dir() {
+        args.push(format!("-Dstabled.galleryDir={}", dir.display()));
+    }
     if let Some(id) = &crate::config::get().discord_application_id {
         args.push(format!("-Dstabled.discordAppId={id}"));
     }

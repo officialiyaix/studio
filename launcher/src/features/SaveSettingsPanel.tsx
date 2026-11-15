@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { Lock, RotateCcw } from 'lucide-react';
 import { api, asError, type Preset, type Save, type SaveSettingsView } from '../lib/api';
 import { useStore } from '../lib/store';
-import { Callout, Range, Segmented, SettingRow, Toggle } from '../components/ui';
+import { rangePct } from '../lib/format';
+import { Callout, PercentRange, Range, Segmented, SettingRow, Toggle } from '../components/ui';
 
 const PRESET_DESC: Record<Preset, string> = {
   performance: 'Fast graphics, 8-chunk render distance. Best for low-end PCs and laptops.',
@@ -154,13 +155,12 @@ export function SaveSettingsPanel({ save }: { save: Save }) {
           <SettingRow label="Motion blur" desc="Blends recent frames in the world renderer; the HUD and menus stay sharp. Costs one extra full-screen pass per frame.">
             <Toggle label="Motion blur" checked={c.motionBlur.enabled} onChange={(v) => patch('motionBlur', { enabled: v })} />
           </SettingRow>
-          <SettingRow label="Strength" desc={`${c.motionBlur.strength}%`}>
+          <SettingRow label="Strength" desc={`${rangePct(c.motionBlur.strength, 10, 100)}%`}>
             <div style={{ minWidth: 220 }}>
-              <Range
+              <PercentRange
                 label="Motion blur strength"
                 min={10}
                 max={100}
-                step={5}
                 value={c.motionBlur.strength}
                 disabled={!c.motionBlur.enabled || locked}
                 onChange={(v) => setView({ ...view, client: { ...c, motionBlur: { ...c.motionBlur, strength: v } } })}

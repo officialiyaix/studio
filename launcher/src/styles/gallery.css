@@ -1,11 +1,25 @@
 /* ---------- Background themes gallery (Settings → Appearance) ---------- */
-.bg-gallery {
+/* The themes block: pre-themes, a separator, then the basic themes. */
+.themes-block {
   display: grid;
-  gap: 12px;
-  padding: 14px;
+  gap: 14px;
+  padding: 16px;
   border-radius: var(--radius);
   border: 1px solid var(--border-soft);
   background: var(--panel-alt-bg);
+}
+.themes-sep {
+  height: 1px;
+  margin: 2px 4px;
+  background: linear-gradient(90deg, transparent, var(--border) 12%, var(--border) 88%, transparent);
+}
+.themes-basic {
+  display: grid;
+  gap: 10px;
+}
+.bg-gallery {
+  display: grid;
+  gap: 12px;
 }
 .bg-gallery-head {
   display: flex;

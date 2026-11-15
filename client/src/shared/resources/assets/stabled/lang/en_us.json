@@ -25,7 +25,7 @@
 	"stabled.intro.done": "That's everything. Choose Finish to continue to the main menu. You can change any of this later in Stabled Settings.",
 
 	"stabled.page.appearance": "Appearance",
-	"stabled.page.appearance.summary": "Pick one of nine themes and how surfaces look.",
+	"stabled.page.appearance.summary": "Pick a pre-theme or one of the basic themes, and how surfaces look.",
 	"stabled.page.performance": "Performance",
 	"stabled.page.performance.summary": "Choose a preset. Changes apply immediately unless marked otherwise.",
 	"stabled.page.fps": "FPS Display",
@@ -38,6 +38,14 @@
 	"stabled.page.menus.summary": "Stabled menu styling and the first-launch introduction.",
 
 	"stabled.theme.no_image": "No image",
+	"stabled.themes.pre": "Pre-themes",
+	"stabled.themes.pre.desc": "Backgrounds that come with Stabled. Pick a category, then a background.",
+	"stabled.themes.basic": "Basic themes",
+	"stabled.gallery.back": "All categories",
+	"stabled.gallery.category.narration": "%s, %s backgrounds",
+	"stabled.gallery.image": "%s background %s",
+	"stabled.gallery.applying": "Applying…",
+	"stabled.gallery.unavailable": "Pre-themes come with the Stabled launcher. Start this Save from Stabled to use them.",
 	"stabled.theme.custom_missing": "No custom image yet. Add one in the Stabled launcher (Settings → Appearance → Custom Background). Until then Stabled Night colours are used.",
 	"stabled.surface.heading": "Surface style",
 	"stabled.surface.simple": "Simple",

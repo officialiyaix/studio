@@ -60,9 +60,18 @@ export function SettingsPage() {
           Appearance
         </h2>
         <div className="panel settings-panel">
-          <div className="field-label">Theme</div>
-          <ThemeGrid />
-          <BackgroundGallery />
+          {/* One block: pre-themes (bundled backgrounds by category) first, then the basic themes. */}
+          <div className="themes-block" role="group" aria-label="Themes">
+            <BackgroundGallery />
+            <div className="themes-sep" role="separator" />
+            <div className="themes-basic">
+              <div>
+                <div className="field-label">Basic themes</div>
+                <p className="tiny muted">Eight colour themes, and Custom Background for an image of your own.</p>
+              </div>
+              <ThemeGrid />
+            </div>
+          </div>
           <CustomBackgroundEditor />
           <div className="field-label" style={{ marginTop: 8 }}>
             Surface style

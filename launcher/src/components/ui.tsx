@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { AlertTriangle, CheckCircle2, Info, Loader2, X, XCircle } from 'lucide-react';
 import type { Save } from '../lib/api';
-import { cx, pct } from '../lib/format';
+import { cx, pct, rangePct } from '../lib/format';
 
 export function Toggle({ checked, onChange, label, disabled }: { checked: boolean; onChange: (v: boolean) => void; label: string; disabled?: boolean }) {
   return (
@@ -122,6 +122,45 @@ export function Range({
       onChange={(e) => onChange(Number(e.target.value))}
       onPointerUp={(e) => onCommit?.(Number((e.target as HTMLInputElement).value))}
       onKeyUp={(e) => onCommit?.(Number((e.target as HTMLInputElement).value))}
+    />
+  );
+}
+
+/**
+ * A slider shown as 0–100% across its whole travel, whatever the stored range is (transparency is stored as
+ * 10–90, dimming as 0–85, …): 0% is the minimum and 100% the maximum. Callbacks receive the stored value.
+ */
+export function PercentRange({
+  value,
+  min,
+  max,
+  onChange,
+  onCommit,
+  label,
+  disabled,
+  id,
+}: {
+  value: number;
+  min: number;
+  max: number;
+  onChange: (v: number) => void;
+  onCommit?: (v: number) => void;
+  label: string;
+  disabled?: boolean;
+  id?: string;
+}) {
+  const toStored = (p: number) => Math.round(min + ((max - min) * p) / 100);
+  return (
+    <Range
+      id={id}
+      label={label}
+      min={0}
+      max={100}
+      step={1}
+      value={rangePct(value, min, max)}
+      disabled={disabled}
+      onChange={(p) => onChange(toStored(p))}
+      onCommit={onCommit ? (p) => onCommit(toStored(p)) : undefined}
     />
   );
 }
