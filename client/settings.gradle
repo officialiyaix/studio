@@ -10,3 +10,13 @@ pluginManagement {
 }
 
 rootProject.name = 'stabled-client'
+
+// One subproject per supported Minecraft version (versions/<mc>/gradle.properties).
+// Build only some with -Pstabled.versions=26.3,1.21.11
+def wanted = (startParameter.projectProperties['stabled.versions'] ?: '').split(',').findAll { it }
+file('versions').listFiles().findAll { it.isDirectory() && new File(it, 'gradle.properties').exists() }.sort { it.name }.each { dir ->
+	if (wanted.isEmpty() || wanted.contains(dir.name)) {
+		include ":mc-${dir.name}"
+		project(":mc-${dir.name}").projectDir = dir
+	}
+}

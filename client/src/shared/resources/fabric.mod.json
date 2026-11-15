@@ -1,0 +1,28 @@
+{
+	"schemaVersion": 1,
+	"id": "stabled",
+	"version": "${version}",
+	"name": "Stabled Client",
+	"description": "The Stabled in-game client: Stabled menus and settings, FPS display, motion blur, Discord Rich Presence and the first-launch introduction.",
+	"license": "All-Rights-Reserved",
+	"icon": "assets/stabled/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": ["stabled.client.StabledClient"]
+	},
+	"mixins": [
+		{
+			"config": "stabled.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.20.1",
+		"minecraft": "${minecraft}",
+		"java": ">=${java}",
+		"fabric-api": "*"
+	},
+	"custom": {
+		"stabled:protected": true
+	}
+}

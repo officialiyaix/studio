@@ -1,0 +1,17 @@
+{
+	"required": true,
+	"package": "stabled.client.mixin",
+	"compatibilityLevel": "JAVA_${java}",
+	"client": [
+//#if MC < 1.21
+		"RenderTargetInvoker",
+//#endif
+		"AbstractButtonMixin",
+		"GameRendererMixin",
+		"PauseScreenMixin",
+		"TitleScreenMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
