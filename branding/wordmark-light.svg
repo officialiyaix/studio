@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 128" width="512" height="128">
+  <style>@font-face{font-family:InterV;src:url(file:///home/user/studio/launcher/node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2) format('woff2');font-weight:100 900}</style>
+  <image href="mark.svg" x="4" y="4" width="120" height="120"/>
+  <text x="146" y="90" font-family="InterV" font-weight="760" font-size="74" letter-spacing="-2.5" fill="#ffffff">Stabled</text>
+</svg>

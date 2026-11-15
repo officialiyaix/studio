@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <title>Stabled</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9d6bff"/>
+      <stop offset="1" stop-color="#5257ea"/>
+    </linearGradient>
+    <linearGradient id="fg" x1="0" y1="0" x2="0" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e6e0ff"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="116" height="116" rx="30" fill="url(#bg)"/>
+  <rect x="6" y="6" width="116" height="116" rx="30" fill="url(#shine)"/>
+  <rect x="6.75" y="6.75" width="114.5" height="114.5" rx="29.25" fill="none" stroke="#ffffff" stroke-opacity="0.22" stroke-width="1.5"/>
+  <!-- A single "S" built from stacked, offset blocks. -->
+  <path d="M52 28 L88 28 A6 6 0 0 1 94 34 L94 40 A6 6 0 0 1 88 46 L52 46 L52 56 L76 56 A18 18 0 0 1 94 74 L94 82 A18 18 0 0 1 76 100 L40 100 A6 6 0 0 1 34 94 L34 88 A6 6 0 0 1 40 82 L76 82 L76 74 L52 74 A18 18 0 0 1 34 56 L34 46 A18 18 0 0 1 52 28 Z" fill="#2c1f7a" fill-opacity="0.35" transform="translate(0 4)"/>
+  <path d="M52 28 L88 28 A6 6 0 0 1 94 34 L94 40 A6 6 0 0 1 88 46 L52 46 L52 56 L76 56 A18 18 0 0 1 94 74 L94 82 A18 18 0 0 1 76 100 L40 100 A6 6 0 0 1 34 94 L34 88 A6 6 0 0 1 40 82 L76 82 L76 74 L52 74 A18 18 0 0 1 34 56 L34 46 A18 18 0 0 1 52 28 Z" fill="url(#fg)"/>
+  <rect x="82" y="31" width="9" height="9" rx="2.5" fill="#22c55e"/>
+</svg>

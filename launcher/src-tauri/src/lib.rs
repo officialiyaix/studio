@@ -1,0 +1,115 @@
+//! Stabled launcher backend.
+
+mod auth;
+mod commands;
+mod config;
+mod error;
+mod images;
+mod minecraft;
+mod mods;
+mod news;
+mod optimiser;
+mod paths;
+mod saves;
+mod settings;
+mod state;
+mod system;
+mod util;
+#[cfg(feature = "dev-tools")]
+pub mod devtools;
+
+use std::sync::Arc;
+use tauri::Manager;
+
+#[cfg(windows)]
+pub use optimiser::run_elevated_helper;
+
+fn locate_bundled_client(app: &tauri::App) -> Option<std::path::PathBuf> {
+    if let Ok(dir) = app.path().resource_dir() {
+        let p = dir.join(minecraft::stack::STABLED_JAR_NAME);
+        if p.is_file() {
+            return Some(p);
+        }
+    }
+    // Development: use the jar produced by `./gradlew build` in /client.
+    let dev = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("resources").join(minecraft::stack::STABLED_JAR_NAME);
+    dev.is_file().then_some(dev)
+}
+
+pub fn run() {
+    let _ = paths::ensure_base_dirs();
+    util::log::init();
+    log_info!("Stabled {} starting on {}", env!("CARGO_PKG_VERSION"), std::env::consts::OS);
+    let state = Arc::new(state::AppState::new());
+
+    tauri::Builder::default()
+        // One launcher at a time, so two windows can never launch the same Save or compete for Discord presence.
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            if let Some(w) = app.get_webview_window("main") {
+                let _ = w.unminimize();
+                let _ = w.show();
+                let _ = w.set_focus();
+            }
+        }))
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_opener::init())
+        .manage(state)
+        .setup(|app| {
+            match locate_bundled_client(app) {
+                Some(p) => saves::managed::set_bundled_client(p),
+                None => log_warn!("The Stabled client jar is not bundled; launching Saves will be unavailable"),
+            }
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![
+            commands::app_info,
+            commands::system_static,
+            commands::system_dynamic,
+            commands::settings_get,
+            commands::settings_set,
+            commands::appearance_get,
+            commands::appearance_set,
+            commands::appearance_set_background,
+            commands::appearance_reset_background,
+            commands::image_inspect,
+            commands::versions_list,
+            commands::saves_list,
+            commands::save_get,
+            commands::save_validate_name,
+            commands::save_create,
+            commands::save_rename,
+            commands::save_set_icon,
+            commands::save_duplicate,
+            commands::save_delete,
+            commands::save_summary,
+            commands::save_open_folder,
+            commands::save_settings_get,
+            commands::save_settings_set,
+            commands::save_reset_intro,
+            commands::mods_list,
+            commands::mods_add,
+            commands::mods_set_enabled,
+            commands::mods_remove,
+            commands::mods_restore_component,
+            commands::save_install,
+            commands::save_launch,
+            commands::save_stop,
+            commands::save_clear_error,
+            commands::auth_status,
+            commands::auth_restore,
+            commands::auth_sign_in,
+            commands::auth_cancel,
+            commands::auth_sign_out,
+            commands::news_get,
+            commands::news_detail,
+            commands::open_external,
+            commands::open_discord_invite,
+            commands::open_data_folder,
+            commands::shared_cache_clear,
+            commands::optimiser_view,
+            commands::optimiser_apply,
+            commands::optimiser_restore,
+        ])
+        .run(tauri::generate_context!())
+        .expect("error while running Stabled");
+}

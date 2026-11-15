@@ -1,0 +1,243 @@
+//! Launcher settings (`settings.json`) and global appearance (`appearance.json`, shared with the in-game client).
+//! Neither file ever contains credentials.
+
+use crate::bail;
+use crate::error::AppResult;
+use crate::paths;
+use crate::util::fsx;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+
+pub const THEMES_JSON: &str = include_str!("../../../shared/themes.json");
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", default)]
+pub struct LauncherBehaviour {
+    /// What the launcher window does after a Save starts: "keep", "minimize" or "hide" (restored when the game exits).
+    pub after_launch: String,
+    /// Expand the navigation rail when the pointer hovers over it (click/keyboard expansion always works).
+    pub expand_nav_on_hover: bool,
+    /// Turn off launcher animations and transitions.
+    pub reduce_motion: bool,
+    /// Page shown when Stabled opens: "home" or "saves".
+    pub start_page: String,
+    /// Include Minecraft: Java Edition release notes from Mojang in the news panel.
+    pub show_minecraft_news: bool,
+}
+
+impl Default for LauncherBehaviour {
+    fn default() -> Self {
+        Self {
+            after_launch: "minimize".into(),
+            expand_nav_on_hover: true,
+            reduce_motion: false,
+            start_page: "home".into(),
+            show_minecraft_news: true,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", default)]
+pub struct SaveDefaults {
+    pub minecraft_version: String,
+    pub memory_mb: u32,
+    pub performance_preset: String,
+    pub fps_enabled: bool,
+    pub motion_blur_enabled: bool,
+    pub discord_enabled: bool,
+}
+
+impl Default for SaveDefaults {
+    fn default() -> Self {
+        Self {
+            minecraft_version: crate::minecraft::stack::PRIMARY_VERSION.into(),
+            memory_mb: 4096,
+            performance_preset: "balanced".into(),
+            fps_enabled: true,
+            motion_blur_enabled: false,
+            discord_enabled: true,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", default)]
+pub struct Advanced {
+    /// Extra JVM arguments appended for every Save. Arguments that would break isolation are rejected.
+    pub jvm_args: String,
+    /// Parallel downloads while installing a Save.
+    pub concurrent_downloads: u32,
+}
+
+impl Default for Advanced {
+    fn default() -> Self {
+        Self { jvm_args: String::new(), concurrent_downloads: 8 }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[serde(rename_all = "camelCase", default)]
+pub struct Settings {
+    pub launcher: LauncherBehaviour,
+    pub save_defaults: SaveDefaults,
+    pub advanced: Advanced,
+}
+
+impl Settings {
+    pub fn load() -> Settings {
+        fsx::read_json::<Settings>(&paths::settings_file()).unwrap_or_default().sanitized()
+    }
+
+    pub fn save(&self) -> AppResult<()> {
+        fsx::write_json(&paths::settings_file(), self)
+    }
+
+    fn sanitized(mut self) -> Settings {
+        if !["keep", "minimize", "hide"].contains(&self.launcher.after_launch.as_str()) {
+            self.launcher.after_launch = "minimize".into();
+        }
+        if !["home", "saves"].contains(&self.launcher.start_page.as_str()) {
+            self.launcher.start_page = "home".into();
+        }
+        self.save_defaults.memory_mb = self.save_defaults.memory_mb.clamp(1024, 32768);
+        if !["performance", "balanced", "quality", "custom"].contains(&self.save_defaults.performance_preset.as_str()) {
+            self.save_defaults.performance_preset = "balanced".into();
+        }
+        if !crate::minecraft::stack::is_supported(&self.save_defaults.minecraft_version) {
+            self.save_defaults.minecraft_version = crate::minecraft::stack::PRIMARY_VERSION.into();
+        }
+        self.advanced.concurrent_downloads = self.advanced.concurrent_downloads.clamp(1, 16);
+        self
+    }
+
+    pub fn validate(self) -> AppResult<Settings> {
+        validate_jvm_args(&self.advanced.jvm_args)?;
+        Ok(self.sanitized())
+    }
+}
+
+/// Extra JVM arguments may tune the JVM, but may not replace what keeps Saves isolated and authenticated.
+pub fn validate_jvm_args(args: &str) -> AppResult<Vec<String>> {
+    let parts: Vec<String> = args.split_whitespace().map(str::to_owned).collect();
+    for p in &parts {
+        let lower = p.to_ascii_lowercase();
+        if lower == "-cp" || lower == "-classpath" || lower.starts_with("--class-path") || lower.starts_with("-djava.library.path")
+            || lower.starts_with("-dstabled.") || lower.starts_with("-javaagent") || lower.starts_with("-xmx") || lower.starts_with("-xms")
+        {
+            bail!("JVM_ARGS", "\"{p}\" can't be used here. Memory is set per Save; class path, agents and Stabled properties are managed by Stabled.");
+        }
+    }
+    Ok(parts)
+}
+
+// ---------- Appearance (shared with the in-game client; schema in docs/CONTRACTS.md) ----------
+
+pub fn builtin_theme_ids() -> Vec<String> {
+    let v: Value = serde_json::from_str(THEMES_JSON).expect("themes.json");
+    v["themes"].as_array().map(|a| a.iter().filter_map(|t| t["id"].as_str().map(str::to_owned)).collect()).unwrap_or_default()
+}
+
+pub fn load_appearance() -> Value {
+    let mut v = fsx::read_json_value(&paths::appearance_file());
+    normalize_appearance(&mut v);
+    v
+}
+
+fn normalize_appearance(v: &mut Value) {
+    if !v.is_object() {
+        *v = serde_json::json!({});
+    }
+    let ids = builtin_theme_ids();
+    let theme = v.get("theme").and_then(Value::as_str).unwrap_or("stabled-night").to_string();
+    if !(ids.contains(&theme) || theme == "custom") {
+        v["theme"] = "stabled-night".into();
+    } else if !v.get("theme").map(Value::is_string).unwrap_or(false) {
+        v["theme"] = theme.into();
+    }
+    let surface = v.get("surface").and_then(Value::as_str).unwrap_or("simple");
+    v["surface"] = if surface == "glass" { "glass" } else { "simple" }.into();
+    let t = v.get("glassTransparency").and_then(Value::as_f64).unwrap_or(35.0).round().clamp(10.0, 90.0);
+    v["glassTransparency"] = (t as i64).into();
+    v["version"] = 1.into();
+    if !v.get("customBackground").map(|c| c.is_object() || c.is_null()).unwrap_or(false) {
+        v["customBackground"] = Value::Null;
+    }
+}
+
+/// Apply a partial update from the UI. Only the documented keys can change; unknown keys written by the game are kept.
+pub fn update_appearance(patch: &Value) -> AppResult<Value> {
+    let mut v = load_appearance();
+    if let Some(theme) = patch.get("theme").and_then(Value::as_str) {
+        if !(builtin_theme_ids().iter().any(|t| t == theme) || theme == "custom") {
+            bail!("APPEARANCE", "Unknown theme");
+        }
+        v["theme"] = theme.into();
+    }
+    if let Some(surface) = patch.get("surface").and_then(Value::as_str) {
+        if surface != "simple" && surface != "glass" {
+            bail!("APPEARANCE", "Unknown surface style");
+        }
+        v["surface"] = surface.into();
+    }
+    if let Some(t) = patch.get("glassTransparency").and_then(Value::as_f64) {
+        v["glassTransparency"] = (t.round().clamp(10.0, 90.0) as i64).into();
+    }
+    if let Some(bg) = patch.get("customBackground").and_then(Value::as_object) {
+        if v["customBackground"].is_object() {
+            for key in ["focusX", "focusY"] {
+                if let Some(x) = bg.get(key).and_then(Value::as_f64) {
+                    v["customBackground"][key] = x.clamp(0.0, 1.0).into();
+                }
+            }
+            if let Some(x) = bg.get("dim").and_then(Value::as_f64) {
+                v["customBackground"]["dim"] = x.clamp(0.0, 0.85).into();
+            }
+        }
+    }
+    normalize_appearance(&mut v);
+    fsx::write_json(&paths::appearance_file(), &v)?;
+    Ok(v)
+}
+
+/// Replace the single Custom Background slot with a managed copy of the chosen image.
+pub fn set_custom_background(source: &std::path::Path) -> AppResult<Value> {
+    let png = crate::images::prepare_background(source)?;
+    let dir = paths::backgrounds_dir();
+    std::fs::create_dir_all(&dir)?;
+    fsx::write_atomic(&dir.join("custom.png"), &png)?;
+    let mut v = load_appearance();
+    let revision = v["customBackground"]["revision"].as_i64().unwrap_or(0) + 1;
+    let keep = |k: &str, d: f64| v["customBackground"][k].as_f64().unwrap_or(d);
+    let bg = serde_json::json!({
+        "file": "backgrounds/custom.png",
+        "focusX": keep("focusX", 0.5),
+        "focusY": keep("focusY", 0.5),
+        "dim": keep("dim", 0.45),
+        "revision": revision,
+    });
+    v["customBackground"] = bg;
+    v["theme"] = "custom".into();
+    normalize_appearance(&mut v);
+    fsx::write_json(&paths::appearance_file(), &v)?;
+    Ok(v)
+}
+
+pub fn reset_custom_background() -> AppResult<Value> {
+    let _ = std::fs::remove_file(paths::backgrounds_dir().join("custom.png"));
+    let mut v = load_appearance();
+    v["customBackground"] = Value::Null;
+    if v["theme"] == "custom" {
+        v["theme"] = "stabled-night".into();
+    }
+    fsx::write_json(&paths::appearance_file(), &v)?;
+    Ok(v)
+}
+
+/// The managed custom background as a data URL, or None if missing/unreadable (the UI then falls back gracefully).
+pub fn custom_background_data_url() -> Option<String> {
+    let bytes = std::fs::read(paths::backgrounds_dir().join("custom.png")).ok()?;
+    image::load_from_memory_with_format(&bytes, image::ImageFormat::Png).ok()?;
+    use base64::Engine;
+    Some(format!("data:image/png;base64,{}", base64::engine::general_purpose::STANDARD.encode(bytes)))
+}

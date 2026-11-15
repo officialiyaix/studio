@@ -1,0 +1,126 @@
+{
+  "$comment": "Stabled theme definitions. Shared by the launcher (launcher/src) and the in-game client (copied into the mod jar at build time). Exactly nine choices: eight built-in themes plus the single Custom Background slot. Colours are #RRGGBB.",
+  "version": 1,
+  "defaultTheme": "stabled-night",
+  "themes": [
+    {
+      "id": "stabled-night",
+      "name": "Stabled Night",
+      "description": "Dark charcoal with violet and indigo accents",
+      "light": false,
+      "colors": {
+        "bg": "#0e0e13", "bgAlt": "#161427",
+        "surface": "#17161f", "surfaceAlt": "#201e2c", "surfaceHover": "#2a2739",
+        "border": "#2d2a3c", "text": "#ecebf5", "textMuted": "#9b98ae",
+        "accent": "#8b5cf6", "accentAlt": "#6366f1", "accentText": "#ffffff",
+        "cta": "#22c55e", "ctaText": "#04230f",
+        "success": "#22c55e", "warning": "#f5a524", "danger": "#f05252", "info": "#60a5fa"
+      }
+    },
+    {
+      "id": "midnight-blue",
+      "name": "Midnight Blue",
+      "description": "Deep navy with cool blue highlights",
+      "light": false,
+      "colors": {
+        "bg": "#080e1c", "bgAlt": "#0d1a36",
+        "surface": "#0f182c", "surfaceAlt": "#152239", "surfaceHover": "#1c2c49",
+        "border": "#22335a", "text": "#e6edf9", "textMuted": "#8d9cba",
+        "accent": "#3b82f6", "accentAlt": "#60a5fa", "accentText": "#ffffff",
+        "cta": "#22c55e", "ctaText": "#04230f",
+        "success": "#22c55e", "warning": "#f5a524", "danger": "#f05252", "info": "#93c5fd"
+      }
+    },
+    {
+      "id": "aurora",
+      "name": "Aurora",
+      "description": "Dark surfaces with teal and purple gradients",
+      "light": false,
+      "colors": {
+        "bg": "#091015", "bgAlt": "#1a1230",
+        "surface": "#10191f", "surfaceAlt": "#16222a", "surfaceHover": "#1e2d37",
+        "border": "#243440", "text": "#e7f3f1", "textMuted": "#8fa8a9",
+        "accent": "#2dd4bf", "accentAlt": "#a855f7", "accentText": "#03201c",
+        "cta": "#22c55e", "ctaText": "#04230f",
+        "success": "#22c55e", "warning": "#f5a524", "danger": "#f05252", "info": "#67e8f9"
+      }
+    },
+    {
+      "id": "forest",
+      "name": "Forest",
+      "description": "Deep green with soft emerald accents",
+      "light": false,
+      "colors": {
+        "bg": "#09110d", "bgAlt": "#0f2018",
+        "surface": "#0f1b15", "surfaceAlt": "#15261d", "surfaceHover": "#1c3226",
+        "border": "#22382b", "text": "#e5f2ea", "textMuted": "#8fa999",
+        "accent": "#34d399", "accentAlt": "#10b981", "accentText": "#022417",
+        "cta": "#4ade80", "ctaText": "#03240f",
+        "success": "#4ade80", "warning": "#f5a524", "danger": "#f05252", "info": "#7dd3fc"
+      }
+    },
+    {
+      "id": "sunset",
+      "name": "Sunset",
+      "description": "Warm orange, coral, and muted purple",
+      "light": false,
+      "colors": {
+        "bg": "#170f1a", "bgAlt": "#2a1424",
+        "surface": "#21141f", "surfaceAlt": "#2b1a28", "surfaceHover": "#372133",
+        "border": "#432a3d", "text": "#fbede7", "textMuted": "#c2a29f",
+        "accent": "#f97316", "accentAlt": "#fb7185", "accentText": "#2a0d00",
+        "cta": "#22c55e", "ctaText": "#04230f",
+        "success": "#22c55e", "warning": "#facc15", "danger": "#ef4444", "info": "#c4b5fd"
+      }
+    },
+    {
+      "id": "crimson",
+      "name": "Crimson",
+      "description": "Dark graphite with restrained red accents",
+      "light": false,
+      "colors": {
+        "bg": "#101012", "bgAlt": "#1a1214",
+        "surface": "#18181b", "surfaceAlt": "#212124", "surfaceHover": "#2b2b2f",
+        "border": "#313136", "text": "#f2f0f1", "textMuted": "#a3a1aa",
+        "accent": "#dc2645", "accentAlt": "#f43f5e", "accentText": "#ffffff",
+        "cta": "#22c55e", "ctaText": "#04230f",
+        "success": "#22c55e", "warning": "#f5a524", "danger": "#ff8a8a", "info": "#93c5fd"
+      }
+    },
+    {
+      "id": "ocean",
+      "name": "Ocean",
+      "description": "Blue and cyan with a calm, clean finish",
+      "light": false,
+      "colors": {
+        "bg": "#06161f", "bgAlt": "#082a3a",
+        "surface": "#0a212c", "surfaceAlt": "#0f2b38", "surfaceHover": "#143747",
+        "border": "#1a4252", "text": "#e6f6fb", "textMuted": "#8db4c3",
+        "accent": "#06b6d4", "accentAlt": "#3b82f6", "accentText": "#012a33",
+        "cta": "#22c55e", "ctaText": "#04230f",
+        "success": "#22c55e", "warning": "#f5a524", "danger": "#f05252", "info": "#67e8f9"
+      }
+    },
+    {
+      "id": "cloud",
+      "name": "Cloud",
+      "description": "A readable light theme with soft neutral surfaces",
+      "light": true,
+      "colors": {
+        "bg": "#eef0f4", "bgAlt": "#e4e8f2",
+        "surface": "#ffffff", "surfaceAlt": "#f4f5f8", "surfaceHover": "#e9ecf2",
+        "border": "#d5dae3", "text": "#1a1d25", "textMuted": "#5b6170",
+        "accent": "#6047e0", "accentAlt": "#3f6fe0", "accentText": "#ffffff",
+        "cta": "#15803d", "ctaText": "#ffffff",
+        "success": "#15803d", "warning": "#b45309", "danger": "#c81e1e", "info": "#1d4ed8"
+      }
+    }
+  ],
+  "custom": {
+    "id": "custom",
+    "name": "Custom Background",
+    "description": "A user-uploaded image from the computer",
+    "baseTheme": "stabled-night",
+    "defaultDim": 0.45
+  }
+}
