@@ -15,8 +15,6 @@ pub const THEMES_JSON: &str = include_str!("../../../shared/themes.json");
 pub struct LauncherBehaviour {
     /// What the launcher window does after a Save starts: "keep", "minimize" or "hide" (restored when the game exits).
     pub after_launch: String,
-    /// Expand the navigation rail when the pointer hovers over it (click/keyboard expansion always works).
-    pub expand_nav_on_hover: bool,
     /// Turn off launcher animations and transitions.
     pub reduce_motion: bool,
     /// Page shown when Stabled opens: "home" or "saves".
@@ -29,7 +27,6 @@ impl Default for LauncherBehaviour {
     fn default() -> Self {
         Self {
             after_launch: "minimize".into(),
-            expand_nav_on_hover: true,
             reduce_motion: false,
             start_page: "saves".into(),
             show_minecraft_news: true,
@@ -76,6 +73,65 @@ impl Default for Advanced {
     }
 }
 
+/// Streamer mode: hides personal details in the launcher while streaming or recording. Every feature that shows
+/// something personal checks `enabled` plus its own switch, so new features join by adding a switch here.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", default)]
+pub struct StreamerMode {
+    pub enabled: bool,
+    /// Minecraft username (header, greeting, account, sign-in).
+    pub hide_username: bool,
+    /// Skin face next to the username.
+    pub hide_avatar: bool,
+    /// Folder locations, which include the Windows user name (Settings, logs, messages).
+    pub hide_paths: bool,
+    /// Usernames, user folders and session details in game logs and crash reports shown by the launcher.
+    pub redact_logs: bool,
+    /// The computer specifications bar (unless fake specs are on).
+    pub hide_specs: bool,
+}
+
+impl Default for StreamerMode {
+    fn default() -> Self {
+        Self { enabled: false, hide_username: true, hide_avatar: true, hide_paths: true, redact_logs: true, hide_specs: false }
+    }
+}
+
+/// Display-only specifications for the specs bar. Nothing else uses them: memory suggestions and the game still
+/// use the real hardware.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", default)]
+pub struct FakeSpecs {
+    pub enabled: bool,
+    pub cpu: String,
+    pub gpu: String,
+    pub ram_gb: u32,
+}
+
+impl Default for FakeSpecs {
+    fn default() -> Self {
+        Self { enabled: false, cpu: String::new(), gpu: String::new(), ram_gb: 0 }
+    }
+}
+
+/// Automatic world backups (see `backups.rs`).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", default)]
+pub struct Backups {
+    /// Back up worlds a session changed, after the game has closed.
+    pub after_sessions: bool,
+    /// Back up every world before Stabled upgrades a Save's game files or mods.
+    pub before_upgrades: bool,
+    /// Automatic backups kept per world (manual and pre-upgrade backups are kept until deleted).
+    pub keep: u32,
+}
+
+impl Default for Backups {
+    fn default() -> Self {
+        Self { after_sessions: true, before_upgrades: true, keep: 5 }
+    }
+}
+
 /// Current settings format. Older files are migrated in `sanitized`.
 const SETTINGS_VERSION: u32 = 2;
 
@@ -87,11 +143,22 @@ pub struct Settings {
     pub launcher: LauncherBehaviour,
     pub save_defaults: SaveDefaults,
     pub advanced: Advanced,
+    pub streamer: StreamerMode,
+    pub fake_specs: FakeSpecs,
+    pub backups: Backups,
 }
 
 impl Default for Settings {
     fn default() -> Self {
-        Self { version: SETTINGS_VERSION, launcher: LauncherBehaviour::default(), save_defaults: SaveDefaults::default(), advanced: Advanced::default() }
+        Self {
+            version: SETTINGS_VERSION,
+            launcher: LauncherBehaviour::default(),
+            save_defaults: SaveDefaults::default(),
+            advanced: Advanced::default(),
+            streamer: StreamerMode::default(),
+            fake_specs: FakeSpecs::default(),
+            backups: Backups::default(),
+        }
     }
 }
 
@@ -127,6 +194,11 @@ impl Settings {
             self.save_defaults.minecraft_version = crate::minecraft::stack::PRIMARY_VERSION.into();
         }
         self.advanced.concurrent_downloads = self.advanced.concurrent_downloads.clamp(1, 16);
+        let clean = |s: &str| -> String { s.chars().filter(|c| !c.is_control()).take(80).collect::<String>().trim().to_string() };
+        self.fake_specs.cpu = clean(&self.fake_specs.cpu);
+        self.fake_specs.gpu = clean(&self.fake_specs.gpu);
+        self.fake_specs.ram_gb = self.fake_specs.ram_gb.min(4096);
+        self.backups.keep = self.backups.keep.clamp(1, 50);
         self
     }
 

@@ -1,8 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { api, asError, onEvent, type AppInfo, type AppearanceView, type AuthStatus, type Save, type Settings } from './api';
+import { api, asError, onEvent, type AppInfo, type AppearanceView, type AuthStatus, type CompatReport, type CrashReport, type Save, type Settings } from './api';
 import { applyAppearance } from './theme';
 
-export type Page = 'home' | 'saves' | 'optimiser' | 'settings';
+export type Page = 'home' | 'saves' | 'store' | 'optimiser' | 'settings';
+export type SavesTab = 'overview' | 'mods' | 'logs' | 'backups' | 'settings';
 export type ToastTone = 'info' | 'success' | 'warning' | 'error';
 export interface Toast {
   id: number;
@@ -21,6 +22,22 @@ interface Store {
   page: Page;
   signIn: { open: boolean; reason: string | null };
   toasts: Toast[];
+  savesTab: SavesTab;
+  setSavesTab: (t: SavesTab) => void;
+  /** Go to the Saves page with this Save selected and a tab open. */
+  openSave: (id: string, tab?: SavesTab) => void;
+  discordPrompt: boolean;
+  askDiscord: () => void;
+  closeDiscord: () => void;
+  /** Problems found by the pre-launch mod check, waiting for the player's decision. */
+  launchCheck: { save: Save; report: CompatReport } | null;
+  resolveLaunchCheck: (go: boolean) => void;
+  /** Crash explanations for a Save that just closed unexpectedly. */
+  crash: { save: Save; report: CrashReport } | null;
+  showCrash: (c: { save: Save; report: CrashReport } | null) => void;
+  /** Save whose Find the broken mod wizard is open. */
+  bisectSave: string | null;
+  setBisectSave: (id: string | null) => void;
   setPage: (p: Page) => void;
   select: (id: string | null) => void;
   refreshSaves: () => Promise<void>;
@@ -56,7 +73,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [page, setPage] = useState<Page>('home');
   const [signIn, setSignIn] = useState<{ open: boolean; reason: string | null }>({ open: false, reason: null });
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [savesTab, setSavesTab] = useState<SavesTab>('overview');
+  const [discordPrompt, setDiscordPrompt] = useState(false);
+  const [launchCheck, setLaunchCheck] = useState<{ save: Save; report: CompatReport } | null>(null);
+  const [crash, setCrash] = useState<{ save: Save; report: CrashReport } | null>(null);
+  const [bisectSave, setBisectSave] = useState<string | null>(null);
   const toastId = useRef(1);
+  const savesRef = useRef<Save[]>([]);
+  savesRef.current = saves;
 
   const toast = useCallback((message: string, tone: ToastTone = 'info') => {
     const id = toastId.current++;
@@ -73,6 +97,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const upsertSave = useCallback((s: Save) => {
+    if (s.testOf) return; // test copies are hidden
     setSaves((list) => {
       const i = list.findIndex((x) => x.id === s.id);
       if (i === -1) return [...list, s];
@@ -124,15 +149,29 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const subs = [
       onEvent<Save>('save-updated', (s) => upsertSave(s)),
       onEvent<AuthStatus>('auth-changed', (a) => setAuth(a)),
-      onEvent<{ id: string; code: number | null }>('game-exited', () => {
+      onEvent<{ id: string; code: number | null; crash: CrashReport | null }>('game-exited', (e) => {
         // The game may have changed the shared appearance (theme picked in game) — pick it up.
         api.appearanceGet().then(setAppearance).catch(() => undefined);
+        const save = savesRef.current.find((s) => s.id === e.id);
+        if (e.crash && save) setCrash({ save, report: e.crash });
+      }),
+      onEvent<{ id: string; checked: number; replaced: number }>('repair-done', (e) => {
+        toast(
+          e.replaced > 0
+            ? `Repair finished: checked ${e.checked.toLocaleString()} game files and replaced ${e.replaced}. Worlds and your mods weren't touched.`
+            : `Repair finished: all ${e.checked.toLocaleString()} game files are intact.`,
+          'success',
+        );
+      }),
+      onEvent<{ id: string; worlds: number; reason: string; error: string | null }>('backups-done', (e) => {
+        if (e.error) toast(`World backup failed: ${e.error}`, 'warning');
+        else if (e.worlds > 0) toast(`Backed up ${e.worlds} world${e.worlds === 1 ? '' : 's'} ${e.reason === 'upgrade' ? 'before the update' : 'from your session'}.`, 'success');
       }),
     ];
     return () => {
       subs.forEach((p) => p.then((un) => un()));
     };
-  }, [upsertSave]);
+  }, [upsertSave, toast]);
 
   // Re-read appearance when the window regains focus (the game may have changed it while running).
   useEffect(() => {
@@ -167,13 +206,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const openSignIn = useCallback((reason: string | null = null) => setSignIn({ open: true, reason }), []);
   const closeSignIn = useCallback(() => setSignIn({ open: false, reason: null }), []);
 
-  const launch = useCallback(
+  const launchNow = useCallback(
     async (save: Save) => {
-      // The backend enforces this too; the UI check only avoids a round trip and opens sign-in directly.
-      if (!auth || (auth.state !== 'signed_in' && auth.state !== 'offline')) {
-        openSignIn(auth?.state === 'no_java' ? auth.message : 'Sign in with Microsoft to launch Minecraft.');
-        return;
-      }
       try {
         await api.saveLaunch(save.id);
       } catch (e) {
@@ -185,8 +219,43 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         }
       }
     },
-    [auth, openSignIn, toast],
+    [openSignIn, toast],
   );
+
+  const launch = useCallback(
+    async (save: Save) => {
+      // The backend enforces this too; the UI check only avoids a round trip and opens sign-in directly.
+      if (!auth || (auth.state !== 'signed_in' && auth.state !== 'offline')) {
+        openSignIn(auth?.state === 'no_java' ? auth.message : 'Sign in with Microsoft to launch Minecraft.');
+        return;
+      }
+      // Mod compatibility check: wrong Minecraft versions, other loaders, duplicates and known conflicts.
+      const report = await api.modsCheck(save.id).catch(() => null);
+      if (report && report.problems.some((p) => p.level === 'error')) {
+        setLaunchCheck({ save, report });
+        return;
+      }
+      await launchNow(save);
+    },
+    [auth, openSignIn, launchNow],
+  );
+
+  const launchCheckRef = useRef(launchCheck);
+  launchCheckRef.current = launchCheck;
+  const resolveLaunchCheck = useCallback(
+    (go: boolean) => {
+      const c = launchCheckRef.current;
+      setLaunchCheck(null);
+      if (c && go) void launchNow(c.save);
+    },
+    [launchNow],
+  );
+
+  const openSave = useCallback((id: string, tab: SavesTab = 'overview') => {
+    setSelectedId(id);
+    setSavesTab(tab);
+    setPage('saves');
+  }, []);
 
   const value = useMemo<Store>(
     () => ({
@@ -200,6 +269,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       page,
       signIn,
       toasts,
+      savesTab,
+      setSavesTab,
+      openSave,
+      discordPrompt,
+      askDiscord: () => setDiscordPrompt(true),
+      closeDiscord: () => setDiscordPrompt(false),
+      launchCheck,
+      resolveLaunchCheck,
+      crash,
+      showCrash: setCrash,
+      bisectSave,
+      setBisectSave,
       setPage,
       select: setSelectedId,
       refreshSaves,
@@ -215,7 +296,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       dismissToast,
       launch,
     }),
-    [info, settings, appearance, auth, saves, savesLoaded, selectedId, page, signIn, toasts, refreshSaves, upsertSave, removeSave, updateSettings, updateAppearance, openSignIn, closeSignIn, toast, dismissToast, launch],
+    [info, settings, appearance, auth, saves, savesLoaded, selectedId, page, signIn, toasts, savesTab, openSave, discordPrompt, launchCheck, resolveLaunchCheck, crash, bisectSave, refreshSaves, upsertSave, removeSave, updateSettings, updateAppearance, openSignIn, closeSignIn, toast, dismissToast, launch],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

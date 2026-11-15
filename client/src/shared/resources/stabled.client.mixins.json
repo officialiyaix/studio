@@ -9,6 +9,7 @@
 		"AbstractButtonMixin",
 		"GameRendererMixin",
 		"PauseScreenMixin",
+		"PlayerModelMixin",
 		"TitleScreenMixin"
 	],
 	"injectors": {

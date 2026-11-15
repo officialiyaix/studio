@@ -1,12 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronUp, Cpu, MemoryStick, Monitor } from 'lucide-react';
 import { api, type SystemDynamic, type SystemStatic } from '../lib/api';
-import { formatGB } from '../lib/format';
+import { cx, formatGB } from '../lib/format';
+import { useStore } from '../lib/store';
+import { usePrivacy } from '../lib/privacy';
 
 const POLL_MS = 5000;
 
-/** Persistent bottom-left panel with the computer's real hardware. Static data is read once; memory every 5 s. */
+/**
+ * Persistent bottom-left panel with the computer's hardware. Static data is read once; memory every 5 s.
+ * Settings → Fake specs replaces what's shown (display only); streamer mode can hide it.
+ */
 export function SpecsPanel() {
+  const { settings } = useStore();
+  const privacy = usePrivacy();
+  const fake = settings?.fakeSpecs.enabled ? settings.fakeSpecs : null;
+  const hidden = !fake && privacy.hideSpecs;
   const [info, setInfo] = useState<SystemStatic | null>(null);
   const [dyn, setDyn] = useState<SystemDynamic | null>(null);
   const [failed, setFailed] = useState(false);
@@ -39,46 +48,49 @@ export function SpecsPanel() {
   }, [open]);
 
   const unavailable = failed ? 'Unavailable' : 'Reading…';
-  const gpu = info?.gpus[0]?.name ?? (info ? 'Not detected' : unavailable);
+  const realGpu = info?.gpus[0]?.name ?? (info ? 'Not detected' : unavailable);
+  const gpu = hidden ? 'Hidden' : fake?.gpu || realGpu;
+  const cpu = hidden ? 'Hidden' : fake?.cpu || (info ? info.cpu ?? 'Not detected' : unavailable);
+  const ram = hidden ? 'Hidden' : fake?.ramGb ? `${fake.ramGb} GB installed` : info?.memoryInstalledBytes != null ? `${formatGB(info.memoryInstalledBytes, 0)} installed` : unavailable;
   const extraGpus = (info?.gpus.length ?? 0) - 1;
   const used = dyn?.memoryUsedBytes ?? null;
   const usable = dyn?.memoryUsableBytes ?? info?.memoryUsableBytes ?? null;
   const usedPct = used != null && usable ? Math.round((used / usable) * 100) : null;
 
   return (
-    <div className="specs panel" ref={ref} aria-label="Computer specifications">
-      <div className="spec cpu" title={info?.cpu ?? undefined}>
+    <div className={cx('specs panel', fake && 'fake')} ref={ref} aria-label="Computer specifications">
+      <div className="spec cpu" title={hidden ? undefined : fake?.cpu || info?.cpu || undefined}>
         <Cpu size={18} />
         <div className="body">
           <span className="k">CPU</span>
-          <span className="v">{info ? info.cpu ?? 'Not detected' : unavailable}</span>
+          <span className="v" key={cpu}>{cpu}</span>
         </div>
       </div>
-      <div className="spec gpu" title={info?.gpus.map((g) => g.name).join('\n')}>
+      <div className="spec gpu" title={hidden ? undefined : fake?.gpu || info?.gpus.map((g) => g.name).join('\n')}>
         <Monitor size={18} />
         <div className="body">
-          <span className="k">GPU{extraGpus > 0 ? ` · ${extraGpus + 1} adapters` : ''}</span>
-          <span className="v">{gpu}</span>
+          <span className="k">GPU{extraGpus > 0 && !fake && !hidden ? ` · ${extraGpus + 1} adapters` : ''}</span>
+          <span className="v" key={gpu}>{gpu}</span>
         </div>
       </div>
       <div className="spec ram">
         <MemoryStick size={18} />
         <div className="body">
           <span className="k">RAM</span>
-          <span className="v">
-            {info?.memoryInstalledBytes != null ? `${formatGB(info.memoryInstalledBytes, 0)} installed` : unavailable}
+          <span className="v" key={ram}>
+            {ram}
           </span>
-          {usedPct != null && (
+          {usedPct != null && !hidden && !fake?.ramGb && (
             <span className="mem-bar" title={`${formatGB(used)} of ${formatGB(usable)} in use`}>
               <span style={{ width: `${usedPct}%` }} />
             </span>
           )}
         </div>
       </div>
-      <button type="button" className="icon-btn plain sm" aria-expanded={open} aria-label="Show full system details" onClick={() => setOpen((o) => !o)}>
+      <button type="button" className="icon-btn plain sm" aria-expanded={open} aria-label="Show full system details" disabled={hidden} onClick={() => setOpen((o) => !o)}>
         <ChevronUp size={16} style={{ transform: open ? 'rotate(180deg)' : undefined, transition: 'transform var(--speed)' }} />
       </button>
-      {open && (
+      {open && !hidden && (
         <div className="specs-pop panel" role="dialog" aria-label="System details">
           <div className="section-title">This computer</div>
           <dl>
@@ -120,7 +132,9 @@ export function SpecsPanel() {
               )}
             </dd>
           </dl>
-          <p className="tiny muted">Read from this PC. Memory in use refreshes every 5 seconds; GB = 1024³ bytes, as Windows shows.</p>
+          <p className="tiny muted">
+            {fake ? 'Your real hardware, read from this PC (the bar shows your fake specs). ' : 'Read from this PC. '}Memory in use refreshes every 5 seconds; GB = 1024³ bytes, as Windows shows.
+          </p>
         </div>
       )}
     </div>

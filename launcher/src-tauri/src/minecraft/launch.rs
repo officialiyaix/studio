@@ -79,8 +79,18 @@ pub fn build(
     if let Some(dir) = crate::gallery::dir() {
         args.push(format!("-Dstabled.galleryDir={}", dir.display()));
     }
+    // Streamer mode: the in-game title screen hides the player's name too.
+    let streamer = crate::settings::Settings::load().streamer;
+    if streamer.enabled && streamer.hide_username {
+        args.push("-Dstabled.streamer.hideName=true".into());
+    }
     if let Some(id) = &crate::config::get().discord_application_id {
         args.push(format!("-Dstabled.discordAppId={id}"));
+    }
+    // PC Optimiser → Tuned Java memory management, unless the player picked a collector themselves.
+    let own_gc = extra_jvm.iter().any(|a| a.starts_with("-XX:+Use") && a.ends_with("GC"));
+    if crate::optimiser::launch_tweaks().gc_flags && !own_gc {
+        args.extend(crate::optimiser::GC_FLAGS.iter().map(|f| f.to_string()));
     }
     args.extend(extra_jvm.iter().cloned());
     let main_class = prepared.fabric_profile["mainClass"].as_str().unwrap_or("net.fabricmc.loader.impl.launch.knot.KnotClient");
@@ -106,6 +116,11 @@ pub async fn spawn(save: &SaveMeta, java: PathBuf, args: Vec<String>, secret: &s
     }
     let mut child = cmd.spawn().map_err(|e| crate::error::AppError::new("LAUNCH", format!("Could not start Java: {e}")))?;
     let pid = child.id().unwrap_or(0);
+    // PC Optimiser → High priority for Minecraft.
+    #[cfg(windows)]
+    if crate::optimiser::launch_tweaks().high_priority {
+        crate::optimiser::boost_process(&child);
+    }
     crate::log_info!("Started Save {} as process {pid}", save.id);
     let log_path = save.game_dir().join("logs").join("stabled-launch.log");
     let _ = std::fs::create_dir_all(save.game_dir().join("logs"));

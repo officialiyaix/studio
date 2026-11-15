@@ -151,7 +151,10 @@ public final class TitleLayout {
 		Minecraft mc = Minecraft.getInstance();
 		Component save = Component.literal(StabledClient.saveName());
 		Component version = Component.translatable("stabled.menu.version", PresenceManager.get().gameVersion());
-		Component user = Component.translatable("stabled.menu.signed_in", mc.getUser().getName());
+		// Streamer mode in the launcher (-Dstabled.streamer.hideName) keeps the player's name off screen.
+		Component user = Boolean.getBoolean("stabled.streamer.hideName")
+			? Component.translatable("stabled.menu.signed_in.hidden")
+			: Component.translatable("stabled.menu.signed_in", mc.getUser().getName());
 		PresenceManager.Status status = PresenceManager.get().status();
 		Component discord = Component.translatable("stabled.menu.discord." + status.name().toLowerCase(java.util.Locale.ROOT));
 		int w = Math.min(190, Math.max(Ui.font().width(save), Ui.font().width(user)) + 26);

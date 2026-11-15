@@ -10,6 +10,8 @@ import { HomePage } from './pages/Home';
 import { SavesPage } from './pages/Saves';
 import { OptimiserPage } from './pages/Optimiser';
 import { SettingsPage } from './pages/Settings';
+import { StorePage } from './pages/Store';
+import { CrashDialog, DiscordPrompt, LaunchCheckDialog } from './features/GlobalDialogs';
 
 function Backdrop() {
   const { appearance } = useStore();
@@ -61,6 +63,7 @@ export function App() {
         <main className="main" id="main">
           {page === 'home' && <HomePage key="home" />}
           {page === 'saves' && <SavesPage key="saves" />}
+          {page === 'store' && <StorePage key="store" />}
           {page === 'optimiser' && <OptimiserPage key="optimiser" />}
           {page === 'settings' && <SettingsPage key="settings" />}
         </main>
@@ -70,6 +73,9 @@ export function App() {
         </footer>
       </div>
       <SignInDialog />
+      <DiscordPrompt />
+      <LaunchCheckDialog />
+      <CrashDialog />
       <Toasts />
     </>
   );

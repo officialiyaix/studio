@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
-import { FolderOpen, Lock, Plus, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react';
+import { FolderOpen, Lock, Plus, RefreshCw, SearchCode, ShieldCheck, ShoppingBag, Trash2 } from 'lucide-react';
 import { open } from '@tauri-apps/plugin-dialog';
 import { api, asError, type ModEntry, type ModList, type Save } from '../lib/api';
 import { useStore } from '../lib/store';
 import { cx, formatBytes } from '../lib/format';
 import { Callout, ConfirmDialog, Toggle } from '../components/ui';
 
-export function ModsManager({ save }: { save: Save }) {
-  const { toast } = useStore();
+export function ModsManager({ save, onFindBroken }: { save: Save; onFindBroken?: () => void }) {
+  const { toast, setPage } = useStore();
   const [list, setList] = useState<ModList | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [removing, setRemoving] = useState<ModEntry | null>(null);
@@ -56,6 +56,14 @@ export function ModsManager({ save }: { save: Save }) {
         <button type="button" className="btn" onClick={() => api.saveOpenFolder(save.id, 'mods')}>
           <FolderOpen size={16} /> Open mods folder
         </button>
+        <button type="button" className="btn" onClick={() => setPage('store')}>
+          <ShoppingBag size={16} /> Browse the Store
+        </button>
+        {onFindBroken && (
+          <button type="button" className="btn" onClick={onFindBroken} disabled={locked} title="Test your mods in a copy of this Save to find the one causing a crash">
+            <SearchCode size={16} /> Find the broken mod
+          </button>
+        )}
         <button type="button" className="icon-btn" aria-label="Refresh mod list" onClick={load}>
           <RefreshCw size={16} />
         </button>
@@ -76,7 +84,7 @@ export function ModsManager({ save }: { save: Save }) {
       ))}
       {problems > 0 && (
         <p className="tiny muted">
-          {problems} problem{problems === 1 ? '' : 's'} found from mod metadata. Stabled checks loaders, Minecraft versions, dependencies, duplicates and declared incompatibilities — it can't predict every conflict, so if the game won't start, check the mod's page.
+          {problems} problem{problems === 1 ? '' : 's'} found from mod metadata. Stabled checks loaders, Minecraft versions, dependencies, duplicates, declared incompatibilities and known conflicts, and checks again before every launch. It can't predict every conflict: if the game still crashes, use Find the broken mod.
         </p>
       )}
 

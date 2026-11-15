@@ -1,13 +1,18 @@
-import { Download, FolderOpen, Loader2, Play, Puzzle, Square, Wrench, X } from 'lucide-react';
+import { useState } from 'react';
+import { FileText, FolderOpen, Loader2, Play, Puzzle, Square, Wrench, X } from 'lucide-react';
 import { api, asError, type Save } from '../lib/api';
 import { useStore } from '../lib/store';
 import { formatBytes, pct, relativeTime } from '../lib/format';
-import { Callout, ProgressBar, SaveIcon, StatusBadge } from '../components/ui';
+import { Callout, ConfirmDialog, ProgressBar, SaveIcon, StatusBadge } from '../components/ui';
 import { SaveMenu } from './SaveActions';
 
-/** The selected Save: identity, real status, progress and launch controls. */
-export function SaveHero({ save, onOpenMods }: { save: Save; onOpenMods?: () => void }) {
+/**
+ * The selected Save: identity, real status, progress and launch controls. Launch installs whatever is missing
+ * first, so there is no separate Install step.
+ */
+export function SaveHero({ save, onOpenMods, onOpenLogs }: { save: Save; onOpenMods?: () => void; onOpenLogs?: () => void }) {
   const { launch, toast, auth } = useStore();
+  const [repairAsk, setRepairAsk] = useState(false);
   const phase = save.phase;
   const progress = phase?.kind === 'downloading' ? phase.progress : null;
   const busy = save.status === 'downloading' || save.status === 'launching';
@@ -74,13 +79,8 @@ export function SaveHero({ save, onOpenMods }: { save: Save; onOpenMods?: () => 
             {busy ? (save.status === 'launching' ? 'Launching' : 'Installing') : 'Launch'}
           </button>
         )}
-        {save.status === 'not_installed' && !busy && (
-          <button type="button" className="btn btn-lg" onClick={() => api.saveInstall(save.id).catch((e) => toast(asError(e).message, 'error'))}>
-            <Download size={17} /> Install
-          </button>
-        )}
         {(save.status === 'ready' || save.status === 'error') && (
-          <button type="button" className="btn btn-lg" title="Re-check and repair game files" onClick={() => api.saveInstall(save.id).catch((e) => toast(asError(e).message, 'error'))}>
+          <button type="button" className="btn btn-lg" title="Check every game file and replace damaged ones" onClick={() => setRepairAsk(true)}>
             <Wrench size={17} /> Repair
           </button>
         )}
@@ -89,11 +89,31 @@ export function SaveHero({ save, onOpenMods }: { save: Save; onOpenMods?: () => 
             <Puzzle size={17} /> Mods
           </button>
         )}
+        {onOpenLogs && (
+          <button type="button" className="btn btn-lg" onClick={onOpenLogs}>
+            <FileText size={17} /> Logs
+          </button>
+        )}
         <button type="button" className="btn btn-lg" onClick={() => api.saveOpenFolder(save.id).catch((e) => toast(asError(e).message, 'error'))}>
           <FolderOpen size={17} /> Folder
         </button>
       </div>
-      {!signedIn && !running && <p className="tiny muted">Launching needs a Microsoft account with Minecraft: Java Edition. Installing and everything else work without signing in.</p>}
+      {!signedIn && !running && <p className="tiny muted">Launching needs a Microsoft account with Minecraft: Java Edition. Everything else works without signing in.</p>}
+      {signedIn && save.status === 'not_installed' && !busy && <p className="tiny muted">Not installed yet: Launch downloads Minecraft, Fabric and the Stabled client first.</p>}
+      {repairAsk && (
+        <ConfirmDialog
+          title="Repair this Save?"
+          confirmLabel="Repair"
+          onCancel={() => setRepairAsk(false)}
+          onConfirm={() => {
+            setRepairAsk(false);
+            api.saveInstall(save.id, true).catch((e) => toast(asError(e).message, 'error'));
+          }}
+        >
+          <p>Stabled checks every game file (Minecraft, libraries, assets and Java) against its official checksum and downloads again any that are missing or damaged.</p>
+          <p className="muted small">Your worlds, screenshots, settings and the mods you added are not touched.</p>
+        </ConfirmDialog>
+      )}
       {running && <p className="tiny muted">Mods and Save settings are locked while Minecraft is running. Change Stabled options in game with Stabled Settings (Right Shift).</p>}
     </section>
   );

@@ -319,6 +319,98 @@ pub fn read_mod_id(path: &Path) -> Option<String> {
     inspect_jar(path).and_then(|(p, _)| p.id)
 }
 
+// ---------- Find the broken mod ----------
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Candidate {
+    /// File name without ".disabled".
+    pub file: String,
+    pub name: String,
+    pub mod_id: Option<String>,
+    /// Files of other candidates this mod requires.
+    pub requires: Vec<String>,
+}
+
+/// Mods that can be switched off for testing: every jar except the components the Stabled client needs.
+/// With `enabled_only`, only currently enabled mods.
+pub fn candidates(meta: &SaveMeta, enabled_only: bool) -> AppResult<Vec<Candidate>> {
+    let state = managed::load(meta);
+    let mut parsed: Vec<(String, Option<Parsed>, Vec<String>)> = Vec::new();
+    for e in std::fs::read_dir(meta.mods_dir())?.flatten() {
+        let name = e.file_name().to_string_lossy().into_owned();
+        let enabled = name.ends_with(".jar");
+        if !(enabled || name.ends_with(".jar.disabled")) || (enabled_only && !enabled) {
+            continue;
+        }
+        let base = name.trim_end_matches(".disabled").to_string();
+        if managed::is_required(&state, &base) {
+            continue;
+        }
+        let (p, nested) = match inspect_jar(&e.path()) {
+            Some((p, n)) => (Some(p), n),
+            None => (None, vec![]),
+        };
+        parsed.push((base, p, nested));
+    }
+    // Which candidate file provides each mod id.
+    let mut provider: HashMap<String, String> = HashMap::new();
+    for (file, p, nested) in &parsed {
+        if let Some(p) = p {
+            for id in p.id.iter().chain(p.provides.iter()).chain(nested.iter()) {
+                provider.entry(id.clone()).or_insert_with(|| file.clone());
+            }
+        }
+    }
+    let mut out: Vec<Candidate> = parsed
+        .iter()
+        .map(|(file, p, _)| {
+            let mut requires: Vec<String> = p
+                .as_ref()
+                .map(|p| p.depends.keys().filter_map(|d| provider.get(d)).filter(|f| *f != file).cloned().collect())
+                .unwrap_or_default();
+            requires.sort();
+            requires.dedup();
+            Candidate {
+                file: file.clone(),
+                name: p.as_ref().and_then(|p| p.name.clone()).unwrap_or_else(|| file.trim_end_matches(".jar").to_string()),
+                mod_id: p.as_ref().and_then(|p| p.id.clone()),
+                requires,
+            }
+        })
+        .collect();
+    out.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+    Ok(out)
+}
+
+/// In a test copy: enables `keep` (plus the mods they require) and disables the other `all` mods.
+/// Returns the files that are enabled afterwards.
+pub fn apply_test_set(meta: &SaveMeta, all: &[String], keep: &[String]) -> AppResult<Vec<String>> {
+    let cands = candidates(meta, false)?;
+    let by_file: HashMap<&str, &Candidate> = cands.iter().map(|c| (c.file.as_str(), c)).collect();
+    let mut on: HashSet<String> = HashSet::new();
+    let mut stack: Vec<String> = keep.to_vec();
+    while let Some(f) = stack.pop() {
+        if !all.contains(&f) || !on.insert(f.clone()) {
+            continue;
+        }
+        if let Some(c) = by_file.get(f.as_str()) {
+            stack.extend(c.requires.iter().cloned());
+        }
+    }
+    for f in all {
+        if !by_file.contains_key(f.as_str()) {
+            continue;
+        }
+        let want = on.contains(f);
+        let current = if meta.mods_dir().join(f).is_file() { f.clone() } else { format!("{f}.disabled") };
+        set_enabled(meta, &current, want)?;
+    }
+    let mut v: Vec<String> = on.into_iter().collect();
+    v.sort();
+    Ok(v)
+}
+
 // ---------- Fabric version predicates ----------
 
 fn describe(pred: &Value) -> String {

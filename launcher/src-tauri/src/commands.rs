@@ -8,7 +8,7 @@ use crate::minecraft::{install, launch, stack};
 use crate::saves::{self, client, managed, SaveMeta};
 use crate::settings::{self, Settings};
 use crate::state::{AppState, RunPhase};
-use crate::{images, mods, news, optimiser, paths, system};
+use crate::{backups, compat, crash, images, logs, mods, news, optimiser, paths, store, system};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::sync::Arc;
@@ -333,7 +333,22 @@ pub fn save_reset_intro(state: S, id: String) -> AppResult<()> {
 #[tauri::command]
 pub async fn mods_list(id: String) -> AppResult<mods::ModList> {
     let meta = saves::load(&id)?;
-    tauri::async_runtime::spawn_blocking(move || mods::list(&meta)).await.map_err(|e| AppError::new("MODS", e.to_string()))?
+    tauri::async_runtime::spawn_blocking(move || {
+        let mut list = mods::list(&meta)?;
+        for p in compat::known_conflicts(&list.mods) {
+            list.issues.push(mods::Issue { level: p.level, message: p.fix.map(|f| format!("{} {f}", p.message)).unwrap_or(p.message) });
+        }
+        Ok(list)
+    })
+    .await
+    .map_err(|e| AppError::new("MODS", e.to_string()))?
+}
+
+/// Pre-launch compatibility check.
+#[tauri::command]
+pub async fn mods_check(id: String) -> AppResult<compat::Report> {
+    let meta = saves::load(&id)?;
+    tauri::async_runtime::spawn_blocking(move || compat::check(&meta)).await.map_err(|e| AppError::new("MODS", e.to_string()))?
 }
 
 #[tauri::command]
@@ -378,8 +393,30 @@ fn set_phase(app: &AppHandle, state: &AppState, id: &str, phase: Option<RunPhase
     emit_save(app, state, id);
 }
 
-async fn prepare_save(app: &AppHandle, state: &Arc<AppState>, meta: &SaveMeta) -> AppResult<install::Prepared> {
-    let concurrency = state.settings.lock().unwrap().advanced.concurrent_downloads as usize;
+async fn prepare_save(app: &AppHandle, state: &Arc<AppState>, meta: &SaveMeta, verify_all: bool) -> AppResult<install::Prepared> {
+    let (concurrency, backup_settings) = {
+        let s = state.settings.lock().unwrap();
+        (s.advanced.concurrent_downloads as usize, s.backups.clone())
+    };
+    // Back up every world before Stabled changes this Save's game files or mods for a new stack.
+    let target = stack::for_version(&meta.minecraft_version).map(|s| s.key());
+    let upgrading = meta.installed_stack.is_some() && meta.installed_stack != target;
+    if upgrading && backup_settings.before_upgrades && meta.test_of.is_none() {
+        state.runs.lock().unwrap().insert(meta.id.clone(), RunPhase::Downloading {
+            progress: Some(install::Progress { phase: "backup".into(), label: "Backing up worlds before the update".into(), files_done: 0, files_total: 0, bytes_done: 0, bytes_total: 0 }),
+        });
+        emit_save(app, state, &meta.id);
+        let m = meta.clone();
+        let keep = backup_settings.keep;
+        let r = tauri::async_runtime::spawn_blocking(move || backups::create(&m, "upgrade", None, None, keep)).await.map_err(|e| AppError::new("BACKUP", e.to_string()))?;
+        match r {
+            Ok(n) => {
+                let _ = app.emit("backups-done", json!({ "id": meta.id, "worlds": n, "reason": "upgrade", "error": null }));
+            }
+            // Never update without the backup the player asked for.
+            Err(e) => bail!("BACKUP", "Stabled couldn't back up your worlds before updating this Save, so nothing was changed: {e}"),
+        }
+    }
     let app2 = app.clone();
     let state2 = state.clone();
     let id = meta.id.clone();
@@ -387,23 +424,30 @@ async fn prepare_save(app: &AppHandle, state: &Arc<AppState>, meta: &SaveMeta) -
         state2.runs.lock().unwrap().insert(id.clone(), RunPhase::Downloading { progress: Some(p) });
         emit_save(&app2, &state2, &id);
     };
-    let prepared = install::prepare(meta, concurrency, &emit).await?;
+    let prepared = install::prepare(meta, concurrency, verify_all, &emit).await?;
     let mut updated = saves::load(&meta.id)?;
     updated.installed_stack = stack::for_version(&meta.minecraft_version).map(|s| s.key());
     updated.save()?;
     Ok(prepared)
 }
 
-/// Install or repair a Save's files without launching (no sign-in needed: these are public game files).
+/// Install, or with `repair` verify every game file's hash and replace damaged ones, without launching (no
+/// sign-in needed: these are public game files). Worlds, mods the player added and settings are never touched.
 #[tauri::command]
-pub async fn save_install(app: AppHandle, state: S<'_>, id: String) -> AppResult<()> {
+pub async fn save_install(app: AppHandle, state: S<'_>, id: String, repair: Option<bool>) -> AppResult<()> {
     ensure_idle(&state, &id, "Installing")?;
     let meta = saves::load(&id)?;
     let state = state.inner().clone();
+    let repair = repair.unwrap_or(false);
     set_phase(&app, &state, &id, Some(RunPhase::Downloading { progress: None }));
     tauri::async_runtime::spawn(async move {
-        match prepare_save(&app, &state, &meta).await {
-            Ok(_) => set_phase(&app, &state, &meta.id, None),
+        match prepare_save(&app, &state, &meta, repair).await {
+            Ok(p) => {
+                set_phase(&app, &state, &meta.id, None);
+                if repair {
+                    let _ = app.emit("repair-done", json!({ "id": meta.id, "checked": p.files_checked, "replaced": p.files_replaced }));
+                }
+            }
             Err(e) => set_phase(&app, &state, &meta.id, Some(RunPhase::Error { message: e.to_string() })),
         }
     });
@@ -434,7 +478,7 @@ pub async fn save_launch(app: AppHandle, state: S<'_>, id: String) -> AppResult<
 }
 
 async fn run_game(app: &AppHandle, state: &Arc<AppState>, meta: &SaveMeta, profile: crate::auth::Profile, token: String) -> AppResult<()> {
-    let prepared = prepare_save(app, state, meta).await?;
+    let prepared = prepare_save(app, state, meta, false).await?;
     set_phase(app, state, &meta.id, Some(RunPhase::Launching));
     let settings = state.settings.lock().unwrap().clone();
     let memory = meta.memory_mb.unwrap_or(settings.save_defaults.memory_mb);
@@ -454,6 +498,7 @@ async fn run_game(app: &AppHandle, state: &Arc<AppState>, meta: &SaveMeta, profi
     updated.launches += 1;
     updated.save()?;
     let started_at = chrono::Utc::now();
+    let started_sys = std::time::SystemTime::now();
     set_phase(app, state, &meta.id, Some(RunPhase::Running { pid: started.pid, started_at: started_at.to_rfc3339() }));
 
     let window = app.get_webview_window("main");
@@ -491,16 +536,48 @@ async fn run_game(app: &AppHandle, state: &Arc<AppState>, meta: &SaveMeta, profi
     }
     let code = status.and_then(|s| s.code());
     crate::log_info!("Save {} exited with {:?} after {}s", meta.id, code, ran_for);
-    let crashed = matches!(code, Some(c) if c != 0);
-    if crashed {
+    // Force close isn't a crash.
+    let forced = status.is_none();
+    let report = if forced {
+        None
+    } else {
+        let m = meta.clone();
+        tauri::async_runtime::spawn_blocking(move || explain_exit(&m, started_sys, code, memory)).await.ok().flatten()
+    };
+    if let Some(r) = &report {
+        let title = r.findings.first().map(|f| f.title.clone()).unwrap_or_default();
         set_phase(app, state, &meta.id, Some(RunPhase::Error {
-            message: format!("Minecraft closed unexpectedly (exit code {}). Open the Save's logs folder for details.", code.unwrap_or(-1)),
+            message: format!("Minecraft crashed{}. {title}. Open Logs for the explanation.", code.map(|c| format!(" (exit code {c})")).unwrap_or_default()),
         }));
     } else {
         set_phase(app, state, &meta.id, None);
     }
-    let _ = app.emit("game-exited", json!({ "id": meta.id, "code": code, "seconds": ran_for }));
+    let _ = app.emit("game-exited", json!({ "id": meta.id, "code": code, "seconds": ran_for, "crash": report }));
+
+    // The game has exited, so Minecraft has finished writing its worlds: back up what this session changed.
+    if settings.backups.after_sessions && meta.test_of.is_none() {
+        let m = meta.clone();
+        let keep = settings.backups.keep;
+        let since = started_sys;
+        let r = tauri::async_runtime::spawn_blocking(move || backups::create(&m, "session", Some(since), None, keep)).await;
+        let (worlds, error) = match r {
+            Ok(Ok(n)) => (n, None),
+            Ok(Err(e)) => (0, Some(e.to_string())),
+            Err(e) => (0, Some(e.to_string())),
+        };
+        let _ = app.emit("backups-done", json!({ "id": meta.id, "worlds": worlds, "reason": "session", "error": error }));
+    }
     Ok(())
+}
+
+fn mod_names(meta: &SaveMeta) -> std::collections::HashMap<String, String> {
+    mods::list(meta).map(|l| l.mods.into_iter().filter_map(|m| Some((m.mod_id?, m.name))).collect()).unwrap_or_default()
+}
+
+fn explain_exit(meta: &SaveMeta, started: std::time::SystemTime, code: Option<i32>, memory: u32) -> Option<crash::CrashReport> {
+    let names = mod_names(meta);
+    let ctx = crash::Context { minecraft: &meta.minecraft_version, memory_mb: memory, mods: &names };
+    crash::after_exit(meta, started, code, &ctx)
 }
 
 #[tauri::command]
@@ -654,4 +731,161 @@ pub async fn optimiser_restore(id: String) -> AppResult<String> {
     tauri::async_runtime::spawn_blocking(move || optimiser::restore(&id, &java_runtimes()))
         .await
         .map_err(|e| AppError::new("OPTIMISER", e.to_string()))?
+}
+
+// ---------------- Logs & crash explanations ----------------
+
+fn log_redactor(state: &AppState) -> Option<logs::Redactor> {
+    let s = state.settings.lock().unwrap().streamer.clone();
+    (s.enabled && s.redact_logs).then(|| logs::Redactor::new(state.auth.status().profile.map(|p| p.name).as_deref()))
+}
+
+#[tauri::command]
+pub fn save_logs(id: String) -> AppResult<Vec<logs::LogFile>> {
+    Ok(logs::list(&saves::load(&id)?))
+}
+
+#[tauri::command]
+pub async fn save_log_read(state: S<'_>, id: String, name: String) -> AppResult<logs::LogContent> {
+    let meta = saves::load(&id)?;
+    let redactor = log_redactor(&state);
+    tauri::async_runtime::spawn_blocking(move || logs::read(&meta, &name, redactor.as_ref())).await.map_err(|e| AppError::new("LOGS", e.to_string()))?
+}
+
+/// Explains a log or crash report from the Logs tab.
+#[tauri::command]
+pub async fn crash_explain(state: S<'_>, id: String, name: String) -> AppResult<crash::CrashReport> {
+    let meta = saves::load(&id)?;
+    let memory = meta.memory_mb.unwrap_or(state.settings.lock().unwrap().save_defaults.memory_mb);
+    let redactor = log_redactor(&state);
+    tauri::async_runtime::spawn_blocking(move || {
+        let content = logs::read(&meta, &name, redactor.as_ref())?;
+        let names = mod_names(&meta);
+        let ctx = crash::Context { minecraft: &meta.minecraft_version, memory_mb: memory, mods: &names };
+        Ok(crash::report(&content.text, Some(name), None, &ctx))
+    })
+    .await
+    .map_err(|e| AppError::new("LOGS", e.to_string()))?
+}
+
+// ---------------- World backups ----------------
+
+#[tauri::command]
+pub async fn backups_view(id: String) -> AppResult<backups::BackupsView> {
+    let meta = saves::load(&id)?;
+    tauri::async_runtime::spawn_blocking(move || backups::view(&meta)).await.map_err(|e| AppError::new("BACKUP", e.to_string()))
+}
+
+#[tauri::command]
+pub async fn backups_create(state: S<'_>, id: String, world: Option<String>) -> AppResult<usize> {
+    ensure_idle(&state, &id, "Backing up")?;
+    let meta = saves::load(&id)?;
+    let keep = state.settings.lock().unwrap().backups.keep;
+    tauri::async_runtime::spawn_blocking(move || backups::create(&meta, "manual", None, world.as_deref(), keep)).await.map_err(|e| AppError::new("BACKUP", e.to_string()))?
+}
+
+#[tauri::command]
+pub async fn backups_restore(state: S<'_>, id: String, backup: String) -> AppResult<String> {
+    ensure_idle(&state, &id, "Restoring a world")?;
+    let meta = saves::load(&id)?;
+    tauri::async_runtime::spawn_blocking(move || backups::restore(&meta, &backup)).await.map_err(|e| AppError::new("BACKUP", e.to_string()))?
+}
+
+#[tauri::command]
+pub fn backups_delete(id: String, backup: String) -> AppResult<()> {
+    backups::delete(&saves::load(&id)?, &backup)
+}
+
+#[tauri::command]
+pub fn backups_open_folder(app: AppHandle, id: String) -> AppResult<()> {
+    let dir = saves::load(&id)?.root().join("backups");
+    std::fs::create_dir_all(&dir)?;
+    app.opener().open_path(dir.to_string_lossy(), None::<&str>).map_err(|e| AppError::new("FOLDER", e.to_string()))
+}
+
+// ---------------- Find the broken mod ----------------
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BisectStart {
+    test_id: String,
+    candidates: Vec<mods::Candidate>,
+}
+
+#[tauri::command]
+pub async fn bisect_start(state: S<'_>, id: String, with_worlds: bool) -> AppResult<BisectStart> {
+    ensure_idle(&state, &id, "Testing mods")?;
+    tauri::async_runtime::spawn_blocking(move || {
+        let original = saves::load(&id)?;
+        let candidates = mods::candidates(&original, true)?;
+        if candidates.is_empty() {
+            bail!("BISECT", "This Save has no mods that can be switched off for testing.");
+        }
+        let copy = saves::create_test_copy(&id, with_worlds)?;
+        Ok(BisectStart { test_id: copy.id, candidates })
+    })
+    .await
+    .map_err(|e| AppError::new("BISECT", e.to_string()))?
+}
+
+/// Enables `keep` (and what it requires) in the test copy and disables the other candidates.
+#[tauri::command]
+pub fn bisect_apply(state: S, test_id: String, all: Vec<String>, keep: Vec<String>) -> AppResult<Vec<String>> {
+    ensure_idle(&state, &test_id, "Changing the test")?;
+    let meta = saves::load(&test_id)?;
+    if meta.test_of.is_none() {
+        bail!("BISECT", "That isn't a test copy");
+    }
+    mods::apply_test_set(&meta, &all, &keep)
+}
+
+#[tauri::command]
+pub async fn bisect_end(state: S<'_>, test_id: String) -> AppResult<()> {
+    if let Some(tx) = state.stoppers.lock().unwrap().remove(&test_id) {
+        let _ = tx.send(());
+    }
+    state.runs.lock().unwrap().remove(&test_id);
+    tauri::async_runtime::spawn_blocking(move || saves::delete_test_copy(&test_id)).await.map_err(|e| AppError::new("BISECT", e.to_string()))?
+}
+
+// ---------------- Store ----------------
+
+#[tauri::command]
+pub async fn store_search(kind: String, query: String, sort: String, category: Option<String>, save_id: Option<String>, offset: Option<u64>) -> AppResult<store::SearchResult> {
+    let kind = store::Kind::parse(&kind)?;
+    let mc = match save_id {
+        Some(id) => Some(saves::load(&id)?.minecraft_version),
+        None => None,
+    };
+    store::search(kind, &query, &sort, category.as_deref(), mc.as_deref(), offset.unwrap_or(0)).await
+}
+
+#[tauri::command]
+pub async fn store_project(id: String) -> AppResult<store::Project> {
+    store::project(&id).await
+}
+
+#[tauri::command]
+pub async fn store_installed(save_id: String, kind: String) -> AppResult<Vec<String>> {
+    let meta = saves::load(&save_id)?;
+    Ok(store::installed(&meta, store::Kind::parse(&kind)?).await?.into_iter().collect())
+}
+
+#[tauri::command]
+pub async fn store_install(state: S<'_>, save_id: String, kind: String, project_id: String) -> AppResult<store::InstallResult> {
+    ensure_idle(&state, &save_id, "Installing from the Store")?;
+    let meta = saves::load(&save_id)?;
+    store::install(&meta, store::Kind::parse(&kind)?, &project_id).await
+}
+
+// ---------------- Optimiser (all) ----------------
+
+#[tauri::command]
+pub async fn optimiser_apply_all() -> AppResult<Vec<optimiser::BatchResult>> {
+    tauri::async_runtime::spawn_blocking(|| optimiser::apply_all(&java_runtimes())).await.map_err(|e| AppError::new("OPTIMISER", e.to_string()))
+}
+
+#[tauri::command]
+pub async fn optimiser_restore_all() -> AppResult<Vec<optimiser::BatchResult>> {
+    tauri::async_runtime::spawn_blocking(|| optimiser::restore_all(&java_runtimes())).await.map_err(|e| AppError::new("OPTIMISER", e.to_string()))
 }

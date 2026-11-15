@@ -1,12 +1,14 @@
 package stabled.client;
 
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.platform.InputConstants;
 import java.nio.file.Files;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.TitleScreen;
 import org.slf4j.Logger;
@@ -17,10 +19,12 @@ import stabled.client.config.Onboarding;
 import stabled.client.config.RuntimeStatus;
 import stabled.client.config.StabledPaths;
 import stabled.client.discord.PresenceManager;
+import stabled.client.emote.EmotePlayer;
 import stabled.client.hud.FpsHud;
 import stabled.client.platform.MotionBlur;
 import stabled.client.platform.Platform;
 import stabled.client.theme.ThemeManager;
+import stabled.client.ui.screen.EmoteWheelScreen;
 import stabled.client.ui.screen.IntroScreen;
 import stabled.client.ui.screen.StabledSettingsScreen;
 
@@ -37,6 +41,7 @@ public final class StabledClient implements ClientModInitializer {
 	private static boolean introOpen;
 	private static boolean runtimeDirty = true;
 	private static BooleanSupplier openSettingsKey;
+	private static KeyMapping emoteKey;
 	private static int tick;
 
 	@Override
@@ -55,8 +60,10 @@ public final class StabledClient implements ClientModInitializer {
 		}
 		ready = true;
 
-		Platform.registerHud(FpsHud::extract);
+		Platform.registerHud("stabled:fps", FpsHud::extract);
+		Platform.registerHud("stabled:emote", EmotePlayer::drawHud);
 		openSettingsKey = Platform.registerKey("key.stabled.settings");
+		emoteKey = Platform.registerMapping("key.stabled.emotes", InputConstants.KEY_B);
 
 		PresenceManager.get().start(settings.discordEnabled, settings.discordShowElapsed);
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> applyPresetIfNeeded());
@@ -70,6 +77,11 @@ public final class StabledClient implements ClientModInitializer {
 
 	public static boolean isReady() {
 		return ready;
+	}
+
+	/** The emote wheel key (B by default; players can rebind it in Controls). */
+	public static KeyMapping emoteKey() {
+		return emoteKey;
 	}
 
 	public static ClientSettings settings() {
@@ -113,6 +125,12 @@ public final class StabledClient implements ClientModInitializer {
 				Platform.setScreen(new StabledSettingsScreen(null));
 			}
 		}
+		while (emoteKey.consumeClick()) {
+			if (Platform.screen() == null && mc.player != null) {
+				Platform.setScreen(new EmoteWheelScreen(emoteKey));
+			}
+		}
+		EmotePlayer.tick(mc);
 		if (!introShownThisSession && !onboarding.completed && Platform.screen() instanceof TitleScreen title) {
 			introShownThisSession = true;
 			Platform.setScreen(new IntroScreen(title));

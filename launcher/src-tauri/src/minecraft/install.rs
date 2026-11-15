@@ -35,6 +35,9 @@ pub struct Prepared {
     pub java: PathBuf,
     pub asset_index: String,
     pub logging_arg: Option<String>,
+    /// Game files checked and files downloaded again (shown after Repair).
+    pub files_checked: usize,
+    pub files_replaced: usize,
 }
 
 fn version_dir(id: &str) -> PathBuf {
@@ -62,12 +65,13 @@ async fn load_or_fetch_json(url: &str, path: &PathBuf, sha1: Option<&str>) -> Ap
     fsx::read_json(path)
 }
 
-pub async fn prepare(save: &SaveMeta, concurrency: usize, emit: &(dyn Fn(Progress) + Send + Sync)) -> AppResult<Prepared> {
+/// `verify_all` (Repair) checks every file's hash instead of only sizes, and re-downloads anything damaged.
+pub async fn prepare(save: &SaveMeta, concurrency: usize, verify_all: bool, emit: &(dyn Fn(Progress) + Send + Sync)) -> AppResult<Prepared> {
     let Some(stack) = stack::for_version(&save.minecraft_version) else {
         bail!("UNSUPPORTED", "Minecraft {} is not supported by the Stabled client", save.minecraft_version);
     };
     // A full hash check runs once per stack revision; afterwards launches only check presence and size.
-    let full_check = !marker(stack).is_file();
+    let full_check = verify_all || !marker(stack).is_file();
     let step = |phase: &str, label: &str| Progress {
         phase: phase.into(),
         label: label.into(),
@@ -201,12 +205,15 @@ pub async fn prepare(save: &SaveMeta, concurrency: usize, emit: &(dyn Fn(Progres
                 .collect()
         }
     };
-    for (phase, label, items) in [
-        ("java", "Downloading Java", quick(java_downloads)),
-        ("libraries", "Downloading game files", quick(downloads)),
-        ("assets", "Downloading assets", quick(asset_downloads)),
-    ] {
-        run_batch(phase, label, items, concurrency, emit).await?;
+    let (mut checked, mut replaced) = (0usize, 0usize);
+    let labels: [(&str, &str); 3] = if verify_all {
+        [("java", "Checking Java"), ("libraries", "Checking game files"), ("assets", "Checking assets")]
+    } else {
+        [("java", "Downloading Java"), ("libraries", "Downloading game files"), ("assets", "Downloading assets")]
+    };
+    for ((phase, label), items) in labels.into_iter().zip([quick(java_downloads), quick(downloads), quick(asset_downloads)]) {
+        checked += items.len();
+        replaced += run_batch(phase, label, items, concurrency, emit).await?;
     }
     java::mark_executable(&java_execs);
     if !java_exe.is_file() {
@@ -220,7 +227,7 @@ pub async fn prepare(save: &SaveMeta, concurrency: usize, emit: &(dyn Fn(Progres
     if full_check {
         let _ = fsx::write_json(&marker(stack), &serde_json::json!({ "stack": stack.key(), "at": chrono::Utc::now().to_rfc3339() }));
     }
-    Ok(Prepared { version_json, fabric_profile, classpath, java: java_exe, asset_index, logging_arg })
+    Ok(Prepared { version_json, fabric_profile, classpath, java: java_exe, asset_index, logging_arg, files_checked: checked, files_replaced: replaced })
 }
 
 async fn run_batch(
@@ -229,17 +236,17 @@ async fn run_batch(
     items: Vec<Download>,
     concurrency: usize,
     emit: &(dyn Fn(Progress) + Send + Sync),
-) -> AppResult<()> {
+) -> AppResult<usize> {
     // Several entries can name the same file (asset indexes list identical objects under different names);
     // downloading one path twice in parallel would race on its temporary file.
     let mut seen = std::collections::HashSet::new();
     let items: Vec<Download> = items.into_iter().filter(|d| seen.insert(d.path.clone())).collect();
     if items.is_empty() {
-        return Ok(());
+        return Ok(0);
     }
     let total_files = items.len();
     let total_bytes: u64 = items.iter().filter_map(|d| d.size).sum();
-    let progress = Arc::new(BatchProgress { files_done: Default::default(), bytes_done: Default::default() });
+    let progress = Arc::new(BatchProgress::default());
     let task = {
         let progress = progress.clone();
         tokio::spawn(async move { download::fetch_all(items, concurrency, progress).await })
@@ -259,7 +266,8 @@ async fn run_batch(
         }
         tokio::time::sleep(std::time::Duration::from_millis(250)).await;
     }
-    task.await.map_err(|e| crate::error::AppError::new("DOWNLOAD", e.to_string()))?
+    task.await.map_err(|e| crate::error::AppError::new("DOWNLOAD", e.to_string()))??;
+    Ok(progress.fetched.load(Ordering::Relaxed))
 }
 
 pub fn is_installed(save: &SaveMeta) -> bool {

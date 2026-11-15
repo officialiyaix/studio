@@ -34,12 +34,12 @@ Stabled has two deliverables that share a small set of files:
 
 | Location | Contents | Mutable |
 | --- | --- | --- |
-| `%APPDATA%\Stabled\settings.json` | Launcher settings | yes |
+| `%APPDATA%\Stabled\settings.json` | Launcher settings, including streamer mode, fake specs and backup options | yes |
 | `%APPDATA%\Stabled\appearance.json` | Theme and surface style (shared with the game) | yes |
 | `%APPDATA%\Stabled\backgrounds\custom.png` | Managed copy of the Custom Background | replaced on upload |
 | `%APPDATA%\Stabled\secure\account.bin` | Microsoft/Minecraft session, DPAPI-encrypted | yes |
 | `%APPDATA%\Stabled\saves\<uuid>\` | One Save (see below) | yes |
-| `%APPDATA%\Stabled\optimiser\history.json` | Values the optimiser replaced | yes |
+| `%APPDATA%\Stabled\optimiser\history.json` | Values the optimiser replaced, and which launch tweaks are on | yes |
 | `%APPDATA%\Stabled\logs\launcher.log` | Launcher log (secrets redacted) | yes |
 | `%LOCALAPPDATA%\Stabled\shared\` | Game jars, libraries, assets, Java runtimes, mod downloads | immutable, content-verified |
 
@@ -50,17 +50,42 @@ save.json        name, version, icon, memory, installed stack — the folder nam
 icon.png         256 × 256 managed icon (optional)
 stabled/         client.json · onboarding.json · managed.json · runtime.json
 minecraft/       the game directory: mods, config, saves (worlds), resourcepacks, shaderpacks, screenshots, logs, options.txt
+backups/         world backups: <world>/<timestamp>__<session|upgrade|manual>.zip
 ```
 
-Nothing mutable is shared between Saves. Duplicating copies the whole folder; deleting moves it to the Recycle Bin.
+Nothing mutable is shared between Saves. Duplicating copies the whole folder except its backups; deleting moves it to the Recycle Bin.
 
 ## Install and launch
+
+Launch installs whatever is missing first, so there is no separate Install step in the UI.
 
 1. `install::prepare` resolves Mojang's version JSON (SHA-1 checked), the Fabric loader profile, libraries (rule-filtered for the platform; LWJGL natives self-extract), the asset index and objects, and Mojang's own Java runtime for that version (`java-runtime-gamma` = Java 17 for 1.20.1–1.20.4, `delta` = Java 21 for 1.20.5–1.21.11, `epsilon` = Java 25 for 26.x). Downloads are parallel, retried, size- and hash-verified, and limited to an allow-list of official hosts. The first install of a stack does a full hash check; later launches check presence and size.
 2. `saves::managed::sync` installs the bundled Stabled client jar for the Save's Minecraft version (`resources/clients/stabled-client-<minecraft>.jar`) and the pinned stack into the Save's own `mods` folder, never overwriting a file Stabled did not install (see "Mods" below).
 3. `commands::save_launch` asks `AuthManager::launch_credentials` for a valid Minecraft token **before** any download or process. Without a signed-in account that owns Java Edition it returns `SIGN_IN_REQUIRED` / `NO_JAVA_ACCESS`, and the UI opens the sign-in popup. This is enforced in the backend, not only the UI (see `auth::tests::launch_refused_without_session`).
 4. `launch::build` expands Mojang's and Fabric's argument templates, adds memory and the Stabled properties, and starts `javaw.exe` without a console window. Output is captured to `minecraft/logs/stabled-launch.log` with the access token redacted.
-5. While running, the Save is locked: mods, Save settings, duplicate and delete are refused by the backend. When the game exits the launcher re-reads the shared appearance (the theme may have been changed in game).
+5. While running, the Save is locked: mods, Save settings, duplicate and delete are refused by the backend. When the game exits the launcher re-reads the shared appearance (the theme may have been changed in game), explains a crash if there was one, and backs up the worlds the session changed.
+
+Before the launch request, the UI runs the **mod compatibility check** (`compat.rs`, command `mods_check`): everything `mods.rs` detects (wrong Minecraft version, other loaders, duplicates, missing requirements, declared `breaks`) plus a table of known conflicts between popular mods their metadata doesn't declare (two renderers, OptiFabric with Sodium or Iris, Forge ports alongside the originals, …) and obsolete mods. Errors open a dialog with Fix in Mods, Launch anyway and Cancel.
+
+**Repair** runs `install::prepare` with `verify_all`: every library, asset, client jar and Java file is hashed against its published checksum and anything missing or damaged is downloaded again. It reports how many files it checked and replaced; worlds, settings and the player's own mods are never touched.
+
+## Logs and crash explanations
+
+`logs.rs` lists a Save's `logs/latest.log`, `debug.log`, archived `*.log.gz`, Stabled's console capture (`stabled-launch.log`), `crash-reports/*.txt` and JVM `hs_err_pid*.log` files, and reads only files from that list (gzip decompressed, large files cut to their last 6 MB). The Logs tab renders only the visible lines, colours them by level (stack traces inherit their line's level), filters to warnings or errors, searches with Ctrl+F or the magnifier (Enter/Shift+Enter between matches) and tails the current log every 2 seconds while the game runs. With streamer mode's "Clean up logs", the backend replaces the player's name, the user folder and server addresses before the text reaches the UI.
+
+`crash.rs` explains crashes. After the game exits with an error (or wrote a crash report or JVM crash file during the session), `after_exit` analyses that file, or the logs when there is none, and the UI shows the findings. Rules match what Minecraft, Fabric Loader, Mixin and the JVM print: Fabric's incompatible-mod-set report (its own suggested fixes are quoted), duplicate mods, out of memory and heap reservation, mods built for a newer Java, Mixin apply failures (the mod is named from "from mod …" and Mixin configs), entrypoint crashes, OpenGL/driver failures and driver crashes (by driver DLL), missing natives, damaged jars, a full disk, damaged world data, shader packs, missing classes and changed methods, and Windows exit codes. Mods whose Mixin handlers appear in the stack trace (`handler$abc000$modid$…`) are listed. Each finding has a confidence level (high, medium, low) and quotes the line it is based on; when nothing matches, the report says so with low confidence and suggests Find the broken mod. A log without a crash is reported as such.
+
+## Find the broken mod
+
+`saves::create_test_copy` makes a hidden copy of a Save (`save.json` gets `testOf`): settings, mods, configs and packs, plus the worlds only when the player asks. It never appears in the Saves list and is never backed up. The wizard first launches it with none of the player's mods (if the problem still happens, mods aren't the cause), then halves the suspects each round: `mods::apply_test_set` enables the half being tested plus anything those mods require (from their `depends`) and disables the rest. After each test the player answers whether the problem happened (a crash is detected and suggested). With one suspect left it is confirmed alone; if it doesn't reproduce, the result is a combination of mods. The result can be disabled or removed in the real Save. The test copy is deleted when the wizard closes.
+
+## World backups
+
+`backups.rs` zips each world into `<save>/backups/<world>/<timestamp>__<reason>.zip` (`session.lock` excluded). After a session (the game process has exited, so Minecraft has finished writing) worlds modified during it are backed up, keeping the newest `backups.keep` per world. Before Stabled installs a different stack into a Save (new Minecraft files or mods), every world is backed up first and the update stops if that fails. Manual and pre-update backups are kept until deleted. Restoring extracts into a new folder, "World (restored <date>)", never over the original (paths are checked with `enclosed_name`).
+
+## Store
+
+`store.rs` uses Modrinth's public API. Search filters by project type, Fabric (mods) or Iris (shaders), the selected Save's Minecraft version and a category. Installing picks the newest release made for the Save's version (and Fabric), downloads its primary file from `cdn.modrinth.com` with the published SHA-512 checked, and adds required dependencies the same way; shader packs add Iris when the Save doesn't have it. Files already in the Save are never overwritten. Which projects a Save already has is found by sending the SHA-1 of its jars to `version_files`, so mods Stabled installed itself show as installed too.
 
 ## Microsoft sign-in
 
@@ -109,4 +134,20 @@ Where versions differ, the source contains blocks such as `//#if MC >= 1.21.6 �
 
 ## PC Optimiser
 
-The earlier Windows optimiser's source was not present in this repository, so none of its actions are included or claimed; the page says so. `optimiser/` provides Stabled's own actions, each with detection, explicit Apply, a recorded previous value and Restore. Only Hardware-accelerated GPU scheduling (HKLM) needs administrator rights; it runs in a short-lived elevated copy of Stabled (`--stabled-optimiser-elevated`) that accepts only machine-wide actions. New actions — including the original optimiser's, if its source becomes available — plug into `optimiser::ACTIONS`.
+The earlier Windows optimiser's source was not present in this repository, so none of its actions are included or claimed; the page says so. `optimiser/` provides Stabled's own 14 actions, grouped by category with an impact level, each with detection, explicit Apply, a recorded previous value and Restore:
+
+- Minecraft launch (applied by Stabled when it starts a Save, recorded in the optimiser history): tuned G1 garbage-collector flags (any platform; skipped if the player's extra Java arguments choose a collector) and high priority for the game process (above-normal priority and Windows 11 power throttling off).
+- Power: the High performance power plan.
+- Graphics: the high-performance GPU for Stabled's Java runtimes, fullscreen optimisations off for them, hardware-accelerated GPU scheduling.
+- Mouse and keyboard: mouse acceleration off (applied immediately with `SPI_SETMOUSE`), the Sticky/Filter/Toggle Keys shortcuts off.
+- Windows and background apps: Game Mode, background recording off, the Game Bar overlay shortcut off, background Store apps off, lighter visual effects, network and multimedia responsiveness.
+
+Hardware-accelerated GPU scheduling and network responsiveness (HKLM) need administrator rights; they run in a short-lived elevated copy of Stabled (`--stabled-optimiser-elevated <request> <result>`) that accepts only machine-wide actions. **Apply all** applies every available action that isn't applied yet and batches the machine-wide ones into a single administrator prompt; **Restore all** puts back everything Stabled changed. Registry restores are limited to the locations the actions write. New actions — including the original optimiser's, if its source becomes available — plug into `optimiser::ACTIONS`.
+
+## Streamer mode and fake specs
+
+`settings.json` holds `streamer` (a master switch plus one switch per kind of detail) and `fakeSpecs`. `lib/privacy.ts` is the one place the UI asks what it may show: the username ("Player"), the skin face, folder paths (the user folder becomes •••) and the specs bar; logs are cleaned in the backend; the in-game title screen hides the name when the launcher passes `-Dstabled.streamer.hideName=true`. Features added later that show personal details check the same switches. Fake specs replace only what the specs bar shows; memory suggestions and everything else use the real hardware.
+
+## Emotes
+
+Holding the emote key (B by default, rebindable in Controls) opens the wheel (`EmoteWheelScreen`): point and let go, tap and click, or press 1–8. `EmotePlayer` plays the emote on the local player's model: `PlayerModelMixin` runs at the end of the player model's `setupAnim` (entity and float arguments before 1.21.2, `PlayerRenderState` 1.21.2–1.21.8, `AvatarRenderState` from 1.21.9; the render states carry the entity id) and blends the emote's pose in and out. Before 1.21.2 the hat, sleeves, jacket and trousers are copied from the parts they cover, as vanilla does; later they are child parts and follow. The camera turns to third person (front) for the emote and back afterwards (unless the player changed it), and moving stops it. Key and button codes come from `InputConstants` because 26.3 uses SDL codes. Emotes are drawn by this client only; there's no server component, so other players don't see them.

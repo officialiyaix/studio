@@ -1010,38 +1010,6 @@
   color: var(--accent);
   font-variant-numeric: tabular-nums;
 }
-.live-preview {
-  position: relative;
-  padding: 18px;
-  border-radius: var(--radius);
-  overflow: hidden;
-  background:
-    repeating-linear-gradient(135deg, color-mix(in srgb, var(--accent) 35%, transparent) 0 10px, transparent 10px 22px),
-    linear-gradient(120deg, var(--accent-alt), var(--bg-alt));
-}
-.lp-panel {
-  padding: 14px;
-  display: grid;
-  gap: 8px;
-  max-width: 460px;
-}
-.lp-title {
-  font-weight: 650;
-}
-.lp-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-.lp-toggle {
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-  font-size: 13px;
-  font-weight: 600;
-}
-
 /* ---------- Responsive ---------- */
 @media (max-width: 1150px) {
   .home-grid {

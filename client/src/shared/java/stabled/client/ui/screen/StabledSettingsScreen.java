@@ -10,6 +10,7 @@ import stabled.client.theme.Theme;
 import stabled.client.ui.Ui;
 import stabled.client.ui.page.AppearancePage;
 import stabled.client.ui.page.DiscordPage;
+import stabled.client.ui.page.EmotesPage;
 import stabled.client.ui.page.FpsPage;
 import stabled.client.ui.page.MenusPage;
 import stabled.client.ui.page.MotionBlurPage;
@@ -32,7 +33,7 @@ public final class StabledSettingsScreen extends StabledScreen {
 	public StabledSettingsScreen(Screen parent) {
 		super(Component.translatable("stabled.settings.title"));
 		this.parent = parent;
-		this.pages = List.of(new AppearancePage(), new PerformancePage(), new FpsPage(), new MotionBlurPage(), new DiscordPage(false), new MenusPage(this));
+		this.pages = List.of(new AppearancePage(), new PerformancePage(), new FpsPage(), new MotionBlurPage(), new EmotesPage(), new DiscordPage(false), new MenusPage(this));
 		this.page = Math.max(0, Math.min(lastPage, this.pages.size() - 1));
 	}
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ExternalLink, Loader2, ShieldCheck } from 'lucide-react';
 import { api, asError } from '../lib/api';
 import { useStore } from '../lib/store';
+import { usePrivacy } from '../lib/privacy';
 import { Callout, Modal } from './ui';
 
 function MicrosoftLogo() {
@@ -21,6 +22,7 @@ function MicrosoftLogo() {
  */
 export function SignInDialog() {
   const { signIn, closeSignIn, auth, setAuth, toast } = useStore();
+  const privacy = usePrivacy();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   if (!signIn.open) return null;
@@ -35,7 +37,7 @@ export function SignInDialog() {
       const s = await api.authSignIn();
       setAuth(s);
       if (s.state === 'signed_in') {
-        toast(`Signed in as ${s.profile?.name}.`, 'success');
+        toast(`Signed in as ${privacy.name(s.profile?.name) ?? 'your Microsoft account'}.`, 'success');
         closeSignIn();
       }
     } catch (e) {

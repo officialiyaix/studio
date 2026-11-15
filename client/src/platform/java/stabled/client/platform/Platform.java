@@ -54,9 +54,10 @@ public final class Platform {
 		return Minecraft.getInstance();
 	}
 
-	public static void registerHud(Consumer<Gfx> draw) {
+	/** Adds a HUD layer drawn after vanilla's; {@code id} is a resource id such as "stabled:fps". */
+	public static void registerHud(String id, Consumer<Gfx> draw) {
 //#if MC >= 1.21.6
-		HudElementRegistry.addLast(Gfx.id("stabled:fps"), (graphics, delta) -> draw.accept(new Gfx(graphics)));
+		HudElementRegistry.addLast(Gfx.id(id), (graphics, delta) -> draw.accept(new Gfx(graphics)));
 //#else
 		HudRenderCallback.EVENT.register((graphics, delta) -> draw.accept(new Gfx(graphics)));
 //#endif
@@ -64,13 +65,18 @@ public final class Platform {
 
 	/** Registers a key binding (default Right Shift) and returns its "was pressed" check. */
 	public static BooleanSupplier registerKey(String translationKey) {
-		KeyMapping mapping = new KeyMapping(translationKey, InputConstants.KEY_RSHIFT, CATEGORY);
+		return registerMapping(translationKey, InputConstants.KEY_RSHIFT)::consumeClick;
+	}
+
+	/** Registers a key binding with a default key (a GLFW key code such as InputConstants.KEY_B). */
+	public static KeyMapping registerMapping(String translationKey, int defaultKey) {
+		KeyMapping mapping = new KeyMapping(translationKey, defaultKey, CATEGORY);
 //#if MC >= 26.1
 		KeyMappingHelper.registerKeyMapping(mapping);
 //#else
 		KeyBindingHelper.registerKeyBinding(mapping);
 //#endif
-		return mapping::consumeClick;
+		return mapping;
 	}
 
 	public static Screen screen() {

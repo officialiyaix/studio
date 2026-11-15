@@ -67,7 +67,6 @@ export interface Settings {
   version: number;
   launcher: {
     afterLaunch: 'keep' | 'minimize' | 'hide';
-    expandNavOnHover: boolean;
     reduceMotion: boolean;
     startPage: 'home' | 'saves';
     showMinecraftNews: boolean;
@@ -81,6 +80,23 @@ export interface Settings {
     discordEnabled: boolean;
   };
   advanced: { jvmArgs: string; concurrentDownloads: number };
+  streamer: StreamerMode;
+  fakeSpecs: FakeSpecs;
+  backups: { afterSessions: boolean; beforeUpgrades: boolean; keep: number };
+}
+export interface StreamerMode {
+  enabled: boolean;
+  hideUsername: boolean;
+  hideAvatar: boolean;
+  hidePaths: boolean;
+  redactLogs: boolean;
+  hideSpecs: boolean;
+}
+export interface FakeSpecs {
+  enabled: boolean;
+  cpu: string;
+  gpu: string;
+  ramGb: number;
 }
 
 // ---------- Appearance ----------
@@ -148,6 +164,8 @@ export interface Save {
   phase: RunPhase | null;
   supported: boolean;
   clientBundled: boolean;
+  /** Set on hidden test copies made by Find the broken mod. */
+  testOf?: string;
 }
 export interface SaveSummary {
   worlds: number;
@@ -245,6 +263,8 @@ export interface OptimiserAction {
   title: string;
   description: string;
   details: string;
+  category: 'power' | 'graphics' | 'input' | 'background' | 'launch';
+  impact: 'high' | 'medium' | 'low';
   requiresAdmin: boolean;
   requiresRestart: boolean;
   state: 'applied' | 'not_applied' | 'unavailable' | 'unknown';
@@ -254,11 +274,127 @@ export interface OptimiserAction {
   appliedAt: string | null;
   unavailableReason: string | null;
 }
+export interface OptimiserBatchResult {
+  id: string;
+  title: string;
+  ok: boolean;
+  message: string;
+}
 export interface OptimiserView {
   supported: boolean;
   platformMessage: string | null;
   originalOptimiser: { connected: boolean; message: string };
   actions: OptimiserAction[];
+}
+
+// ---------- Compatibility, crashes, logs ----------
+export interface CompatProblem {
+  level: 'error' | 'warning';
+  kind: 'minecraft-version' | 'loader' | 'duplicate' | 'dependency' | 'breaks' | 'known-conflict' | 'invalid' | 'other';
+  file: string | null;
+  modName: string | null;
+  message: string;
+  fix: string | null;
+}
+export interface CompatReport {
+  problems: CompatProblem[];
+  checkedMods: number;
+}
+export interface CrashFinding {
+  id: string;
+  title: string;
+  explanation: string;
+  fixes: string[];
+  confidence: 'high' | 'medium' | 'low';
+  evidence: string | null;
+  mods: string[];
+}
+export interface CrashReport {
+  file: string | null;
+  exitCode: number | null;
+  headline: string | null;
+  findings: CrashFinding[];
+  modsInTrace: string[];
+}
+export interface LogFile {
+  name: string;
+  kind: 'latest' | 'launch' | 'debug' | 'archive' | 'crash' | 'jvm-crash';
+  size: number;
+  modified: string | null;
+}
+export interface LogContent {
+  name: string;
+  text: string;
+  truncated: boolean;
+  size: number;
+  modified: string | null;
+}
+
+// ---------- Backups ----------
+export interface WorldBackup {
+  id: string;
+  world: string;
+  reason: 'session' | 'upgrade' | 'manual';
+  createdAt: string;
+  size: number;
+}
+export interface BackupsView {
+  backups: WorldBackup[];
+  worlds: Array<{ folder: string; size: number; modified: string | null }>;
+  totalSize: number;
+}
+
+// ---------- Find the broken mod ----------
+export interface BisectCandidate {
+  file: string;
+  name: string;
+  modId: string | null;
+  requires: string[];
+}
+
+// ---------- Store ----------
+export type StoreKind = 'mod' | 'resourcepack' | 'shader';
+export interface StoreHit {
+  projectId: string;
+  slug: string;
+  title: string;
+  description: string;
+  author: string;
+  iconUrl: string | null;
+  imageUrl: string | null;
+  color: number | null;
+  downloads: number;
+  follows: number;
+  categories: string[];
+  dateModified: string | null;
+}
+export interface StoreSearch {
+  hits: StoreHit[];
+  total: number;
+  offset: number;
+  limit: number;
+}
+export interface StoreProject {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  body: string;
+  iconUrl: string | null;
+  color: number | null;
+  gallery: Array<{ url: string; title: string | null }>;
+  downloads: number;
+  follows: number;
+  categories: string[];
+  license: string | null;
+  sourceUrl: string | null;
+  issuesUrl: string | null;
+  wikiUrl: string | null;
+  discordUrl: string | null;
+  published: string | null;
+  updated: string | null;
+  projectType: string;
+  pageUrl: string;
 }
 
 export const api = {
@@ -291,7 +427,7 @@ export const api = {
   saveSettingsSet: (id: string, patch: { client?: Record<string, Record<string, unknown>>; memoryMb?: number | null }) =>
     call<SaveSettingsView>('save_settings_set', { id, patch }),
   saveResetIntro: (id: string) => call<void>('save_reset_intro', { id }),
-  saveInstall: (id: string) => call<void>('save_install', { id }),
+  saveInstall: (id: string, repair = false) => call<void>('save_install', { id, repair }),
   saveLaunch: (id: string) => call<void>('save_launch', { id }),
   saveStop: (id: string) => call<void>('save_stop', { id }),
   saveClearError: (id: string) => call<void>('save_clear_error', { id }),
@@ -319,6 +455,30 @@ export const api = {
   optimiserView: () => call<OptimiserView>('optimiser_view'),
   optimiserApply: (id: string) => call<string>('optimiser_apply', { id }),
   optimiserRestore: (id: string) => call<string>('optimiser_restore', { id }),
+  optimiserApplyAll: () => call<OptimiserBatchResult[]>('optimiser_apply_all'),
+  optimiserRestoreAll: () => call<OptimiserBatchResult[]>('optimiser_restore_all'),
+
+  modsCheck: (id: string) => call<CompatReport>('mods_check', { id }),
+  saveLogs: (id: string) => call<LogFile[]>('save_logs', { id }),
+  saveLogRead: (id: string, name: string) => call<LogContent>('save_log_read', { id, name }),
+  crashExplain: (id: string, name: string) => call<CrashReport>('crash_explain', { id, name }),
+
+  backupsView: (id: string) => call<BackupsView>('backups_view', { id }),
+  backupsCreate: (id: string, world?: string) => call<number>('backups_create', { id, world: world ?? null }),
+  backupsRestore: (id: string, backup: string) => call<string>('backups_restore', { id, backup }),
+  backupsDelete: (id: string, backup: string) => call<void>('backups_delete', { id, backup }),
+  backupsOpenFolder: (id: string) => call<void>('backups_open_folder', { id }),
+
+  bisectStart: (id: string, withWorlds: boolean) => call<{ testId: string; candidates: BisectCandidate[] }>('bisect_start', { id, withWorlds }),
+  bisectApply: (testId: string, all: string[], keep: string[]) => call<string[]>('bisect_apply', { testId, all, keep }),
+  bisectEnd: (testId: string) => call<void>('bisect_end', { testId }),
+
+  storeSearch: (kind: StoreKind, query: string, sort: string, category: string | null, saveId: string | null, offset = 0) =>
+    call<StoreSearch>('store_search', { kind, query, sort, category, saveId, offset }),
+  storeProject: (id: string) => call<StoreProject>('store_project', { id }),
+  storeInstalled: (saveId: string, kind: StoreKind) => call<string[]>('store_installed', { saveId, kind }),
+  storeInstall: (saveId: string, kind: StoreKind, projectId: string) =>
+    call<{ installed: string[]; already: string[]; message: string }>('store_install', { saveId, kind, projectId }),
 };
 
 export function onEvent<T>(name: string, handler: (payload: T) => void): Promise<UnlistenFn> {

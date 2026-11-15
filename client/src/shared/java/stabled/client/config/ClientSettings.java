@@ -42,6 +42,9 @@ public final class ClientSettings {
 	// Menus
 	public boolean styledMenus = true;
 
+	// Emotes
+	public boolean emotesThirdPerson = true;
+
 	public static ClientSettings load() {
 		JsonObject o = JsonFiles.readObject(StabledPaths.clientSettingsFile());
 		ClientSettings s = new ClientSettings();
@@ -67,6 +70,9 @@ public final class ClientSettings {
 
 		JsonObject menus = JsonFiles.getObject(o, "menus");
 		s.styledMenus = JsonFiles.getBool(menus, "styled", s.styledMenus);
+
+		JsonObject emotes = JsonFiles.getObject(o, "emotes");
+		s.emotesThirdPerson = JsonFiles.getBool(emotes, "thirdPerson", s.emotesThirdPerson);
 		return s;
 	}
 
@@ -92,6 +98,8 @@ public final class ClientSettings {
 		}
 		JsonObject menus = JsonFiles.getObject(o, "menus");
 		menus.addProperty("styled", this.styledMenus);
+		JsonObject emotes = JsonFiles.getObject(o, "emotes");
+		emotes.addProperty("thirdPerson", this.emotesThirdPerson);
 		return JsonFiles.writeObject(StabledPaths.clientSettingsFile(), o);
 	}
 

@@ -214,7 +214,7 @@ pub async fn sync(meta: &SaveMeta, stack: &Stack, concurrency: usize) -> AppResu
             Source::Bundled(_) => None,
         })
         .collect();
-    let progress = std::sync::Arc::new(download::BatchProgress { files_done: Default::default(), bytes_done: Default::default() });
+    let progress = std::sync::Arc::new(download::BatchProgress::default());
     download::fetch_all(downloads, concurrency, progress).await?;
 
     let mods_dir = meta.mods_dir();

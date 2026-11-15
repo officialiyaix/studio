@@ -1,11 +1,13 @@
 {
 	"key.stabled.settings": "Open Stabled Settings",
+	"key.stabled.emotes": "Emote wheel",
 	"key.category.stabled.main": "Stabled",
 
 	"stabled.menu.settings": "Stabled Settings",
 	"stabled.menu.subtitle": "for Minecraft: Java Edition",
 	"stabled.menu.version": "Minecraft %s · Fabric",
 	"stabled.menu.signed_in": "Signed in as %s",
+	"stabled.menu.signed_in.hidden": "Signed in · streamer mode",
 	"stabled.menu.discord.connected": "Discord Presence on",
 	"stabled.menu.discord.connecting": "Connecting to Discord…",
 	"stabled.menu.discord.waiting_for_discord": "Discord not detected",
@@ -53,12 +55,6 @@
 	"stabled.surface.simple.desc": "Solid, opaque panels and buttons with minimal effects. Your glass transparency is kept for later.",
 	"stabled.surface.glass.desc": "Translucent panels and buttons with a restrained blur behind menus. Higher transparency shows more of the background.",
 	"stabled.surface.transparency": "Transparency",
-	"stabled.surface.preview": "Live preview of surface style",
-	"stabled.surface.sample_panel": "Sample panel",
-	"stabled.surface.sample_text": "Text stays readable",
-	"stabled.surface.sample_primary": "Primary",
-	"stabled.surface.sample_secondary": "Secondary",
-	"stabled.surface.sample_toggle": "Toggle",
 	"stabled.appearance.global": "Theme and surface style are global: they apply to the Stabled launcher and to every Save.",
 
 	"stabled.preset.heading": "Preset",
@@ -128,5 +124,25 @@
 
 	"stabled.narration.toggle": "%s: %s",
 	"stabled.narration.choice": "%s",
-	"stabled.narration.choice_selected": "%s, selected"
+	"stabled.narration.choice_selected": "%s, selected",
+	"stabled.page.emotes": "Emotes",
+	"stabled.page.emotes.summary": "Hold %s in game, point at an emote and let go. Moving stops it.",
+	"stabled.emotes.title": "Emotes",
+	"stabled.emotes.pick": "Pick one",
+	"stabled.emotes.hint_hold": "Let go of %s to play · click · 1–8 · Esc to cancel",
+	"stabled.emotes.hint_click": "Click an emote · 1–8 · %s or Esc to close",
+	"stabled.emotes.playing": "%s · move to stop",
+	"stabled.emotes.third_person": "Show me in third person while emoting",
+	"stabled.emotes.third_person.desc": "The camera turns to face you for the emote, then goes back to first person.",
+	"stabled.emotes.local": "Emotes are shown on your screen only: servers don't share them with other players.",
+	"stabled.emotes.try": "Try them",
+	"stabled.emotes.need_world": "Join a world to try them.",
+	"stabled.emote.wave": "Wave",
+	"stabled.emote.clap": "Clap",
+	"stabled.emote.dance": "Dance",
+	"stabled.emote.point": "Point",
+	"stabled.emote.cheer": "Cheer",
+	"stabled.emote.facepalm": "Facepalm",
+	"stabled.emote.bow": "Bow",
+	"stabled.emote.shrug": "Shrug"
 }

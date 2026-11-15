@@ -32,7 +32,12 @@
 .glass .mod-row,
 .glass .stat,
 .glass .surface-choice:not(.selected),
-.glass .profile-btn {
+.glass .profile-btn,
+.glass .store-card,
+.glass .store-kinds,
+.glass .backup-world,
+.glass .crash-card,
+.glass .log-view {
   border-color: var(--glass-rim);
   box-shadow: var(--glass-sheen);
 }
@@ -51,7 +56,8 @@
 .glass .header .icon-btn,
 .glass .profile-btn,
 .glass .toolbar .btn,
-.glass .tabs {
+.glass .tabs,
+.glass .store-kinds {
   backdrop-filter: blur(var(--glass-blur)) saturate(1.15);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.15);
 }
@@ -87,11 +93,11 @@
 
 /* The navigation rail: a rim on its edge and a soft light along the top in glass mode. */
 .glass .rail {
-  border-right-color: var(--glass-rim);
-  box-shadow: var(--glass-sheen);
+  border-color: var(--glass-rim);
+  box-shadow: var(--glass-sheen), 0 18px 42px -22px rgb(0 0 0 / 0.65);
 }
 .glass .rail.open {
-  box-shadow: var(--glass-sheen), 18px 0 40px -18px rgb(0 0 0 / 0.55);
+  box-shadow: var(--glass-sheen), 24px 18px 50px -20px rgb(0 0 0 / 0.6);
 }
 
 /* Simple: no blur anywhere, flat edges. */
@@ -104,22 +110,18 @@
 /* ---------- Per-area opacity (Frosted Glass) ----------
    Some areas are more solid than the Transparency setting, by a fixed number of percentage points:
    Saves, PC Optimiser and the specifications bar: transparency - 20. Settings and Home's Save blocks:
-   transparency - 10. (Transparency 35% gives 15% and 25%; it never goes below fully solid.) The sample panel
-   in Settings keeps the exact setting, since it previews it. */
+   transparency - 10. (Transparency 35% gives 15% and 25%; it never goes below fully solid.) */
 :root {
   --transparency: 0%;
 }
-.glass :is(.saves-page, .optimiser, .footer) {
+.glass :is(.saves-page, .optimiser, .footer, .store) {
   --surface-pct: calc(100% - max(0%, var(--transparency) - 20%));
 }
 .glass :is(.settings, .home .hero, .home .save-grid) {
   --surface-pct: calc(100% - max(0%, var(--transparency) - 10%));
 }
-.glass .settings .live-preview {
-  --surface-pct: calc(100% - var(--transparency));
-}
 /* Re-derive the colours that depend on --surface-pct wherever it is overridden. */
-.glass :is(.saves-page, .optimiser, .footer, .settings, .home .hero, .home .save-grid, .settings .live-preview) {
+.glass :is(.saves-page, .optimiser, .footer, .store, .settings, .home .hero, .home .save-grid) {
   --panel-bg: color-mix(in srgb, var(--surface) var(--surface-pct), transparent);
   --panel-alt-bg: color-mix(in srgb, var(--surface-alt) var(--surface-pct), transparent);
   --hover-bg: color-mix(in srgb, var(--surface-hover) max(var(--surface-pct), 55%), transparent);

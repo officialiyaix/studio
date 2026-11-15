@@ -30,7 +30,7 @@ FULL_EDGE = 1920
 THUMB_WIDTH = 480
 EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
 # Display names for folders whose name isn't already presentable.
-NAMES = {"general": "General"}
+NAMES = {"general": "General", "bleach character": "Bleach"}
 # Categories listed last regardless of name.
 LAST = {"general"}
 

@@ -50,6 +50,20 @@ The game was started with the exact command the launcher builds (`--features dev
 
 Startup sign-in popup over the blurred launcher (with the honest "not configured" state), dismissal, no re-prompt during navigation; Home, Saves (Overview/Mods/Save settings), PC Optimiser, Settings; navigation rail hover expansion over content without layout shift; theme switching (Stabled Night, Cloud, Sunset, Custom Background) and Simple/Frosted Glass applied instantly and persisted; Create Save field order, version list from Mojang's live manifest with supported/unsupported marking, inline validation (empty and duplicate names), creation; Install with live progress → Ready; **Launch while signed out opens sign-in and starts no process**; minimum window size 960 × 620 without clipping; appearance chosen in game shown by the launcher.
 
+### Store, logs, crash help, backups, compatibility and emotes
+
+| Area | Result |
+| --- | --- |
+| Unit tests | Crash explanations (out of memory, Fabric's incompatible-mod report with its fixes quoted, Mixin failure naming the mod, AMD driver crash from an `hs_err` file, mods in a stack trace, unknown crash at low confidence, a normal log reported as no crash); streamer-mode log redaction (name, user folder, server address, IP); world backup zip contents (`session.lock` excluded); optimiser actions well formed |
+| Store | Live Modrinth search for a 1.20.1 Save (18,133 Fabric mods), detail view with gallery, mods Stabled installed shown as Installed via `version_files`, real install of Iris into the Save with its SHA-512 checked; installing BSL Shaders into a 1.20.2 Save without Iris put the pack in `shaderpacks` and added Iris for 1.20.2 |
+| Logs | Latest log loaded with level colours and counts; Ctrl+F search with "2 of 8" and next/previous; Explain on a normal log reports no crash |
+| Backups | Back up now wrote a zip; Restore added "TestWorld (restored …)" whose files are byte-identical to the original; the original world untouched |
+| Find the broken mod | Test copy created without worlds; each round enabled exactly the expected mods in the copy; result screen named the mod; closing deleted the copy and left the real Save's mods unchanged |
+| Compatibility | A Forge jar and an OptiFabric jar next to Sodium were reported (other loader, wrong Minecraft version, known conflict) |
+| PC Optimiser | Apply all and the score ring on Linux (the Java launch tweak); its garbage-collector flags were then used for real launches of 1.20.1, 1.21.4 and 26.3, with no errors |
+| Emotes | Wheel opened with B on 1.20.1, 1.21.4 and 26.3; hold-and-release, tap-and-click and number keys play the emote in third person (front) with the HUD pill; poses checked for each emote; smoke tests of 1.21.1, 1.21.9, 1.21.11 and 26.1.2 load the player model mixin without errors |
+| Launcher UI | Floating navigation rail with the Store; Home greeting; Logs and Backups tabs; Discord confirmation; Settings with Accounts first (red when signed out), streamer mode with the header indicator, fake specs in the specs bar |
+
 ## Not verified here — needs a Windows PC, hardware or configuration
 
 | Item | Why / what to check |
@@ -58,7 +72,8 @@ Startup sign-in popup over the blurred launcher (with the honest "not configured
 | Microsoft sign-in end to end | Needs a `MICROSOFT_CLIENT_ID` approved for the Minecraft services API. Check: browser opens, cancel/timeout, Java owner vs. account without Java, profile avatar, restart restores the session, sign-out removes `secure\account.bin` |
 | DPAPI round trip | Sign in, restart, confirm the session restores; confirm `account.bin` is unreadable as text |
 | System information | DXGI GPU names and VRAM, CPU name from the registry, installed RAM, Windows 11 naming |
-| PC Optimiser | Each action's detect → Apply → Restore on Windows; UAC prompt for GPU scheduling, including declining it |
+| PC Optimiser | Each action's detect → Apply → Restore on Windows (mouse acceleration and Sticky Keys apply immediately); Apply all asking for administrator permission once for GPU scheduling and network responsiveness, including declining it; High priority for Minecraft visible in Task Manager |
+| Emotes seen by others | Emotes have no server component, so other players don't see them; nothing to test beyond the local view |
 | Launch on Windows | `javaw.exe` without a console, after-launch Minimise/Hide/Keep, Force close, crash reporting |
 | Real Discord | With `DISCORD_APPLICATION_ID` set and Discord running: activity named "Stabled Client" with the `stabled` art asset; Discord closed → game unaffected, status shows retrying |
 | Real GPUs | Motion blur and menus on NVIDIA, AMD and Intel drivers, OpenGL and Vulkan — at least one version per motion blur implementation (e.g. 1.20.1, 1.21.8 and 26.3) |

@@ -37,13 +37,14 @@ uuid = { version = "1", features = ["v4", "serde"] }
 getrandom = "0.3"
 url = "2"
 zip = { version = "2", default-features = false, features = ["deflate"] }
+flate2 = "1"
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp"] }
 sysinfo = { version = "0.37", default-features = false, features = ["system"] }
 trash = "5"
 chrono = { version = "0.4", default-features = false, features = ["clock", "serde", "std"] }
 thiserror = "2"
 dirs = "6"
-regex = { version = "1", default-features = false, features = ["std", "unicode-perl"] }
+regex = { version = "1", default-features = false, features = ["std", "unicode-perl", "unicode-case"] }
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.55"
@@ -56,6 +57,7 @@ windows = { version = "0.61", features = [
   "Win32_System_SystemInformation",
   "Win32_System_Threading",
   "Win32_System_Registry",
+  "Win32_UI_Accessibility",
   "Win32_UI_Shell",
   "Win32_UI_WindowsAndMessaging",
 ] }

@@ -1,31 +1,31 @@
 import { useEffect, useRef, useState } from 'react';
-import { Cpu, ExternalLink, Home, Layers, Settings as SettingsIcon } from 'lucide-react';
+import { Cpu, ExternalLink, Home, Layers, Settings as SettingsIcon, ShoppingBag } from 'lucide-react';
 import { useStore, type Page } from '../lib/store';
-import { api, asError } from '../lib/api';
 import { cx } from '../lib/format';
 import { DiscordGlyph, InfoGlyph } from './icons';
 
 const ITEMS: Array<{ id: Page; label: string; icon: typeof Home }> = [
   { id: 'home', label: 'Home', icon: Home },
   { id: 'saves', label: 'Saves', icon: Layers },
+  { id: 'store', label: 'Store', icon: ShoppingBag },
   { id: 'optimiser', label: 'PC Optimiser', icon: Cpu },
   { id: 'settings', label: 'Settings', icon: SettingsIcon },
 ];
 
-/** Widths from --rail-w / --rail-w-open in base.css; hover cards sit just right of the rail. */
+/** Widths from --rail-w / --rail-w-open and the floating gap (--rail-gap) in base.css; hover cards sit just right of the rail. */
 const RAIL_W = 68;
 const RAIL_W_OPEN = 224;
+const RAIL_GAP = 12;
 
 type CardKind = 'discord' | 'about';
 
 /**
- * Compact icon rail that expands over the content (never pushing it sideways) on hover, with a short intent
+ * Floating icon rail that expands over the content (never pushing it sideways) on hover, with a short intent
  * delay, or while keyboard focus is inside. At the bottom: the Stabled Discord and About items, each with a
- * hover card (the Discord card holds the clickable invite link).
+ * hover card. Opening the Discord invite always asks first (DiscordPrompt).
  */
 export function NavRail() {
-  const { page, setPage, settings, info, toast } = useStore();
-  const hoverEnabled = settings?.launcher.expandNavOnHover ?? true;
+  const { page, setPage, info, askDiscord } = useStore();
   const [hover, setHover] = useState(false);
   const [keyboardFocus, setKeyboardFocus] = useState(false);
   const [tip, setTip] = useState<{ text: string; x: number; y: number } | null>(null);
@@ -33,7 +33,7 @@ export function NavRail() {
   const timer = useRef<number | undefined>(undefined);
   const cardTimer = useRef<number | undefined>(undefined);
   const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const open = keyboardFocus || (hoverEnabled && hover);
+  const open = keyboardFocus || hover;
   const invite = info?.config.discordInviteUrl ?? null;
 
   useEffect(
@@ -81,7 +81,8 @@ export function NavRail() {
 
   const openInvite = () => {
     if (!invite) return;
-    api.openExternal(invite).catch((e) => toast(asError(e).message, 'error'));
+    setCard(null);
+    askDiscord();
   };
 
   const onKeyDown = (e: React.KeyboardEvent, i: number) => {
@@ -178,7 +179,7 @@ export function NavRail() {
           className={cx('rail-card', `rail-card-${card.kind}`)}
           role={card.kind === 'about' ? 'tooltip' : 'dialog'}
           aria-label={card.kind === 'about' ? 'About Stabled' : 'Stabled Discord'}
-          style={{ left: (open ? RAIL_W_OPEN : RAIL_W) + 12, top: card.y }}
+          style={{ left: RAIL_GAP + (open ? RAIL_W_OPEN : RAIL_W) + 12, top: card.y }}
           onMouseEnter={() => {
             keepCard();
             enter();

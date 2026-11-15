@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { AlertTriangle, CheckCircle2, Info, Loader2, X, XCircle } from 'lucide-react';
 import type { Save } from '../lib/api';
 import { cx, pct, rangePct } from '../lib/format';
@@ -218,7 +219,8 @@ export function Modal({
       prev?.focus?.();
     };
   }, [onClose, dismissible]);
-  return (
+  // Rendered on <body>, so an animated (transformed) ancestor can't trap the fixed-position backdrop.
+  return createPortal(
     <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && dismissible && onClose()}>
       <div ref={ref} className={cx('modal', wide && 'wide')} role="dialog" aria-modal="true" aria-labelledby={labelledBy ?? titleId}>
         {title !== undefined && (
@@ -234,7 +236,8 @@ export function Modal({
         <div className="modal-body">{children}</div>
         {footer && <div className="modal-foot">{footer}</div>}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

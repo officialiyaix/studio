@@ -24,7 +24,7 @@ pub fn main(args: &[String]) -> i32 {
                 crate::gallery::set_dir(std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("resources").join("backgrounds"));
                 let meta = match saves::load(&id) { Ok(m) => m, Err(e) => { eprintln!("{e}"); return 1; } };
                 let emit = |p: install::Progress| eprintln!("[{}] {} {}/{} files {}/{} bytes", p.phase, p.label, p.files_done, p.files_total, p.bytes_done, p.bytes_total);
-                let prepared = match install::prepare(&meta, 8, &emit).await { Ok(p) => p, Err(e) => { eprintln!("install failed: {e}"); return 1; } };
+                let prepared = match install::prepare(&meta, 8, false, &emit).await { Ok(p) => p, Err(e) => { eprintln!("install failed: {e}"); return 1; } };
                 let mut m = saves::load(&id).unwrap();
                 m.installed_stack = stack::for_version(&m.minecraft_version).map(|s| s.key());
                 let _ = m.save();

@@ -8,7 +8,7 @@ import { NewsPanel } from '../features/NewsPanel';
 import { SaveHero } from '../features/SaveHero';
 
 export function HomePage() {
-  const { saves, savesLoaded, selectedId, select, setPage } = useStore();
+  const { saves, savesLoaded, selectedId, select, openSave } = useStore();
   const [creating, setCreating] = useState(false);
   const selected = saves.find((s) => s.id === selectedId) ?? null;
 
@@ -22,7 +22,7 @@ export function HomePage() {
       <div className="home-grid">
         <div className="home-main scroll">
           {selected ? (
-            <SaveHero key={selected.id} save={selected} onOpenMods={() => setPage('saves')} />
+            <SaveHero key={selected.id} save={selected} onOpenMods={() => openSave(selected.id, 'mods')} onOpenLogs={() => openSave(selected.id, 'logs')} />
           ) : (
             savesLoaded && (
               <section className="hero panel welcome">

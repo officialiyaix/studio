@@ -16,14 +16,12 @@ import stabled.client.ui.widget.LabelWidget;
 import stabled.client.ui.widget.SliderWidget;
 import stabled.client.ui.widget.StabledButton;
 import stabled.client.ui.widget.ThemeTile;
-import stabled.client.ui.widget.ToggleWidget;
 
 /**
  * Step 1 / Appearance: pre-themes (bundled backgrounds by category), a separator, the basic themes, then Simple or
- * Frosted Glass, the transparency slider and samples.
+ * Frosted Glass and the transparency slider.
  */
 public final class AppearancePage implements Page {
-	private boolean sampleToggle = true;
 	/** Pre-theme category being browsed (null = the category list). Kept while the page is rebuilt. */
 	private String openCategory;
 	private String galleryError;
@@ -62,7 +60,6 @@ public final class AppearancePage implements Page {
 				v -> ThemeManager.setTransparency(v, true)));
 			b.advance(26);
 		}
-		this.preview(b);
 		b.label(Component.translatable("stabled.appearance.global"), LabelWidget.Tone.MUTED);
 	}
 
@@ -174,43 +171,5 @@ public final class AppearancePage implements Page {
 				b.label(Component.translatable("stabled.theme.custom_missing"), LabelWidget.Tone.WARNING);
 			}
 		}
-	}
-
-	/** Live samples drawn over a strip of the actual background so translucency is visible. */
-	private void preview(PageBuilder b) {
-		int h = 46;
-		int x = b.x();
-		int y = b.y();
-		int w = b.width();
-		b.add(new DrawWidget(x, y, w, h, Component.translatable("stabled.surface.preview"), (g, px, py, pw, ph, pt) -> {
-			Theme t = Ui.theme();
-			g.scissor(px, py, px + pw, py + ph);
-			String tex = ThemeManager.isCustomSelected() ? ThemeManager.customBackgroundTexture() : null;
-			if (tex != null) {
-				Ui.coverBlit(g, tex, px, py, pw, ph, ThemeManager.backgroundWidth(), ThemeManager.backgroundHeight());
-			} else {
-				g.gradient(px, py, px + pw, py + ph, t.bgAlt(), t.bg());
-				// Diagonal stripes make transparency easy to judge.
-				for (int sx = -ph; sx < pw; sx += 10) {
-					for (int k = 0; k < ph; k += 2) {
-						g.fill(px + sx + k, py + k, px + sx + k + 4, py + k + 2, Ui.alpha(t.accent(), 0.22F));
-					}
-				}
-			}
-			g.endScissor();
-			Ui.roundOutline(g, px, py, pw, ph, 3, t.border());
-			int panelX = px + pw - Math.min(110, pw / 3) - 6;
-			Ui.panel(g, panelX, py + 6, Math.min(110, pw / 3), ph - 12, 3);
-			Ui.textClipped(g, Component.translatable("stabled.surface.sample_panel"), panelX + 6, py + 12, Math.min(110, pw / 3) - 12, t.text());
-			Ui.textClipped(g, Component.translatable("stabled.surface.sample_text"), panelX + 6, py + 24, Math.min(110, pw / 3) - 12, t.textMuted());
-		}));
-		int sampleW = Math.max(40, (w - Math.min(110, w / 3) - 30) / 3);
-		b.add(new StabledButton(x + 6, y + 13, sampleW, 20, Component.translatable("stabled.surface.sample_primary"), StabledButton.Style.PRIMARY, btn -> {
-		}));
-		b.add(new StabledButton(x + 10 + sampleW, y + 13, sampleW, 20, Component.translatable("stabled.surface.sample_secondary"), StabledButton.Style.SECONDARY, btn -> {
-		}));
-		b.add(new ToggleWidget(x + 14 + sampleW * 2, y + 13, sampleW, 20, Component.translatable("stabled.surface.sample_toggle"),
-			() -> this.sampleToggle, v -> this.sampleToggle = v));
-		b.advance(h + 4);
 	}
 }

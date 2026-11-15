@@ -13,6 +13,37 @@
       ]
     },
     {
+      "id": "bleach-character",
+      "name": "Bleach",
+      "images": [
+        {
+          "id": "01",
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "02",
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "03",
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "04",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "id": "05",
+          "width": 1920,
+          "height": 1080
+        }
+      ]
+    },
+    {
       "id": "dragon-ball",
       "name": "Dragon Ball",
       "images": [
@@ -91,6 +122,52 @@
           "id": "11",
           "width": 1536,
           "height": 864
+        }
+      ]
+    },
+    {
+      "id": "minecraft-shaders",
+      "name": "Minecraft Shaders",
+      "images": [
+        {
+          "id": "01",
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "02",
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "03",
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "04",
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "05",
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "06",
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "07",
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "08",
+          "width": 1920,
+          "height": 1080
         }
       ]
     },

@@ -26,6 +26,8 @@
   --glass-blur: 0px;
   --rail-w: 68px;
   --rail-w-open: 224px;
+  /* The rail floats this far from the window edges. */
+  --rail-gap: 12px;
   --header-h: 60px;
   --footer-h: 58px;
   --radius-lg: 16px;

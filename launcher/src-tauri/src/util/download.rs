@@ -171,9 +171,12 @@ fn file_name(p: &Path) -> String {
     p.file_name().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default()
 }
 
+#[derive(Default)]
 pub struct BatchProgress {
     pub files_done: AtomicUsize,
     pub bytes_done: AtomicU64,
+    /// Files that were missing or failed their check and were downloaded again.
+    pub fetched: AtomicUsize,
 }
 
 /// Download many files with bounded concurrency. Files that are already valid are skipped.
@@ -194,6 +197,7 @@ pub async fn fetch_all(
             };
             if !valid {
                 fetch(&d, Some(&progress.bytes_done)).await?;
+                progress.fetched.fetch_add(1, Ordering::Relaxed);
             } else if let Some(s) = d.size {
                 progress.bytes_done.fetch_add(s, Ordering::Relaxed);
             }

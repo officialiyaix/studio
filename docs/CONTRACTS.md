@@ -8,7 +8,9 @@ The launcher and the Stabled Client share a few JSON files and JVM properties. B
 | --- | --- |
 | `stabled.home` | `%APPDATA%\Stabled` |
 | `stabled.saveDir` | `%APPDATA%\Stabled\saves\<id>` |
+| `stabled.galleryDir` | The launcher's bundled background gallery (`index.json` + images), for pre-themes in game |
 | `stabled.discordAppId` | `DISCORD_APPLICATION_ID`, only when configured |
+| `stabled.streamer.hideName` | `true` while streamer mode hides the username; the title screen then doesn't show it |
 
 Without them (e.g. `gradlew runClient`) the client uses folders beside the game directory and says it is running in development mode.
 
@@ -43,12 +45,14 @@ Created by the launcher with the Save defaults; edited by the launcher only whil
   "motionBlur": { "enabled": false, "strength": 40 },
   "discord":    { "enabled": true, "showElapsed": true },
   "performance":{ "preset": "balanced", "applied": "balanced" },
-  "menus":      { "styled": true }
+  "menus":      { "styled": true },
+  "emotes":     { "thirdPerson": true }
 }
 ```
 
 - `fps.position`: `top-left | top-right | bottom-left | bottom-right`; `scale`: `0.75 | 1.0 | 1.25 | 1.5 | 2.0`; `color`: `theme | white | green | yellow | cyan`; `background`: `panel | shadow | none`.
 - `motionBlur.strength`: 10–100.
+- `emotes.thirdPerson`: switch to third person (front) while an emote plays. Edited in game only; the launcher keeps it.
 - `performance.preset`: `performance | balanced | quality | custom`. `applied` is written by the game after it applies a preset, so a preset chosen in the launcher is applied once at the next launch and never re-applied over manual tweaks.
 
 Documented defaults for a new Save: Stabled Night, Simple surfaces, Balanced preset, FPS display on, motion blur off, Discord Presence on.

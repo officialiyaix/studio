@@ -4,7 +4,7 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { api, asError, type ThemeDef } from '../lib/api';
 import { useStore } from '../lib/store';
 import { cx, rangePct } from '../lib/format';
-import { Callout, PercentRange, Toggle } from '../components/ui';
+import { Callout, PercentRange } from '../components/ui';
 
 function Swatch({ theme, image, dim }: { theme: ThemeDef; image?: string | null; dim?: number }) {
   const c = theme.colors;
@@ -207,7 +207,6 @@ export function CustomBackgroundEditor() {
 /** Simple vs Frosted Glass, the 10–90% Transparency slider and live samples directly beneath it. */
 export function SurfaceStyle() {
   const { appearance, updateAppearance, setAppearanceView } = useStore();
-  const [sampleOn, setSampleOn] = useState(true);
   if (!appearance) return null;
   const a = appearance.appearance;
   const glass = a.surface === 'glass';
@@ -250,23 +249,6 @@ export function SurfaceStyle() {
               onCommit={(v) => updateAppearance({ glassTransparency: v })}
             />
             <span className="hint">Higher transparency shows more of the background: 0% is the most solid, 100% the clearest. Text and icons always stay fully opaque.</span>
-          </div>
-          <div className="live-preview" aria-label="Live preview">
-            <div className="lp-panel panel">
-              <div className="lp-title">Sample panel</div>
-              <p className="tiny muted">Text stays crisp at any transparency.</p>
-              <div className="lp-row">
-                <button type="button" className="btn btn-primary btn-sm">
-                  Primary
-                </button>
-                <button type="button" className="btn btn-sm">
-                  Secondary
-                </button>
-                <span className="lp-toggle">
-                  <Toggle label="Sample toggle" checked={sampleOn} onChange={setSampleOn} /> Toggle
-                </span>
-              </div>
-            </div>
           </div>
         </div>
       ) : (

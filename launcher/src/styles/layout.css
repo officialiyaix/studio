@@ -5,7 +5,7 @@
   z-index: 1;
   height: 100%;
   display: grid;
-  grid-template-columns: var(--rail-w) minmax(0, 1fr);
+  grid-template-columns: calc(var(--rail-w) + var(--rail-gap)) minmax(0, 1fr);
   grid-template-rows: var(--header-h) minmax(0, 1fr) var(--footer-h);
   grid-template-areas:
     'rail header'
@@ -23,18 +23,30 @@
   position: relative;
   z-index: 30;
 }
+/* The rail floats: inset from the window edges, rounded, with a soft accent glow towards the bottom. */
 .rail {
   position: absolute;
-  inset: 0 auto 0 0;
+  inset: var(--rail-gap) auto var(--rail-gap) var(--rail-gap);
   width: var(--rail-w);
   display: flex;
   flex-direction: column;
   padding: 12px 10px;
   gap: 6px;
-  background: color-mix(in srgb, var(--surface) max(var(--surface-pct), 70%), transparent);
-  border-right: 1px solid var(--border-soft);
+  border-radius: 20px;
+  border: 1px solid var(--border-soft);
+  background:
+    radial-gradient(120% 45% at 50% 100%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%),
+    color-mix(in srgb, var(--surface) max(var(--surface-pct), 70%), transparent);
+  box-shadow: 0 18px 42px -22px rgb(0 0 0 / 0.65), 0 2px 8px rgb(0 0 0 / 0.18);
   transition: width var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
   overflow: hidden;
+  animation: rail-float-in 520ms var(--ease-out) both;
+}
+@keyframes rail-float-in {
+  from {
+    opacity: 0;
+    transform: translateX(-14px) scale(0.98);
+  }
 }
 .glass .rail {
   backdrop-filter: blur(var(--glass-blur)) saturate(1.15);
@@ -43,8 +55,10 @@
 .rail.open {
   width: var(--rail-w-open);
   /* The expanded rail overlays content, so it stays nearly opaque even in Frosted Glass. */
-  background: color-mix(in srgb, var(--surface) max(var(--surface-pct), 94%), transparent);
-  box-shadow: 18px 0 40px -18px rgb(0 0 0 / 0.55);
+  background:
+    radial-gradient(120% 45% at 50% 100%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 70%),
+    color-mix(in srgb, var(--surface) max(var(--surface-pct), 94%), transparent);
+  box-shadow: 24px 18px 50px -20px rgb(0 0 0 / 0.6), 0 2px 8px rgb(0 0 0 / 0.2);
 }
 .rail-brand {
   display: flex;

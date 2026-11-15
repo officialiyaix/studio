@@ -44,6 +44,10 @@ pub struct SaveMeta {
     pub installed_stack: Option<String>,
     #[serde(default)]
     pub launches: u32,
+    /// Set on the temporary test copies made by Find the broken mod: the Save they copy. Test copies are hidden
+    /// from the Saves list and never backed up.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub test_of: Option<String>,
 }
 
 fn one() -> u32 {
@@ -95,7 +99,9 @@ pub fn list() -> Vec<SaveMeta> {
         for e in rd.flatten() {
             let id = e.file_name().to_string_lossy().into_owned();
             if let Ok(m) = load(&id) {
-                out.push(m);
+                if m.test_of.is_none() {
+                    out.push(m);
+                }
             }
         }
     }
@@ -160,6 +166,7 @@ pub fn create(req: CreateRequest, settings: &Settings) -> AppResult<SaveMeta> {
         memory_mb: req.memory_mb.map(|m| m.clamp(1024, 32768)),
         installed_stack: None,
         launches: 0,
+        test_of: None,
     };
     let root = meta.root();
     for sub in GAME_SUBDIRS {
@@ -236,8 +243,67 @@ pub fn duplicate(id: &str, name: Option<String>) -> AppResult<SaveMeta> {
     meta.launches = 0;
     fsx::copy_dir(&src.root(), &meta.root())?;
     let _ = std::fs::remove_file(meta.stabled_dir().join("runtime.json"));
+    // World backups belong to the original Save.
+    let _ = std::fs::remove_dir_all(meta.root().join("backups"));
     meta.save()?;
     Ok(meta)
+}
+
+/// A hidden copy of a Save for Find the broken mod: settings, mods, configs and packs, plus the worlds only when
+/// asked (needed when the problem happens inside a world). The original Save is never changed.
+pub fn create_test_copy(id: &str, with_worlds: bool) -> AppResult<SaveMeta> {
+    let src = load(id)?;
+    // One test copy per Save at a time.
+    for e in std::fs::read_dir(paths::saves_dir()).into_iter().flatten().flatten() {
+        if let Ok(m) = load(&e.file_name().to_string_lossy()) {
+            if m.test_of.as_deref() == Some(id) {
+                delete_test_copy(&m.id)?;
+            }
+        }
+    }
+    let mut meta = src.clone();
+    meta.id = uuid::Uuid::new_v4().to_string();
+    meta.name = format!("{} (test copy)", src.name);
+    meta.created_at = chrono::Utc::now().to_rfc3339();
+    meta.last_played_at = None;
+    meta.launches = 0;
+    meta.test_of = Some(src.id.clone());
+    std::fs::create_dir_all(meta.game_dir())?;
+    fsx::copy_dir(&src.stabled_dir(), &meta.stabled_dir())?;
+    let _ = std::fs::remove_file(meta.stabled_dir().join("runtime.json"));
+    let skip: &[&str] = if with_worlds { &["logs", "crash-reports", "screenshots"] } else { &["saves", "logs", "crash-reports", "screenshots"] };
+    for e in std::fs::read_dir(src.game_dir())?.flatten() {
+        let name = e.file_name().to_string_lossy().into_owned();
+        if skip.contains(&name.as_str()) || name.starts_with("hs_err_pid") {
+            continue;
+        }
+        let to = meta.game_dir().join(&name);
+        if e.path().is_dir() {
+            fsx::copy_dir(&e.path(), &to)?;
+        } else {
+            std::fs::copy(e.path(), &to)?;
+        }
+    }
+    if let Ok(icon) = std::fs::read(src.root().join("icon.png")) {
+        let _ = std::fs::write(meta.root().join("icon.png"), icon);
+    }
+    meta.save()?;
+    crate::log_info!("Created test copy {} of Save {}", meta.id, src.id);
+    Ok(meta)
+}
+
+/// Deletes a test copy permanently (it only ever held copies).
+pub fn delete_test_copy(id: &str) -> AppResult<()> {
+    let meta = load(id)?;
+    if meta.test_of.is_none() {
+        bail!("SAVE", "That isn't a test copy");
+    }
+    let root = meta.root();
+    if !root.starts_with(paths::saves_dir()) {
+        bail!("SAVE", "Refusing to delete outside the Saves folder");
+    }
+    std::fs::remove_dir_all(&root)?;
+    Ok(())
 }
 
 /// Moves the whole Save folder (including its worlds) to the Recycle Bin, so it can still be recovered from there.

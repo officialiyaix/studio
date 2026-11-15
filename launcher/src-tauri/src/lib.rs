@@ -1,11 +1,15 @@
 //! Stabled launcher backend.
 
 mod auth;
+mod backups;
 mod commands;
+mod compat;
+mod crash;
 mod config;
 mod error;
 mod gallery;
 mod images;
+mod logs;
 mod minecraft;
 mod mods;
 mod news;
@@ -14,6 +18,7 @@ mod paths;
 mod saves;
 mod settings;
 mod state;
+mod store;
 mod system;
 mod util;
 #[cfg(feature = "dev-tools")]
@@ -127,6 +132,24 @@ pub fn run() {
             commands::optimiser_view,
             commands::optimiser_apply,
             commands::optimiser_restore,
+            commands::optimiser_apply_all,
+            commands::optimiser_restore_all,
+            commands::mods_check,
+            commands::save_logs,
+            commands::save_log_read,
+            commands::crash_explain,
+            commands::backups_view,
+            commands::backups_create,
+            commands::backups_restore,
+            commands::backups_delete,
+            commands::backups_open_folder,
+            commands::bisect_start,
+            commands::bisect_apply,
+            commands::bisect_end,
+            commands::store_search,
+            commands::store_project,
+            commands::store_installed,
+            commands::store_install,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Stabled");

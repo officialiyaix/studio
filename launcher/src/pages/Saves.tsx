@@ -1,21 +1,29 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Plus, Search } from 'lucide-react';
 import { api, type Save, type SaveSummary } from '../lib/api';
-import { useStore } from '../lib/store';
+import { useStore, type SavesTab } from '../lib/store';
 import { cx, formatBytes, formatDate } from '../lib/format';
 import { SaveIcon, StatusBadge } from '../components/ui';
 import { CreateSaveDialog } from '../features/CreateSaveDialog';
 import { ModsManager } from '../features/ModsManager';
 import { SaveHero } from '../features/SaveHero';
 import { SaveSettingsPanel } from '../features/SaveSettingsPanel';
+import { LogsViewer } from '../features/LogsViewer';
+import { BackupsPanel } from '../features/BackupsPanel';
+import { BisectWizard } from '../features/BisectWizard';
 
-type Tab = 'overview' | 'mods' | 'settings';
+const TABS: Array<{ id: SavesTab; label: string }> = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'mods', label: 'Mods' },
+  { id: 'logs', label: 'Logs' },
+  { id: 'backups', label: 'Backups' },
+  { id: 'settings', label: 'Save settings' },
+];
 
 export function SavesPage() {
-  const { saves, selectedId, select } = useStore();
+  const { saves, selectedId, select, savesTab: tab, setSavesTab: setTab, bisectSave, setBisectSave } = useStore();
   const [creating, setCreating] = useState(false);
   const [query, setQuery] = useState('');
-  const [tab, setTab] = useState<Tab>('overview');
   const selected = saves.find((s) => s.id === selectedId) ?? null;
   const filtered = useMemo(() => saves.filter((s) => s.name.toLowerCase().includes(query.trim().toLowerCase())), [saves, query]);
 
@@ -52,15 +60,17 @@ export function SavesPage() {
             <>
               <SaveHero key={selected.id} save={selected} onOpenMods={() => setTab('mods')} />
               <div className="tabs" role="tablist" aria-label="Save sections">
-                {(['overview', 'mods', 'settings'] as Tab[]).map((t) => (
-                  <button key={t} type="button" role="tab" aria-selected={tab === t} className={cx('tab', tab === t && 'active')} onClick={() => setTab(t)}>
-                    {t === 'overview' ? 'Overview' : t === 'mods' ? 'Mods' : 'Save settings'}
+                {TABS.map((t) => (
+                  <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} className={cx('tab', tab === t.id && 'active')} onClick={() => setTab(t.id)}>
+                    {t.label}
                   </button>
                 ))}
               </div>
-              <div role="tabpanel">
+              <div role="tabpanel" key={`${selected.id}-${tab}`} className="tab-panel">
                 {tab === 'overview' && <Overview save={selected} />}
-                {tab === 'mods' && <ModsManager save={selected} />}
+                {tab === 'mods' && <ModsManager save={selected} onFindBroken={() => setBisectSave(selected.id)} />}
+                {tab === 'logs' && <LogsViewer save={selected} />}
+                {tab === 'backups' && <BackupsPanel save={selected} />}
                 {tab === 'settings' && <SaveSettingsPanel save={selected} />}
               </div>
             </>
@@ -72,6 +82,7 @@ export function SavesPage() {
         </div>
       </div>
       {creating && <CreateSaveDialog onClose={() => setCreating(false)} />}
+      {bisectSave && saves.some((s) => s.id === bisectSave) && <BisectWizard save={saves.find((s) => s.id === bisectSave)!} onClose={() => setBisectSave(null)} />}
     </div>
   );
 }

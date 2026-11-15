@@ -9,6 +9,10 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 //#else
 import net.minecraft.client.gui.GuiGraphics;
 //#endif
+//#if MC >= 1.21.9
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+//#endif
 
 /**
  * Base for Stabled's own screens. The background and foreground layers are drawn through {@link Gfx}, below the
@@ -27,6 +31,21 @@ public abstract class BaseScreen extends Screen {
 	protected abstract void drawForeground(Gfx g, int mouseX, int mouseY, float partialTick);
 
 	protected boolean scrolled(double mouseX, double mouseY, double amount) {
+		return false;
+	}
+
+	/** A key went down while this screen is open; return true to consume it. */
+	protected boolean keyDown(KeyInput key) {
+		return false;
+	}
+
+	/** A key was released while this screen is open; return true to consume it. */
+	protected boolean keyUp(KeyInput key) {
+		return false;
+	}
+
+	/** A mouse button was pressed on the screen, before widgets see it; return true to consume it. */
+	protected boolean clicked(double mouseX, double mouseY, int button) {
 		return false;
 	}
 
@@ -88,6 +107,38 @@ public abstract class BaseScreen extends Screen {
 	@Override
 	public boolean mouseScrolled(double x, double y, double amount) {
 		return this.scrolled(x, y, amount) || super.mouseScrolled(x, y, amount);
+	}
+//#endif
+
+//#if MC >= 1.21.9
+	@Override
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		return this.clicked(event.x(), event.y(), event.button()) || super.mouseClicked(event, doubleClick);
+	}
+
+	@Override
+	public boolean keyPressed(KeyEvent event) {
+		return this.keyDown(new KeyInput(event)) || super.keyPressed(event);
+	}
+
+	@Override
+	public boolean keyReleased(KeyEvent event) {
+		return this.keyUp(new KeyInput(event)) || super.keyReleased(event);
+	}
+//#else
+	@Override
+	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+		return this.clicked(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
+	}
+
+	@Override
+	public boolean keyPressed(int key, int scanCode, int modifiers) {
+		return this.keyDown(new KeyInput(key, scanCode)) || super.keyPressed(key, scanCode, modifiers);
+	}
+
+	@Override
+	public boolean keyReleased(int key, int scanCode, int modifiers) {
+		return this.keyUp(new KeyInput(key, scanCode)) || super.keyReleased(key, scanCode, modifiers);
 	}
 //#endif
 
