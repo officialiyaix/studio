@@ -1,6 +1,6 @@
 # Configuration
 
-Stabled reads four external values. They are public identifiers, not secrets, but they belong to whoever publishes Stabled, so none are filled in here.
+Stabled reads four external values. They are public identifiers, not secrets, and belong to whoever publishes Stabled. `MICROSOFT_CLIENT_ID` is filled in (Stabled's registered Microsoft app); the other three are still empty.
 
 Set them in one of three places (later wins):
 

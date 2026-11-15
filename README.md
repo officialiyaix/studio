@@ -44,7 +44,7 @@ Four values are configured in [`config/stabled.config.json`](config/stabled.conf
 | `DISCORD_INVITE_URL` | Settings → Socials → Join Discord | The button is disabled with an explanation |
 | `NEWS_FEED_URL` | Stabled news in the news panel | Minecraft release notes and built-in guides are shown |
 
-None of these are set in this repository. See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for how to obtain each one.
+`MICROSOFT_CLIENT_ID` is set in `config/stabled.config.json` (Stabled's own Microsoft app; Minecraft sign-in also needs Mojang's approval of it). The other three are not set yet. See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for how to obtain each one.
 
 ## Building
 
