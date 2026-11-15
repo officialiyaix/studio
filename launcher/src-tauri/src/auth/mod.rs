@@ -461,3 +461,33 @@ async fn ensure_avatar(a: &Account) {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Launch enforcement lives in the backend: without a verified session no credentials are released, so
+    /// `save_launch` returns before any download or process is started.
+    #[test]
+    fn launch_refused_without_session() {
+        let rt = tokio::runtime::Builder::new_current_thread().enable_all().build().unwrap();
+        let auth = AuthManager::new();
+        let err = rt.block_on(auth.launch_credentials()).unwrap_err();
+        let expected = if crate::config::get().microsoft_client_id.is_some() { "SIGN_IN_REQUIRED" } else { "AUTH_UNCONFIGURED" };
+        assert_eq!(err.code(), expected);
+        assert_ne!(auth.status().state, "signed_in");
+    }
+
+    #[test]
+    fn account_debug_never_prints_tokens() {
+        let a = Account {
+            ms_refresh_token: "refresh-secret-value".into(),
+            mc_access_token: "access-secret-value".into(),
+            mc_expires_at: 0,
+            owns_java: true,
+            profile: None,
+        };
+        let shown = format!("{a:?}");
+        assert!(!shown.contains("secret-value"));
+    }
+}

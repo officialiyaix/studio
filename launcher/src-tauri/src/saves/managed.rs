@@ -94,6 +94,22 @@ pub fn is_required(state: &ManagedState, file: &str) -> bool {
     state.components.iter().any(|c| c.file == file && c.required)
 }
 
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RemovedComponent {
+    pub mod_id: String,
+    pub title: String,
+}
+
+pub fn removed(state: &ManagedState) -> Vec<RemovedComponent> {
+    state
+        .components
+        .iter()
+        .filter(|c| c.removed_by_user && !c.required)
+        .map(|c| RemovedComponent { mod_id: c.mod_id.clone(), title: c.title.clone() })
+        .collect()
+}
+
 pub fn skipped(state: &ManagedState) -> Vec<String> {
     state.skipped.clone()
 }

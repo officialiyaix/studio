@@ -40,6 +40,8 @@ pub struct Issue {
 pub struct ModList {
     pub mods: Vec<ModEntry>,
     pub issues: Vec<Issue>,
+    /// Optional Stabled components the user removed; they can be restored.
+    pub removed: Vec<managed::RemovedComponent>,
 }
 
 struct Parsed {
@@ -179,6 +181,7 @@ pub fn list(meta: &SaveMeta) -> AppResult<ModList> {
     // Everything the enabled set provides: mod ids, `provides` aliases and nested jars, plus built-ins.
     let mut provided: HashSet<String> = ["minecraft", "java", "fabricloader", "fabric-loader", "mixinextras"].iter().map(|s| s.to_string()).collect();
     let mut owners: HashMap<String, Vec<String>> = HashMap::new();
+    let mut versions: HashMap<String, String> = HashMap::new();
     for (e, p, nested) in &entries {
         if !e.enabled {
             continue;
@@ -187,6 +190,9 @@ pub fn list(meta: &SaveMeta) -> AppResult<ModList> {
             if let Some(id) = &p.id {
                 provided.insert(id.clone());
                 owners.entry(id.clone()).or_default().push(e.file.clone());
+                if let Some(v) = &p.version {
+                    versions.insert(id.clone(), v.clone());
+                }
             }
             provided.extend(p.provides.iter().cloned());
             provided.extend(nested.iter().cloned());
@@ -224,9 +230,15 @@ pub fn list(meta: &SaveMeta) -> AppResult<ModList> {
                 e.issues.push(Issue { level: "error".into(), message: format!("Requires \"{dep}\", which is not installed or is disabled.") });
             }
         }
-        for (other, _) in &p.breaks {
-            if enabled_ids.contains(other) {
-                e.issues.push(Issue { level: "error".into(), message: format!("Declares that it is incompatible with \"{other}\", which is enabled.") });
+        for (other, pred) in &p.breaks {
+            if !enabled_ids.contains(other) {
+                continue;
+            }
+            // `breaks` usually targets a version range (e.g. old releases); only report it when the installed one matches.
+            let installed = versions.get(other).map(String::as_str).unwrap_or("");
+            if installed.is_empty() || predicate_matches(pred, installed) {
+                let which = if installed.is_empty() { String::new() } else { format!(" {installed}") };
+                e.issues.push(Issue { level: "error".into(), message: format!("Declares that it is incompatible with \"{other}\"{which}, which is enabled.") });
             }
         }
     }
@@ -235,7 +247,7 @@ pub fn list(meta: &SaveMeta) -> AppResult<ModList> {
     }
     let mut mods: Vec<ModEntry> = entries.into_iter().map(|(e, _, _)| e).collect();
     mods.sort_by(|a, b| b.managed.is_some().cmp(&a.managed.is_some()).then(a.name.to_lowercase().cmp(&b.name.to_lowercase())));
-    Ok(ModList { mods, issues: global })
+    Ok(ModList { mods, issues: global, removed: managed::removed(&managed_state) })
 }
 
 fn mod_path(meta: &SaveMeta, file: &str) -> AppResult<PathBuf> {
@@ -413,5 +425,8 @@ mod tests {
         assert!(!predicate_matches(&json!("1.21.x"), "26.3"));
         assert!(predicate_matches(&json!("*"), "26.3"));
         assert!(predicate_matches(&json!(">=0.19.3"), "0.20.1"));
+        // Build metadata is ignored; pre-releases sort before releases.
+        assert!(!predicate_matches(&json!("<0.150.0"), "0.166.2+26.3"));
+        assert!(predicate_matches(&json!(">=0.9.3-beta.1"), "0.9.3-beta.5"));
     }
 }

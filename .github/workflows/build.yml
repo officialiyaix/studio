@@ -1,0 +1,112 @@
+name: Build
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  client:
+    name: Stabled Client mod
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build mod
+        working-directory: client
+        run: ./gradlew build --no-configuration-cache
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stabled-client
+          path: client/build/libs/stabled-client-*.jar
+          if-no-files-found: error
+
+  launcher-checks:
+    name: Launcher checks
+    needs: client
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: stabled-client
+          path: client-jar
+      - name: Bundle client jar
+        run: cp client-jar/stabled-client-*.jar launcher/src-tauri/resources/stabled-client.jar
+      - name: System dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev libssl-dev
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: launcher/package-lock.json
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: launcher/src-tauri
+      - name: Frontend type check and build
+        working-directory: launcher
+        run: |
+          npm ci
+          npm run build
+      - name: Backend tests
+        working-directory: launcher/src-tauri
+        run: cargo test --lib
+      - name: Type-check Windows-only code
+        working-directory: launcher/src-tauri
+        run: cargo check --target x86_64-pc-windows-msvc
+
+  windows:
+    name: Windows installer
+    needs: client
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: stabled-client
+          path: client-jar
+      - name: Bundle client jar
+        shell: pwsh
+        run: Copy-Item (Get-ChildItem client-jar/stabled-client-*.jar | Select-Object -First 1).FullName launcher/src-tauri/resources/stabled-client.jar
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: launcher/package-lock.json
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: launcher/src-tauri
+      - name: Build installer
+        working-directory: launcher
+        env:
+          # Public identifiers only — set them as repository variables (Settings → Secrets and variables → Actions → Variables).
+          MICROSOFT_CLIENT_ID: ${{ vars.MICROSOFT_CLIENT_ID }}
+          DISCORD_APPLICATION_ID: ${{ vars.DISCORD_APPLICATION_ID }}
+          DISCORD_INVITE_URL: ${{ vars.DISCORD_INVITE_URL }}
+          NEWS_FEED_URL: ${{ vars.NEWS_FEED_URL }}
+        run: |
+          npm ci
+          npx tauri build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stabled-windows-installer
+          path: launcher/src-tauri/target/release/bundle/nsis/*.exe
+          if-no-files-found: error

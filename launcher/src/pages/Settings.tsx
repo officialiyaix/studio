@@ -1,0 +1,308 @@
+import { useEffect, useState } from 'react';
+import { ExternalLink, FolderOpen, Loader2, LogOut, RefreshCw, Trash2, User } from 'lucide-react';
+import { api, asError, type Settings, type VersionOption } from '../lib/api';
+import { useStore } from '../lib/store';
+import { formatBytes } from '../lib/format';
+import { Callout, ConfirmDialog, Range, Segmented, SettingRow, Toggle } from '../components/ui';
+import { CustomBackgroundEditor, SurfaceStyle, ThemeGrid } from '../features/Appearance';
+
+function DiscordIcon({ size = 26 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+      <path d="M20.32 4.37a19.8 19.8 0 0 0-4.89-1.52.07.07 0 0 0-.08.04c-.21.38-.44.87-.61 1.25a18.27 18.27 0 0 0-5.49 0 12.64 12.64 0 0 0-.62-1.25.08.08 0 0 0-.08-.04 19.74 19.74 0 0 0-4.89 1.52.07.07 0 0 0-.03.03C.53 9.05-.32 13.58.1 18.06a.08.08 0 0 0 .03.06 19.9 19.9 0 0 0 5.99 3.03.08.08 0 0 0 .08-.03c.46-.63.87-1.3 1.23-1.99a.08.08 0 0 0-.04-.11 13.1 13.1 0 0 1-1.87-.89.08.08 0 0 1-.01-.13c.13-.09.25-.19.37-.29a.07.07 0 0 1 .08-.01c3.93 1.79 8.18 1.79 12.06 0a.07.07 0 0 1 .08.01c.12.1.24.2.37.29a.08.08 0 0 1-.01.13c-.6.35-1.22.65-1.87.89a.08.08 0 0 0-.04.11c.36.7.77 1.36 1.23 1.99a.08.08 0 0 0 .08.03 19.84 19.84 0 0 0 6-3.03.08.08 0 0 0 .03-.06c.5-5.18-.84-9.67-3.55-13.66a.06.06 0 0 0-.03-.03ZM8.02 15.33c-1.18 0-2.16-1.08-2.16-2.42 0-1.33.96-2.42 2.16-2.42 1.21 0 2.18 1.1 2.16 2.42 0 1.34-.96 2.42-2.16 2.42Zm7.97 0c-1.18 0-2.15-1.08-2.15-2.42 0-1.33.95-2.42 2.15-2.42 1.21 0 2.18 1.1 2.16 2.42 0 1.34-.94 2.42-2.16 2.42Z" />
+    </svg>
+  );
+}
+
+export function SettingsPage() {
+  const { settings, updateSettings, info, auth, openSignIn, setAuth, toast } = useStore();
+  const [jvm, setJvm] = useState(settings?.advanced.jvmArgs ?? '');
+  const [jvmError, setJvmError] = useState<string | null>(null);
+  const [mem, setMem] = useState(settings?.saveDefaults.memoryMb ?? 4096);
+  const [versions, setVersions] = useState<VersionOption[]>([]);
+  const [clearing, setClearing] = useState<'confirm' | 'busy' | null>(null);
+
+  useEffect(() => {
+    api.versionsList().then((v) => setVersions(v.versions.filter((x) => x.supported))).catch(() => undefined);
+  }, []);
+  useEffect(() => {
+    if (settings) {
+      setJvm(settings.advanced.jvmArgs);
+      setMem(settings.saveDefaults.memoryMb);
+    }
+  }, [settings]);
+
+  if (!settings) return null;
+  const set = <K extends keyof Settings>(section: K, patch: Partial<Settings[K]>) =>
+    updateSettings({ ...settings, [section]: { ...settings[section], ...patch } }).catch(() => undefined);
+
+  const invite = info?.config.discordInviteUrl ?? null;
+
+  return (
+    <div className="page settings scroll">
+      {/* ---------- Socials ---------- */}
+      <section className="settings-section" aria-labelledby="socials-h">
+        <h2 id="socials-h" className="section-title">
+          Socials
+        </h2>
+        <div className="discord-card panel">
+          <span className="discord-logo">
+            <DiscordIcon />
+          </span>
+          <div style={{ minWidth: 0 }}>
+            <h3>Join the Stabled community</h3>
+            <p className="muted small">Get help, share your Saves and hear about updates on the Stabled Discord server.</p>
+            {!invite && <p className="tiny muted" style={{ marginTop: 4 }}>The community invite isn't configured in this build (DISCORD_INVITE_URL), so there's nothing to open yet.</p>}
+          </div>
+          <button type="button" className="btn btn-lg discord-btn" disabled={!invite} onClick={() => api.openDiscordInvite().catch((e) => toast(asError(e).message, 'error'))}>
+            Join Discord <ExternalLink size={15} />
+          </button>
+        </div>
+      </section>
+
+      {/* ---------- Appearance ---------- */}
+      <section className="settings-section" aria-labelledby="appearance-h">
+        <h2 id="appearance-h" className="section-title">
+          Appearance
+        </h2>
+        <div className="panel settings-panel">
+          <div className="field-label">Theme</div>
+          <ThemeGrid />
+          <CustomBackgroundEditor />
+          <div className="field-label" style={{ marginTop: 8 }}>
+            Surface style
+          </div>
+          <SurfaceStyle />
+          <SettingRow label="Reduce motion" desc="Turns off launcher animations and transitions.">
+            <Toggle label="Reduce motion" checked={settings.launcher.reduceMotion} onChange={(v) => set('launcher', { reduceMotion: v })} />
+          </SettingRow>
+        </div>
+      </section>
+
+      {/* ---------- Launcher behaviour ---------- */}
+      <section className="settings-section" aria-labelledby="behaviour-h">
+        <h2 id="behaviour-h" className="section-title">
+          Launcher behaviour
+        </h2>
+        <div className="panel settings-panel">
+          <SettingRow label="When a Save starts" desc="What the Stabled window does while you play. Hidden windows come back when the game closes.">
+            <Segmented
+              label="When a Save starts"
+              value={settings.launcher.afterLaunch}
+              onChange={(v) => set('launcher', { afterLaunch: v })}
+              options={[
+                { value: 'keep', label: 'Keep open' },
+                { value: 'minimize', label: 'Minimise' },
+                { value: 'hide', label: 'Hide' },
+              ]}
+            />
+          </SettingRow>
+          <SettingRow label="Expand navigation on hover" desc="When off, use the expand button at the bottom of the rail; labels still appear as tooltips.">
+            <Toggle label="Expand navigation on hover" checked={settings.launcher.expandNavOnHover} onChange={(v) => set('launcher', { expandNavOnHover: v })} />
+          </SettingRow>
+          <SettingRow label="Open Stabled on" desc="The page shown when Stabled starts.">
+            <Segmented label="Start page" value={settings.launcher.startPage} onChange={(v) => set('launcher', { startPage: v })} options={[{ value: 'home', label: 'Home' }, { value: 'saves', label: 'Saves' }]} />
+          </SettingRow>
+          <SettingRow label="Show Minecraft release notes" desc="Adds Minecraft: Java Edition release notes from Mojang to the news panel.">
+            <Toggle label="Show Minecraft release notes" checked={settings.launcher.showMinecraftNews} onChange={(v) => set('launcher', { showMinecraftNews: v })} />
+          </SettingRow>
+        </div>
+      </section>
+
+      {/* ---------- Accounts ---------- */}
+      <section className="settings-section" id="settings-accounts" aria-labelledby="accounts-h">
+        <h2 id="accounts-h" className="section-title">
+          Accounts
+        </h2>
+        <div className="panel settings-panel">
+          <div className="account-row">
+            <span className="avatar" style={{ width: 44, height: 44 }}>
+              {auth?.avatar ? <img src={auth.avatar} alt="" /> : <User size={20} />}
+            </span>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ fontWeight: 650 }}>{auth?.profile?.name ?? 'Not signed in'}</div>
+              <div className="tiny muted">
+                {auth?.state === 'signed_in' && 'Microsoft account · Minecraft: Java Edition'}
+                {auth?.state === 'offline' && "Signed in, but the session couldn't be refreshed. Launching will try again."}
+                {auth?.state === 'no_java' && (auth.message ?? 'This account has no Java Edition access.')}
+                {auth?.state === 'signed_out' && 'Sign in with Microsoft to launch Minecraft.'}
+                {auth?.state === 'unconfigured' && "Microsoft sign-in isn't configured in this build (MICROSOFT_CLIENT_ID)."}
+                {auth?.state === 'signing_in' && 'Waiting for the browser…'}
+              </div>
+            </div>
+            {auth?.profile ? (
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button type="button" className="btn btn-sm" onClick={() => openSignIn('Choose the Microsoft account to use with Stabled.')}>
+                  <RefreshCw size={14} /> Switch account
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-danger"
+                  onClick={async () => {
+                    setAuth(await api.authSignOut());
+                    toast('Signed out. Your Saves and settings are unchanged.', 'success');
+                  }}
+                >
+                  <LogOut size={14} /> Sign out
+                </button>
+              </div>
+            ) : (
+              <button type="button" className="btn btn-primary btn-sm" onClick={() => openSignIn()} disabled={auth?.state === 'unconfigured'}>
+                Sign in with Microsoft
+              </button>
+            )}
+          </div>
+          <p className="tiny muted">
+            {auth?.persistent === false
+              ? 'On this platform your session is kept only while Stabled is open.'
+              : 'Your session is encrypted with Windows (DPAPI) for your user account and is never stored in settings files or logs.'}
+          </p>
+        </div>
+      </section>
+
+      {/* ---------- Save defaults ---------- */}
+      <section className="settings-section" aria-labelledby="defaults-h">
+        <h2 id="defaults-h" className="section-title">
+          Save defaults
+        </h2>
+        <div className="panel settings-panel">
+          <p className="tiny muted">Used for new Saves. Each Save can change these in its own settings.</p>
+          <SettingRow label="Minecraft version" desc="Preselected in Create Save.">
+            <select className="input" style={{ width: 200 }} value={settings.saveDefaults.minecraftVersion} onChange={(e) => set('saveDefaults', { minecraftVersion: e.target.value })} aria-label="Default Minecraft version">
+              {(versions.length ? versions : [{ id: settings.saveDefaults.minecraftVersion } as VersionOption]).map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.id}
+                </option>
+              ))}
+            </select>
+          </SettingRow>
+          <SettingRow label="Memory" desc={`${(mem / 1024).toFixed(1)} GB for Saves that don't set their own.`}>
+            <div style={{ minWidth: 240 }}>
+              <Range label="Default memory" min={1024} max={16384} step={512} value={mem} onChange={setMem} onCommit={(v) => set('saveDefaults', { memoryMb: v })} />
+            </div>
+          </SettingRow>
+          <SettingRow label="Performance preset">
+            <Segmented
+              label="Default performance preset"
+              value={settings.saveDefaults.performancePreset}
+              onChange={(v) => set('saveDefaults', { performancePreset: v })}
+              options={[
+                { value: 'performance', label: 'Performance' },
+                { value: 'balanced', label: 'Balanced' },
+                { value: 'quality', label: 'Quality' },
+                { value: 'custom', label: 'Custom' },
+              ]}
+            />
+          </SettingRow>
+        </div>
+      </section>
+
+      {/* ---------- Game features ---------- */}
+      <section className="settings-section" aria-labelledby="features-h">
+        <h2 id="features-h" className="section-title">
+          Game features
+        </h2>
+        <div className="panel settings-panel">
+          <p className="tiny muted">Starting values for the Stabled client in new Saves. Change them per Save, or in game under Stabled Settings.</p>
+          <SettingRow label="FPS display" desc="Shows the game's measured frame rate.">
+            <Toggle label="FPS display for new Saves" checked={settings.saveDefaults.fpsEnabled} onChange={(v) => set('saveDefaults', { fpsEnabled: v })} />
+          </SettingRow>
+          <SettingRow label="Motion blur" desc="Off by default; it costs a little performance.">
+            <Toggle label="Motion blur for new Saves" checked={settings.saveDefaults.motionBlurEnabled} onChange={(v) => set('saveDefaults', { motionBlurEnabled: v })} />
+          </SettingRow>
+          <SettingRow
+            label="Discord Presence"
+            desc={info?.config.discordPresenceConfigured ? 'Shows Stabled Client activity on your Discord profile while you play.' : "On by default, but this build has no Discord application ID (DISCORD_APPLICATION_ID), so no activity is sent until it's configured."}
+          >
+            <Toggle label="Discord Presence for new Saves" checked={settings.saveDefaults.discordEnabled} onChange={(v) => set('saveDefaults', { discordEnabled: v })} />
+          </SettingRow>
+        </div>
+      </section>
+
+      {/* ---------- Advanced ---------- */}
+      <section className="settings-section" aria-labelledby="advanced-h">
+        <h2 id="advanced-h" className="section-title">
+          Advanced
+        </h2>
+        <div className="panel settings-panel">
+          <div className="field">
+            <label htmlFor="jvm">Extra Java arguments</label>
+            <textarea
+              id="jvm"
+              className="input"
+              rows={2}
+              spellCheck={false}
+              value={jvm}
+              placeholder="e.g. -XX:+UseZGC"
+              aria-invalid={!!jvmError}
+              onChange={(e) => setJvm(e.target.value)}
+              onBlur={async () => {
+                if (jvm === settings.advanced.jvmArgs) return;
+                try {
+                  setJvmError(null);
+                  await updateSettings({ ...settings, advanced: { ...settings.advanced, jvmArgs: jvm } });
+                } catch (e) {
+                  setJvmError(asError(e).message);
+                }
+              }}
+            />
+            {jvmError ? <span className="error">{jvmError}</span> : <span className="hint">Added to every Save. Memory, class path and Stabled's own properties are managed for you.</span>}
+          </div>
+          <SettingRow label="Parallel downloads" desc={`${settings.advanced.concurrentDownloads} files at a time while installing.`}>
+            <div style={{ minWidth: 200 }}>
+              <Range label="Parallel downloads" min={1} max={16} value={settings.advanced.concurrentDownloads} onChange={(v) => set('advanced', { concurrentDownloads: v })} />
+            </div>
+          </SettingRow>
+          <SettingRow label="Data folders" desc={<span className="selectable">{info?.dataDir}</span>}>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button type="button" className="btn btn-sm" onClick={() => api.openDataFolder('data')}>
+                <FolderOpen size={14} /> Data
+              </button>
+              <button type="button" className="btn btn-sm" onClick={() => api.openDataFolder('logs')}>
+                <FolderOpen size={14} /> Logs
+              </button>
+            </div>
+          </SettingRow>
+          <SettingRow label="Clear downloaded game files" desc="Frees space used by shared game files, libraries, Java and mod downloads. Saves, worlds and settings are kept; files download again on the next launch.">
+            <button type="button" className="btn btn-sm btn-danger" onClick={() => setClearing('confirm')} disabled={clearing === 'busy'}>
+              {clearing === 'busy' ? <Loader2 size={14} className="spin" /> : <Trash2 size={14} />} Clear
+            </button>
+          </SettingRow>
+          <div className="about tiny muted">
+            <div>
+              Stabled {info?.version} · {info?.platform} · Stabled client for Minecraft {info?.supportedVersions.join(', ')}
+            </div>
+            <div>
+              Microsoft sign-in: {info?.config.microsoftConfigured ? 'configured' : 'not configured'} · Discord Presence: {info?.config.discordPresenceConfigured ? 'configured' : 'not configured'} · Community invite:{' '}
+              {info?.config.discordInviteUrl ? 'configured' : 'not configured'} · News feed: {info?.config.newsFeedConfigured ? 'configured' : 'not configured'}
+            </div>
+            <div>Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.</div>
+          </div>
+          {!info?.clientBundled && <Callout tone="warning">This build doesn't include the Stabled client component, so Saves can't be launched.</Callout>}
+        </div>
+      </section>
+
+      {clearing === 'confirm' && (
+        <ConfirmDialog
+          title="Clear downloaded game files?"
+          confirmLabel="Clear files"
+          danger
+          onCancel={() => setClearing(null)}
+          onConfirm={async () => {
+            setClearing('busy');
+            try {
+              const freed = await api.sharedCacheClear();
+              toast(`Freed ${formatBytes(freed)}. Saves and worlds were not touched.`, 'success');
+            } catch (e) {
+              toast(asError(e).message, 'error');
+            } finally {
+              setClearing(null);
+            }
+          }}
+        >
+          <p>Shared downloads (Minecraft, libraries, sounds, Java and mod files) will be removed and downloaded again the next time you launch. Your Saves, worlds, mods folders and settings are not affected.</p>
+        </ConfirmDialog>
+      )}
+    </div>
+  );
+}
