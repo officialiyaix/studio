@@ -11,7 +11,8 @@ pub fn main(args: &[String]) -> i32 {
         match args.first().map(String::as_str) {
             Some("create") => {
                 let name = args.get(1).cloned().unwrap_or_else(|| "Dev Save".into());
-                let req = saves::CreateRequest { name, minecraft_version: stack::PRIMARY_VERSION.into(), icon_png_base64: None, memory_mb: Some(2048), performance_preset: None };
+                let version = args.get(2).cloned().unwrap_or_else(|| stack::PRIMARY_VERSION.into());
+                let req = saves::CreateRequest { name, minecraft_version: version, icon_png_base64: None, memory_mb: Some(2048), performance_preset: None };
                 match saves::create(req, &crate::settings::Settings::load()) {
                     Ok(m) => { println!("{}", m.id); 0 }
                     Err(e) => { eprintln!("{e}"); 1 }
@@ -19,8 +20,7 @@ pub fn main(args: &[String]) -> i32 {
             }
             Some("install") | Some("command") => {
                 let id = args.get(1).cloned().unwrap_or_default();
-                let jar = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("resources").join(stack::STABLED_JAR_NAME);
-                saves::managed::set_bundled_client(jar);
+                saves::managed::set_bundled_clients_dir(std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("resources").join("clients"));
                 let meta = match saves::load(&id) { Ok(m) => m, Err(e) => { eprintln!("{e}"); return 1; } };
                 let emit = |p: install::Progress| eprintln!("[{}] {} {}/{} files {}/{} bytes", p.phase, p.label, p.files_done, p.files_total, p.bytes_done, p.bytes_total);
                 let prepared = match install::prepare(&meta, 8, &emit).await { Ok(p) => p, Err(e) => { eprintln!("install failed: {e}"); return 1; } };
@@ -36,7 +36,7 @@ pub fn main(args: &[String]) -> i32 {
                 }
                 0
             }
-            _ => { eprintln!("usage: --dev create <name> | install <id> | command <id>"); 2 }
+            _ => { eprintln!("usage: --dev create <name> [minecraft version] | install <id> | command <id>"); 2 }
         }
     })
 }

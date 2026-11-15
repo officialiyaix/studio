@@ -20,11 +20,16 @@ fn main() {
         println!("cargo:rustc-env=STABLED_CFG_{key}={}", value.trim());
     }
 
-    // The Stabled Client mod jar is bundled as a resource. Build it first with `./gradlew build` in /client.
-    let jar = Path::new("resources/stabled-client.jar");
-    if !jar.exists() {
-        println!("cargo:warning=resources/stabled-client.jar is missing: run `npm run bundle-client` (builds /client) before packaging. Launching Saves will report the missing component.");
+    // The Stabled Client builds (one per Minecraft version) are bundled from resources/clients/.
+    // Build them with `npm run bundle-client`, which runs Gradle in /client and copies the jars here.
+    let clients = Path::new("resources/clients");
+    let count = std::fs::read_dir(clients).map(|d| d.filter_map(Result::ok).filter(|e| e.path().extension().map(|x| x == "jar").unwrap_or(false)).count()).unwrap_or(0);
+    if count == 0 {
+        let _ = std::fs::create_dir_all(clients);
+        // Tauri requires the resource glob to match something; a README keeps the folder present.
+        let _ = std::fs::write(clients.join("README.txt"), "Stabled Client builds are copied here by `npm run bundle-client`.\n");
+        println!("cargo:warning=No Stabled client builds in resources/clients: run `npm run bundle-client` before packaging. Saves can't be launched without them.");
     }
-    println!("cargo:rerun-if-changed=resources/stabled-client.jar");
+    println!("cargo:rerun-if-changed=resources/clients");
     tauri_build::build()
 }

@@ -89,8 +89,8 @@ pub const ACTIONS: &[ActionInfo] = &[
     ActionInfo {
         id: "java-gpu",
         title: "Use the high-performance GPU for Minecraft",
-        description: "On laptops with two GPUs, tells Windows to run Stabled's Java runtime on the faster graphics card.",
-        details: "Adds a per-app graphics preference for Stabled's javaw.exe under HKCU\\Software\\Microsoft\\DirectX\\UserGpuPreferences (the same setting as Settings → System → Display → Graphics).",
+        description: "On laptops with two GPUs, tells Windows to run Stabled's Java runtimes on the faster graphics card.",
+        details: "Adds a per-app graphics preference for each of Stabled's Java runtimes (javaw.exe for Java 17, 21 and 25, whichever your Saves use) under HKCU\\Software\\Microsoft\\DirectX\\UserGpuPreferences (the same setting as Settings → System → Display → Graphics).",
         requires_admin: false,
         requires_restart: false,
     },
@@ -119,7 +119,7 @@ fn write_history(h: &Value) -> AppResult<()> {
 
 const INTEGRATION_MESSAGE: &str = "The Windows optimiser from the earlier project wasn't found in this repository, so its actions aren't included here. The settings below are Stabled's own; each is applied only when you choose Apply and can be restored.";
 
-pub fn view(java_path: Option<std::path::PathBuf>) -> OptimiserView {
+pub fn view(java: &[std::path::PathBuf]) -> OptimiserView {
     let note = IntegrationNote { connected: false, message: INTEGRATION_MESSAGE.into() };
     #[cfg(windows)]
     {
@@ -127,7 +127,7 @@ pub fn view(java_path: Option<std::path::PathBuf>) -> OptimiserView {
         let actions = ACTIONS
             .iter()
             .map(|a| {
-                let detected = windows_impl::detect(a.id, java_path.as_deref());
+                let detected = windows_impl::detect(a.id, java);
                 ActionView {
                     id: a.id.into(),
                     title: a.title.into(),
@@ -148,7 +148,7 @@ pub fn view(java_path: Option<std::path::PathBuf>) -> OptimiserView {
     }
     #[cfg(not(windows))]
     {
-        let _ = java_path;
+        let _ = java;
         OptimiserView {
             supported: false,
             platform_message: Some("The PC Optimiser changes Windows settings, so it is only available on Windows.".into()),
@@ -175,17 +175,24 @@ pub fn view(java_path: Option<std::path::PathBuf>) -> OptimiserView {
 }
 
 /// Apply one action, recording what it replaced. Returns a short result message for the UI.
-pub fn apply(id: &str, java_path: Option<std::path::PathBuf>) -> AppResult<String> {
+pub fn apply(id: &str, java: &[std::path::PathBuf]) -> AppResult<String> {
     let Some(info) = ACTIONS.iter().find(|a| a.id == id) else { bail!("OPTIMISER", "Unknown action") };
     #[cfg(windows)]
     {
-        let previous = windows_impl::run(id, "apply", java_path.as_deref(), None, info.requires_admin)?;
+        let previous = windows_impl::run(id, "apply", java, None, info.requires_admin)?;
         let mut h = history();
         if !h.is_object() {
             h = json!({});
         }
-        // Keep the *original* value if the action is applied again.
-        let original = h.get(id).and_then(|e| e.get("previous").cloned()).filter(Value::is_object).unwrap_or(previous);
+        // Keep the *original* values if the action is applied again; record values it touches for the first time
+        // (e.g. a Java runtime installed since the last Apply).
+        let original = match h.get(id).and_then(|e| e.get("previous").cloned()).filter(Value::is_object) {
+            Some(mut original) => {
+                merge_new_values(&mut original, &previous);
+                original
+            }
+            None => previous,
+        };
         h[id] = json!({ "appliedAt": chrono::Utc::now().to_rfc3339(), "previous": original });
         write_history(&h)?;
         crate::log_info!("Optimiser applied {id}");
@@ -193,12 +200,12 @@ pub fn apply(id: &str, java_path: Option<std::path::PathBuf>) -> AppResult<Strin
     }
     #[cfg(not(windows))]
     {
-        let _ = (info, java_path, json!({}));
+        let _ = (info, java, json!({}));
         bail!("OPTIMISER", "The PC Optimiser is only available on Windows.")
     }
 }
 
-pub fn restore(id: &str, java_path: Option<std::path::PathBuf>) -> AppResult<String> {
+pub fn restore(id: &str, java: &[std::path::PathBuf]) -> AppResult<String> {
     let Some(info) = ACTIONS.iter().find(|a| a.id == id) else { bail!("OPTIMISER", "Unknown action") };
     let mut h = history();
     let Some(previous) = h.get(id).and_then(|e| e.get("previous").cloned()).filter(Value::is_object) else {
@@ -206,7 +213,7 @@ pub fn restore(id: &str, java_path: Option<std::path::PathBuf>) -> AppResult<Str
     };
     #[cfg(windows)]
     {
-        windows_impl::run(id, "restore", java_path.as_deref(), Some(&previous), info.requires_admin)?;
+        windows_impl::run(id, "restore", java, Some(&previous), info.requires_admin)?;
         if let Some(o) = h.as_object_mut() {
             o.remove(id);
         }
@@ -216,8 +223,21 @@ pub fn restore(id: &str, java_path: Option<std::path::PathBuf>) -> AppResult<Str
     }
     #[cfg(not(windows))]
     {
-        let _ = (info, java_path, previous, &mut h);
+        let _ = (info, java, previous, &mut h);
         bail!("OPTIMISER", "The PC Optimiser is only available on Windows.")
+    }
+}
+
+/// Adds registry snapshots from `newer` whose (hive, path, name) isn't in `original` yet.
+#[cfg_attr(not(windows), allow(dead_code))]
+fn merge_new_values(original: &mut Value, newer: &Value) {
+    let key = |v: &Value| (v["machine"].as_bool(), v["path"].as_str().map(str::to_owned), v["name"].as_str().map(str::to_owned));
+    let Some(new_values) = newer["values"].as_array() else { return };
+    let Some(values) = original.get_mut("values").and_then(Value::as_array_mut) else { return };
+    for v in new_values {
+        if !values.iter().any(|o| key(o) == key(v)) {
+            values.push(v.clone());
+        }
     }
 }
 

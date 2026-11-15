@@ -4,11 +4,23 @@ This records what has actually been exercised, how, and what still needs a Windo
 
 ## Environment used
 
-A Linux container with Xvfb and Mesa software rendering (llvmpipe for OpenGL 4.5, lavapipe for Vulkan 1.4), JDK 25, Rust 1.97 and Node 22. Network access to Mojang, Fabric and Modrinth; no access to Microsoft account services, Discord or Mojang's launcher-content (news) host.
+A Linux container with Xvfb and Mesa software rendering (llvmpipe for OpenGL 4.5, lavapipe for Vulkan 1.4), JDK 25 (plus Mojang's Java 17, 21 and 25 runtimes for the games), Rust 1.97 and Node 22. Network access to Mojang, Fabric and Modrinth; no access to Microsoft account services, Discord or Mojang's launcher-content (news) host.
 
 ## Verified
 
-### In-game client (real Minecraft 26.3 + Fabric 0.20.1 + the full pinned stack)
+### Every supported Minecraft version (1.20.1 – 26.3)
+
+All 23 Stabled client jars compile against their own Minecraft and Fabric API versions (`./gradlew build`). Each version was then run end to end with `tools/client-smoke-test.sh <version>`, which uses the launcher's own install pipeline and launch command:
+
+1. create a Save for the version and install it (Mojang files, the version's Java runtime, Fabric, the pinned stack, the bundled Stabled jar);
+2. generate a flat world with that version's dedicated server;
+3. start the game: the introduction must open on the title screen and complete through Next ×4 and Finish (keyboard), then the Stabled title screen;
+4. start again with quick play into the world, with motion blur on: FPS display, motion blur while turning, Stabled pause menu, Right Shift → Stabled Settings;
+5. scan the logs for mixin, injection, linkage and Stabled errors.
+
+The per-version results are in [COMPATIBILITY.md](COMPATIBILITY.md#test-results). Two launcher bugs found this way were fixed: identical files in one download batch (asset objects listed under several names) raced on one temporary file, and temporary names replaced the file extension, so `java.exe` and `java.dll` in a Java runtime shared `java.part` — which would have broken Java installs on Windows.
+
+### In-game client in depth (real Minecraft 26.3 + Fabric 0.20.1 + the full pinned stack)
 
 The game was started with the exact command the launcher builds (`--features dev-tools` CLI, offline development profile because no Microsoft client ID is configured).
 
@@ -30,7 +42,7 @@ The game was started with the exact command the launcher builds (`--features dev
 | Area | Result |
 | --- | --- |
 | Builds | Linux debug build; `cargo check --target x86_64-pc-windows-msvc` passes, and a deliberately injected type error in `optimiser/windows_impl.rs` was caught — so the DPAPI, DXGI, registry and UAC code is compiled against the real `windows` crate APIs |
-| Unit tests | Fabric version predicates; version-aware `breaks`; launch refused without a session (`SIGN_IN_REQUIRED`/`AUTH_UNCONFIGURED`); account debug output never contains tokens |
+| Unit tests | Fabric version predicates; version-aware `breaks`; launch refused without a session (`SIGN_IN_REQUIRED`/`AUTH_UNCONFIGURED`); account debug output never contains tokens; download temporary names never collide |
 | Install pipeline | Real downloads: Mojang version JSON, client jar, 73 libraries, 5,149 assets, Java 25 runtime, Fabric profile; SHA-1/SHA-512 verified; managed stack copied into the Save's own `mods` folder; second Save installs from the shared cache in seconds with its own copies |
 | Mod checks | Correctly reports nothing for the pinned stack; correctly reads Sodium's declared incompatibility with Iris ≤ 1.12.0 |
 
@@ -49,7 +61,7 @@ Startup sign-in popup over the blurred launcher (with the honest "not configured
 | PC Optimiser | Each action's detect → Apply → Restore on Windows; UAC prompt for GPU scheduling, including declining it |
 | Launch on Windows | `javaw.exe` without a console, after-launch Minimise/Hide/Keep, Force close, crash reporting |
 | Real Discord | With `DISCORD_APPLICATION_ID` set and Discord running: activity named "Stabled Client" with the `stabled` art asset; Discord closed → game unaffected, status shows retrying |
-| Real GPUs | Motion blur and menus on NVIDIA, AMD and Intel drivers, OpenGL and Vulkan |
+| Real GPUs | Motion blur and menus on NVIDIA, AMD and Intel drivers, OpenGL and Vulkan — at least one version per motion blur implementation (e.g. 1.20.1, 1.21.8 and 26.3) |
 | Live news | Mojang release notes (the host was blocked here; the failure/offline path was exercised) and a configured `NEWS_FEED_URL` |
 | Custom background upload | The upload goes through the native file dialog, which wasn't driven here; the stored-image display, focal point and dimming paths were exercised |
 
@@ -62,6 +74,10 @@ cd launcher/src-tauri && cargo check --target x86_64-pc-windows-msvc
 
 # Install a Save and print its launch command (development only, offline profile)
 cd launcher/src-tauri && cargo build --features dev-tools
-STABLED_DATA_DIR=/tmp/stabled target/debug/stabled --dev create "Dev Save"
+STABLED_DATA_DIR=/tmp/stabled target/debug/stabled --dev create "Dev Save" 1.21.11
 STABLED_DATA_DIR=/tmp/stabled target/debug/stabled --dev command <id>
+
+# Build the client for some versions and run the in-game smoke test (Linux, Xvfb)
+cd client && ./gradlew -Pstabled.versions=1.20.1,26.3 build
+tools/client-smoke-test.sh 1.20.1      # screenshots and logs in ./smoke-test/1.20.1/
 ```

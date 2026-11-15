@@ -39,6 +39,8 @@ export interface AppInfo {
   dataDir: string;
   sharedDir: string;
   clientBundled: boolean;
+  /** Minecraft versions whose Stabled client jar is included in this launcher build. */
+  bundledClientVersions: string[];
   supportedVersions: string[];
 }
 
@@ -143,6 +145,7 @@ export interface Save {
   status: SaveStatus;
   phase: RunPhase | null;
   supported: boolean;
+  clientBundled: boolean;
 }
 export interface SaveSummary {
   worlds: number;

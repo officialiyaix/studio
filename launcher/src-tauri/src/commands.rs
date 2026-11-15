@@ -30,6 +30,7 @@ pub struct AppInfo {
     shared_dir: String,
     client_bundled: bool,
     supported_versions: Vec<String>,
+    bundled_client_versions: Vec<String>,
 }
 
 #[tauri::command]
@@ -41,8 +42,9 @@ pub fn app_info() -> AppInfo {
         config: crate::config::status(),
         data_dir: paths::root().display().to_string(),
         shared_dir: paths::shared().display().to_string(),
-        client_bundled: managed::bundled_client().is_some(),
+        client_bundled: !managed::bundled_versions().is_empty(),
         supported_versions: stack::all().iter().map(|s| s.minecraft.clone()).collect(),
+        bundled_client_versions: managed::bundled_versions(),
     }
 }
 
@@ -151,7 +153,10 @@ pub struct SaveView {
     /// "not_installed" | "ready" | "downloading" | "launching" | "running" | "error"
     status: String,
     phase: Option<RunPhase>,
+    /// The Stabled client supports this Minecraft version.
     supported: bool,
+    /// This launcher build includes the Stabled client jar for the Save's Minecraft version.
+    client_bundled: bool,
 }
 
 fn view(state: &AppState, meta: SaveMeta) -> SaveView {
@@ -167,6 +172,7 @@ fn view(state: &AppState, meta: SaveMeta) -> SaveView {
     SaveView {
         icon: saves::icon_data_url(&meta),
         supported: stack::is_supported(&meta.minecraft_version),
+        client_bundled: managed::bundled_client(&meta.minecraft_version).is_some(),
         status: status.into(),
         phase,
         meta,
@@ -399,6 +405,9 @@ pub async fn save_launch(app: AppHandle, state: S<'_>, id: String) -> AppResult<
     if !stack::is_supported(&meta.minecraft_version) {
         bail!("UNSUPPORTED", "Minecraft {} is not supported by the Stabled client.", meta.minecraft_version);
     }
+    if managed::bundled_client(&meta.minecraft_version).is_none() {
+        bail!("CLIENT_MISSING", "This launcher build doesn't include the Stabled client for Minecraft {}.", meta.minecraft_version);
+    }
     // Server-side enforcement: no valid Minecraft session with Java Edition → no process, no downloads.
     let (profile, token) = state.auth.launch_credentials().await?;
     let state = state.inner().clone();
@@ -608,26 +617,29 @@ pub async fn shared_cache_clear(state: S<'_>) -> AppResult<u64> {
 
 // ---------------- Optimiser ----------------
 
-fn java_runtime() -> Option<std::path::PathBuf> {
-    let s = stack::for_version(stack::PRIMARY_VERSION)?;
-    Some(crate::minecraft::java::executable(&s.java.component))
+/// Every Java runtime Stabled has installed (Java 17, 21 and/or 25, depending on the Saves' Minecraft versions).
+fn java_runtimes() -> Vec<std::path::PathBuf> {
+    let mut components: Vec<String> = stack::all().iter().map(|s| s.java.component.clone()).collect();
+    components.sort();
+    components.dedup();
+    components.iter().map(|c| crate::minecraft::java::executable(c)).filter(|p| p.is_file()).collect()
 }
 
 #[tauri::command]
 pub fn optimiser_view() -> optimiser::OptimiserView {
-    optimiser::view(java_runtime())
+    optimiser::view(&java_runtimes())
 }
 
 #[tauri::command]
 pub async fn optimiser_apply(id: String) -> AppResult<String> {
-    tauri::async_runtime::spawn_blocking(move || optimiser::apply(&id, java_runtime()))
+    tauri::async_runtime::spawn_blocking(move || optimiser::apply(&id, &java_runtimes()))
         .await
         .map_err(|e| AppError::new("OPTIMISER", e.to_string()))?
 }
 
 #[tauri::command]
 pub async fn optimiser_restore(id: String) -> AppResult<String> {
-    tauri::async_runtime::spawn_blocking(move || optimiser::restore(&id, java_runtime()))
+    tauri::async_runtime::spawn_blocking(move || optimiser::restore(&id, &java_runtimes()))
         .await
         .map_err(|e| AppError::new("OPTIMISER", e.to_string()))?
 }

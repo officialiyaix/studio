@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ExternalLink, FolderOpen, Loader2, LogOut, RefreshCw, Trash2, User } from 'lucide-react';
-import { api, asError, type Settings, type VersionOption } from '../lib/api';
+import { api, asError, type AppInfo, type Settings, type VersionOption } from '../lib/api';
 import { useStore } from '../lib/store';
 import { formatBytes } from '../lib/format';
 import { Callout, ConfirmDialog, Range, Segmented, SettingRow, Toggle } from '../components/ui';
@@ -270,7 +270,7 @@ export function SettingsPage() {
           </SettingRow>
           <div className="about tiny muted">
             <div>
-              Stabled {info?.version} · {info?.platform} · Stabled client for Minecraft {info?.supportedVersions.join(', ')}
+              Stabled {info?.version} · {info?.platform} · {clientSummary(info)}
             </div>
             <div>
               Microsoft sign-in: {info?.config.microsoftConfigured ? 'configured' : 'not configured'} · Discord Presence: {info?.config.discordPresenceConfigured ? 'configured' : 'not configured'} · Community invite:{' '}
@@ -278,7 +278,7 @@ export function SettingsPage() {
             </div>
             <div>Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.</div>
           </div>
-          {!info?.clientBundled && <Callout tone="warning">This build doesn't include the Stabled client component, so Saves can't be launched.</Callout>}
+          {info && !info.clientBundled && <Callout tone="warning">This build doesn't include any Stabled client jars, so Saves can't be launched.</Callout>}
         </div>
       </section>
 
@@ -305,4 +305,24 @@ export function SettingsPage() {
       )}
     </div>
   );
+}
+
+/** "Stabled client included for 23 of 23 supported Minecraft versions (1.20.1–26.3)" */
+function clientSummary(info: AppInfo | null): string {
+  if (!info) return '';
+  const included = info.supportedVersions.filter((v) => info.bundledClientVersions.includes(v));
+  if (!included.length) return 'Stabled client not included in this build';
+  const sorted = [...included].sort(compareVersions);
+  const range = sorted.length > 1 ? `${sorted[0]}–${sorted[sorted.length - 1]}` : sorted[0];
+  return `Stabled client included for ${included.length} of ${info.supportedVersions.length} supported Minecraft versions (${range})`;
+}
+
+function compareVersions(a: string, b: string): number {
+  const pa = a.split('.').map(Number);
+  const pb = b.split('.').map(Number);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const d = (pa[i] ?? 0) - (pb[i] ?? 0);
+    if (d) return d;
+  }
+  return 0;
 }

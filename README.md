@@ -15,7 +15,7 @@ Not an official Minecraft product. Not approved by or associated with Mojang or 
 | Path | What it is |
 | --- | --- |
 | `launcher/` | Tauri 2 desktop app: React + TypeScript UI (`src/`) and Rust backend (`src-tauri/`) |
-| `client/` | The Stabled Client Fabric mod for Minecraft 26.3 (Java 25, Gradle, Fabric Loom) |
+| `client/` | The Stabled Client Fabric mod, built for every supported Minecraft version from one source tree (Gradle, Fabric Loom) |
 | `shared/themes.json` | The nine theme choices, used by both the launcher and the mod |
 | `config/stabled.config.json` | External configuration values (see below) |
 | `branding/` | Original Stabled mark and wordmark (SVG sources and PNG renders) |
@@ -23,12 +23,15 @@ Not an official Minecraft product. Not approved by or associated with Mojang or 
 
 ## Supported versions
 
-| Minecraft | Loader | Stabled client | Status |
-| --- | --- | --- | --- |
-| **26.3** | Fabric Loader 0.20.1 | 1.0.0 | Implemented and tested (OpenGL and Vulkan) |
-| Any other version | — | — | Not supported; shown as "Not supported yet" in Create Save |
+Every Minecraft: Java Edition release from **1.20.1 to 26.3** — 23 versions — on Fabric Loader 0.20.1:
 
-The pinned performance stack (Fabric API, Sodium, Lithium, FerriteCore, ImmediatelyFast, EntityCulling) and its exact versions are listed in [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md). Sodium for 26.3 is currently only published as a beta, and Stabled labels it as such.
+| Minecraft | Java | Stabled client |
+| --- | --- | --- |
+| 1.20.1, 1.20.2, 1.20.3, 1.20.4 | 17 | 1.0.0 |
+| 1.20.5, 1.20.6, 1.21, 1.21.1 – 1.21.11 | 21 | 1.0.0 |
+| 26.1, 26.1.1, 26.1.2, 26.2, 26.3 | 25 | 1.0.0 |
+
+Each version has its own pinned performance stack (Fabric API, Sodium, Lithium, FerriteCore, ImmediatelyFast, EntityCulling where a compatible build exists) and its own Stabled client jar. Exact versions, beta components, gaps and what was tested on each version are in [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md). Create Save lists older releases as not supported; snapshots and pre-releases are not offered.
 
 ## Configuration
 
@@ -45,13 +48,14 @@ None of these are set in this repository. See [docs/CONFIGURATION.md](docs/CONFI
 
 ## Building
 
-Requirements: Node.js 22, Rust (stable), JDK 25. On Windows, the WebView2 runtime (installed automatically by the installer).
+Requirements: Node.js 22, Rust (stable), JDK 25 (Gradle runs on 25 and compiles each Minecraft version for Java 17, 21 or 25). On Windows, the WebView2 runtime (installed automatically by the installer).
 
 ```bash
-# 1. Build the Stabled Client mod and bundle it into the launcher
+# 1. Build the Stabled Client mod for every Minecraft version and bundle the jars into the launcher
 cd launcher
 npm ci
-npm run bundle-client        # runs ./gradlew build in /client and copies the jar
+npm run bundle-client                  # all 23 versions → src-tauri/resources/clients/stabled-client-<minecraft>.jar
+npm run bundle-client -- 26.3 1.21.11  # or only some versions
 
 # 2. Run in development
 npm run tauri dev
@@ -60,7 +64,7 @@ npm run tauri dev
 npx tauri build              # → src-tauri/target/release/bundle/nsis/Stabled_1.0.0_x64-setup.exe
 ```
 
-CI (`.github/workflows/build.yml`) builds the mod, runs the backend tests, type-checks the Windows-only code and produces the NSIS installer on `windows-latest`.
+CI (`.github/workflows/build.yml`) builds the mod for every Minecraft version in parallel, runs the backend tests, type-checks the Windows-only code and produces the NSIS installer on `windows-latest`.
 
 ## Documentation
 

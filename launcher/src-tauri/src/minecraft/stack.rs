@@ -44,6 +44,9 @@ pub struct Stack {
     pub loader: Loader,
     pub java: JavaSpec,
     pub mods: Vec<StackMod>,
+    /// Why a usual component is missing for this version (e.g. no compatible build exists).
+    #[serde(default)]
+    pub notes: Vec<String>,
 }
 
 impl Stack {
@@ -56,10 +59,16 @@ impl Stack {
     }
 }
 
+#[derive(Deserialize)]
+struct StacksFile {
+    stacks: Vec<Stack>,
+}
+
 static STACKS: OnceLock<Vec<Stack>> = OnceLock::new();
 
+/// Every supported version, oldest first (generated and verified by tools/update_stacks.py).
 pub fn all() -> &'static Vec<Stack> {
-    STACKS.get_or_init(|| vec![serde_json::from_str(include_str!("../../stack/26.3.json")).expect("stack/26.3.json")])
+    STACKS.get_or_init(|| serde_json::from_str::<StacksFile>(include_str!("../../stack/stacks.json")).expect("stack/stacks.json").stacks)
 }
 
 pub fn for_version(version: &str) -> Option<&'static Stack> {
@@ -72,4 +81,10 @@ pub fn is_supported(version: &str) -> bool {
 
 /// Mod id of the bundled Stabled client. It is required for every Save and protected from removal.
 pub const STABLED_MOD_ID: &str = "stabled";
+/// File name of the Stabled client inside a Save's mods folder.
 pub const STABLED_JAR_NAME: &str = "stabled-client.jar";
+
+/// File name of the bundled Stabled client build for a Minecraft version (resources/clients/).
+pub fn bundled_jar_name(minecraft: &str) -> String {
+    format!("stabled-client-{minecraft}.jar")
+}

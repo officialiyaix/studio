@@ -7,13 +7,13 @@ import { SaveMenu } from './SaveActions';
 
 /** The selected Save: identity, real status, progress and launch controls. */
 export function SaveHero({ save, onOpenMods }: { save: Save; onOpenMods?: () => void }) {
-  const { launch, toast, info, auth } = useStore();
+  const { launch, toast, auth } = useStore();
   const phase = save.phase;
   const progress = phase?.kind === 'downloading' ? phase.progress : null;
   const busy = save.status === 'downloading' || save.status === 'launching';
   const running = save.status === 'running';
   const value = progress ? pct(progress.bytesTotal ? progress.bytesDone : progress.filesDone, progress.bytesTotal || progress.filesTotal) : 0;
-  const canLaunch = save.supported && !busy && !running && info?.clientBundled !== false;
+  const canLaunch = save.supported && save.clientBundled && !busy && !running;
   const signedIn = auth?.state === 'signed_in' || auth?.state === 'offline';
 
   return (
@@ -59,7 +59,9 @@ export function SaveHero({ save, onOpenMods }: { save: Save; onOpenMods?: () => 
         </Callout>
       )}
       {!save.supported && <Callout tone="warning">Minecraft {save.minecraftVersion} isn't supported by this version of the Stabled client.</Callout>}
-      {info && !info.clientBundled && <Callout tone="warning">This build doesn't include the Stabled client component, so Saves can't be launched.</Callout>}
+      {save.supported && !save.clientBundled && (
+        <Callout tone="warning">This launcher build doesn't include the Stabled client for Minecraft {save.minecraftVersion}, so this Save can't be launched.</Callout>
+      )}
 
       <div className="hero-actions">
         {running ? (

@@ -230,6 +230,10 @@ async fn run_batch(
     concurrency: usize,
     emit: &(dyn Fn(Progress) + Send + Sync),
 ) -> AppResult<()> {
+    // Several entries can name the same file (asset indexes list identical objects under different names);
+    // downloading one path twice in parallel would race on its temporary file.
+    let mut seen = std::collections::HashSet::new();
+    let items: Vec<Download> = items.into_iter().filter(|d| seen.insert(d.path.clone())).collect();
     if items.is_empty() {
         return Ok(());
     }

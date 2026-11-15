@@ -57,15 +57,21 @@ pub struct ManagedInfo {
     pub modified: bool,
 }
 
-static BUNDLED_CLIENT: OnceLock<PathBuf> = OnceLock::new();
+static BUNDLED_CLIENTS: OnceLock<PathBuf> = OnceLock::new();
 
-/// Set at startup to the Stabled client jar shipped with the launcher.
-pub fn set_bundled_client(path: PathBuf) {
-    let _ = BUNDLED_CLIENT.set(path);
+/// Set at startup to the folder holding the Stabled client builds shipped with the launcher (one per version).
+pub fn set_bundled_clients_dir(path: PathBuf) {
+    let _ = BUNDLED_CLIENTS.set(path);
 }
 
-pub fn bundled_client() -> Option<&'static PathBuf> {
-    BUNDLED_CLIENT.get().filter(|p| p.is_file())
+/// The Stabled client build for a Minecraft version, if this launcher build includes it.
+pub fn bundled_client(minecraft: &str) -> Option<PathBuf> {
+    BUNDLED_CLIENTS.get().map(|d| d.join(stack::bundled_jar_name(minecraft))).filter(|p| p.is_file())
+}
+
+/// Minecraft versions for which a Stabled client build is bundled.
+pub fn bundled_versions() -> Vec<String> {
+    stack::all().iter().filter(|s| bundled_client(&s.minecraft).is_some()).map(|s| s.minecraft.clone()).collect()
 }
 
 fn file(meta: &SaveMeta) -> PathBuf {
@@ -161,10 +167,10 @@ enum Source {
 }
 
 fn desired(stack: &Stack) -> AppResult<Vec<Desired>> {
-    let Some(client) = bundled_client() else {
-        bail!("CLIENT_MISSING", "This build of Stabled does not include the Stabled client component, so Saves can't be launched. Rebuild the launcher with the client jar bundled (see docs/BUILDING.md).");
+    let Some(client) = bundled_client(&stack.minecraft) else {
+        bail!("CLIENT_MISSING", "This build of Stabled doesn't include the Stabled client for Minecraft {}, so this Save can't be launched. Rebuild the launcher with `npm run bundle-client` (see README).", stack.minecraft);
     };
-    let bytes = std::fs::read(client)?;
+    let bytes = std::fs::read(&client)?;
     let mut out = vec![Desired {
         mod_id: stack::STABLED_MOD_ID.into(),
         title: "Stabled Client".into(),
@@ -174,7 +180,7 @@ fn desired(stack: &Stack) -> AppResult<Vec<Desired>> {
         version: env!("CARGO_PKG_VERSION").into(),
         required: true,
         beta: false,
-        source: Source::Bundled(client.clone()),
+        source: Source::Bundled(client),
     }];
     for m in &stack.mods {
         out.push(Desired {

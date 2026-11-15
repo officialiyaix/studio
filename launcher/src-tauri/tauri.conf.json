@@ -41,16 +41,29 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis"],
+    "targets": [
+      "nsis"
+    ],
     "publisher": "Stabled",
-    "shortDescription": "Stabled — Minecraft Java Edition launcher",
+    "shortDescription": "Stabled \u2014 Minecraft Java Edition launcher",
     "longDescription": "Stabled is a performance-focused Minecraft: Java Edition launcher with isolated Saves, the Stabled in-game client and a Windows PC optimiser. Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.",
     "category": "Game",
     "copyright": "Stabled",
-    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.ico", "icons/icon.png"],
-    "resources": { "resources/stabled-client.jar": "stabled-client.jar" },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico",
+      "icons/icon.png"
+    ],
+    "resources": {
+      "resources/clients/*": "clients/"
+    },
     "windows": {
-      "webviewInstallMode": { "type": "downloadBootstrapper", "silent": true },
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper",
+        "silent": true
+      },
       "nsis": {
         "installMode": "currentUser",
         "displayLanguageSelector": false,

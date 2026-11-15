@@ -79,27 +79,42 @@ pub async fn list() -> VersionList {
 
 fn option(id: &str, release_time: Option<String>) -> VersionOption {
     match super::stack::for_version(id) {
-        Some(stack) => {
+        Some(stack) if crate::saves::managed::bundled_client(id).is_some() => {
             let beta: Vec<&str> = stack.mods.iter().filter(|m| m.version_type != "release").map(|m| m.title.as_str()).collect();
+            let missing: Vec<&str> = ["FerriteCore", "EntityCulling", "ImmediatelyFast", "Lithium", "Sodium"]
+                .into_iter()
+                .filter(|t| !stack.mods.iter().any(|m| m.title == *t))
+                .collect();
+            let mut note = "Stabled client supported".to_string();
+            if !beta.is_empty() {
+                note.push_str(&format!(" · {} is a beta build for this version", beta.join(", ")));
+            }
+            if !missing.is_empty() {
+                note.push_str(&format!(" · no compatible {} build exists for this version", missing.join(" or ")));
+            }
             VersionOption {
                 id: id.to_string(),
                 release_time,
                 supported: true,
-                loader: Some(format!("Fabric {}", stack.loader.version)),
-                note: if beta.is_empty() {
-                    "Stabled client supported and tested".into()
-                } else {
-                    format!("Stabled client supported and tested · {} is a beta build for this version", beta.join(", "))
-                },
+                loader: Some(format!("Fabric {} · Java {}", stack.loader.version, stack.java.major_version)),
+                note,
                 has_beta_components: !beta.is_empty(),
             }
         }
+        Some(_) => VersionOption {
+            id: id.to_string(),
+            release_time,
+            supported: false,
+            loader: None,
+            note: "Supported by Stabled, but this launcher build doesn't include its Stabled client".into(),
+            has_beta_components: false,
+        },
         None => VersionOption {
             id: id.to_string(),
             release_time,
             supported: false,
             loader: None,
-            note: "Not supported by the Stabled client yet".into(),
+            note: "Not supported by the Stabled client".into(),
             has_beta_components: false,
         },
     }

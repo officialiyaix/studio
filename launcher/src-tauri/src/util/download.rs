@@ -98,7 +98,7 @@ pub async fn fetch(d: &Download, progress: Option<&AtomicU64>) -> AppResult<()> 
     if let Some(parent) = d.path.parent() {
         tokio::fs::create_dir_all(parent).await?;
     }
-    let tmp = d.path.with_extension("part");
+    let tmp = part_path(&d.path);
     let mut last_err: Option<AppError> = None;
     for attempt in 0..3u32 {
         if attempt > 0 {
@@ -116,6 +116,14 @@ pub async fn fetch(d: &Download, progress: Option<&AtomicU64>) -> AppResult<()> 
         }
     }
     Err(last_err.unwrap_or_else(|| AppError::new("DOWNLOAD", "Download failed")))
+}
+
+/// `java.exe` → `java.exe.part`. The suffix is appended rather than replacing the extension, so files that differ
+/// only by extension (`bin/java.exe` and `bin/java.dll`) never share a temporary file.
+fn part_path(path: &Path) -> std::path::PathBuf {
+    let mut name = path.file_name().map(|n| n.to_os_string()).unwrap_or_default();
+    name.push(".part");
+    path.with_file_name(name)
 }
 
 async fn fetch_once(d: &Download, tmp: &Path, progress: Option<&AtomicU64>) -> AppResult<()> {
@@ -211,4 +219,17 @@ pub async fn get_json(url: &str) -> AppResult<serde_json::Value> {
         bail!("NETWORK", "Server returned {}", resp.status());
     }
     Ok(resp.json().await?)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::part_path;
+    use std::path::Path;
+
+    #[test]
+    fn temporary_names_never_collide() {
+        assert_eq!(part_path(Path::new("rt/bin/java.exe")), Path::new("rt/bin/java.exe.part"));
+        assert_ne!(part_path(Path::new("rt/bin/java.exe")), part_path(Path::new("rt/bin/java.dll")));
+        assert_eq!(part_path(Path::new("objects/ab/abcdef")), Path::new("objects/ab/abcdef.part"));
+    }
 }

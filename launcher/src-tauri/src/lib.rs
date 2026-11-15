@@ -24,16 +24,16 @@ use tauri::Manager;
 #[cfg(windows)]
 pub use optimiser::run_elevated_helper;
 
-fn locate_bundled_client(app: &tauri::App) -> Option<std::path::PathBuf> {
+fn locate_bundled_clients(app: &tauri::App) -> Option<std::path::PathBuf> {
     if let Ok(dir) = app.path().resource_dir() {
-        let p = dir.join(minecraft::stack::STABLED_JAR_NAME);
-        if p.is_file() {
+        let p = dir.join("clients");
+        if p.is_dir() {
             return Some(p);
         }
     }
-    // Development: use the jar produced by `./gradlew build` in /client.
-    let dev = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("resources").join(minecraft::stack::STABLED_JAR_NAME);
-    dev.is_file().then_some(dev)
+    // Development: the jars copied by `npm run bundle-client`.
+    let dev = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("resources").join("clients");
+    dev.is_dir().then_some(dev)
 }
 
 pub fn run() {
@@ -55,10 +55,11 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .manage(state)
         .setup(|app| {
-            match locate_bundled_client(app) {
-                Some(p) => saves::managed::set_bundled_client(p),
-                None => log_warn!("The Stabled client jar is not bundled; launching Saves will be unavailable"),
+            match locate_bundled_clients(app) {
+                Some(p) => saves::managed::set_bundled_clients_dir(p),
+                None => log_warn!("No Stabled client builds are bundled; launching Saves will be unavailable"),
             }
+            log_info!("Bundled Stabled client builds: {:?}", saves::managed::bundled_versions());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

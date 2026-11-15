@@ -4,7 +4,7 @@ use crate::bail;
 use crate::error::{AppError, AppResult};
 use serde_json::{json, Value};
 use std::os::windows::process::CommandExt;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use winreg::enums::{HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE, KEY_READ, KEY_SET_VALUE};
 use winreg::RegKey;
 
@@ -98,11 +98,11 @@ fn schemes() -> Vec<String> {
     powercfg(&["/list"]).map(|o| guid_re().captures_iter(&o).map(|c| c[1].to_ascii_lowercase()).collect()).unwrap_or_default()
 }
 
-fn java_value_name(java: Option<&Path>) -> Option<String> {
-    java.filter(|p| p.is_file()).map(|p| p.to_string_lossy().into_owned())
+fn java_value_names(java: &[PathBuf]) -> Vec<String> {
+    java.iter().filter(|p| p.is_file()).map(|p| p.to_string_lossy().into_owned()).collect()
 }
 
-pub fn detect(id: &str, java: Option<&Path>) -> Detected {
+pub fn detect(id: &str, java: &[PathBuf]) -> Detected {
     match id {
         "power-plan" => {
             let Some((guid, name)) = active_scheme() else {
@@ -131,13 +131,20 @@ pub fn detect(id: &str, java: Option<&Path>) -> Detected {
             }
         }
         "java-gpu" => {
-            let Some(name) = java_value_name(java) else {
+            let names = java_value_names(java);
+            if names.is_empty() {
                 return d("unavailable", "Java not installed yet", "High performance", Some("Install or launch a Save first so Stabled's Java runtime exists.".into()));
-            };
-            match read_string(false, GPU_PREFS, &name) {
-                Some(v) if v.contains("GpuPreference=2") => d("applied", "High performance", "High performance", None),
-                Some(v) if v.contains("GpuPreference=1") => d("not_applied", "Power saving", "High performance", None),
-                _ => d("not_applied", "Let Windows decide", "High performance", None),
+            }
+            let prefs: Vec<Option<String>> = names.iter().map(|n| read_string(false, GPU_PREFS, n)).collect();
+            let high = prefs.iter().filter(|v| v.as_deref().is_some_and(|v| v.contains("GpuPreference=2"))).count();
+            if high == names.len() {
+                d("applied", "High performance", "High performance", None)
+            } else if high > 0 {
+                d("not_applied", &format!("High performance for {high} of {} Java runtimes", names.len()), "High performance", None)
+            } else if prefs.iter().any(|v| v.as_deref().is_some_and(|v| v.contains("GpuPreference=1"))) {
+                d("not_applied", "Power saving", "High performance", None)
+            } else {
+                d("not_applied", "Let Windows decide", "High performance", None)
             }
         }
         "gpu-scheduling" => match read_dword(true, GRAPHICS_DRIVERS, "HwSchMode") {
@@ -150,14 +157,14 @@ pub fn detect(id: &str, java: Option<&Path>) -> Detected {
 }
 
 /// Performs `apply` or `restore`. Returns the snapshot of what `apply` replaced.
-pub fn run(id: &str, op: &str, java: Option<&Path>, previous: Option<&Value>, requires_admin: bool) -> AppResult<Value> {
+pub fn run(id: &str, op: &str, java: &[PathBuf], previous: Option<&Value>, requires_admin: bool) -> AppResult<Value> {
     if requires_admin && !is_elevated() {
         return run_elevated(id, op, previous);
     }
     perform(id, op, java, previous)
 }
 
-fn perform(id: &str, op: &str, java: Option<&Path>, previous: Option<&Value>) -> AppResult<Value> {
+fn perform(id: &str, op: &str, java: &[PathBuf], previous: Option<&Value>) -> AppResult<Value> {
     if op == "restore" {
         let prev = previous.ok_or_else(|| AppError::new("OPTIMISER", "Nothing to restore"))?;
         if id == "power-plan" {
@@ -194,10 +201,15 @@ fn perform(id: &str, op: &str, java: Option<&Path>, previous: Option<&Value>) ->
             Ok(json!({ "values": snap }))
         }
         "java-gpu" => {
-            let name = java_value_name(java).ok_or_else(|| AppError::new("OPTIMISER", "Stabled's Java runtime isn't installed yet."))?;
-            let snap = vec![snapshot(false, GPU_PREFS, &name)];
+            let names = java_value_names(java);
+            if names.is_empty() {
+                bail!("OPTIMISER", "Stabled's Java runtime isn't installed yet.");
+            }
+            let snap: Vec<Value> = names.iter().map(|n| snapshot(false, GPU_PREFS, n)).collect();
             let (key, _) = hive(false).create_subkey(GPU_PREFS)?;
-            key.set_value(&name, &"GpuPreference=2;".to_string())?;
+            for name in &names {
+                key.set_value(name, &"GpuPreference=2;".to_string())?;
+            }
             Ok(json!({ "values": snap }))
         }
         "gpu-scheduling" => {
@@ -274,7 +286,7 @@ pub fn elevated_main(args: &[String]) -> i32 {
         Err(AppError::new("OPTIMISER", "Unsupported elevated request"))
     } else {
         let prev = req.get("previous").filter(|v| v.is_object());
-        perform(id, op, None, prev)
+        perform(id, op, &[], prev)
     };
     let body = match outcome {
         Ok(previous) => json!({ "ok": true, "previous": previous }),
