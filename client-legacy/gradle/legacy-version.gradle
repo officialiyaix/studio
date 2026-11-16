@@ -1,0 +1,179 @@
+// Build logic shared by every versions/<mc> subproject of the legacy client.
+import groovy.io.FileType
+
+apply plugin: 'fabric-loom'
+apply plugin: 'legacy-looming'
+
+def mc = project.minecraft_version
+
+version = "${rootProject.mod_version}+mc${mc}"
+group = rootProject.maven_group
+base { archivesName = 'stabled-client' }
+
+// ---------------------------------------------------------------------------------------------------------------
+// Version preprocessor.
+//
+// Sources and text resources may contain blocks such as
+//
+//     //#if MC >= 1.21.6
+//     ...code for 1.21.6 and newer...
+//     //#elif MC >= 1.20.5
+//     ...code for 1.20.5 up to 1.21.5...
+//     //#else
+//     ...older versions...
+//     //#endif
+//
+// Conditions compare MC (this subproject's Minecraft version) with ==, !=, <, <=, > or >= and can be joined with
+// && and ||. Blocks nest. Each version compiles a copy of the sources in which the inactive lines (and the
+// directive lines themselves) are blanked, so line numbers in stack traces match the original files.
+// ---------------------------------------------------------------------------------------------------------------
+def versionKey = { String v ->
+	def parts = v.tokenize('.').collect { it as int }
+	while (parts.size() < 3) {
+		parts << 0
+	}
+	(parts[0] as long) * 1_000_000L + parts[1] * 1_000L + parts[2]
+}
+def mcKey = versionKey(mc)
+
+def evalCondition = { String expr, File file, int line ->
+	expr.split(/\|\|/).any { String alternative ->
+		alternative.split(/&&/).every { String term ->
+			def m = term.trim() =~ /^MC\s*(>=|<=|==|!=|>|<)\s*([0-9]+(?:\.[0-9]+)*)$/
+			if (!m.matches()) {
+				throw new GradleException("${file}:${line}: unsupported preprocessor condition '${term.trim()}'")
+			}
+			def rhs = versionKey(m.group(2))
+			switch (m.group(1)) {
+				case '>=': return mcKey >= rhs
+				case '<=': return mcKey <= rhs
+				case '>': return mcKey > rhs
+				case '<': return mcKey < rhs
+				case '==': return mcKey == rhs
+				default: return mcKey != rhs
+			}
+		}
+	}
+}
+
+def preprocessFile = { File file ->
+	String[] lines = file.getText('UTF-8').split('\n', -1)
+	def stack = [] // entries: [parentActive, branchTaken]
+	boolean active = true
+	for (int i = 0; i < lines.length; i++) {
+		String t = lines[i].trim()
+		int lineNo = i + 1
+		if (t.startsWith('//#if ')) {
+			boolean cond = evalCondition(t.substring(6), file, lineNo)
+			stack << [active, cond]
+			active = active && cond
+			lines[i] = ''
+		} else if (t.startsWith('//#elif ')) {
+			if (stack.isEmpty()) {
+				throw new GradleException("${file}:${lineNo}: //#elif without //#if")
+			}
+			def top = stack[-1]
+			boolean cond = !top[1] && evalCondition(t.substring(8), file, lineNo)
+			if (cond) {
+				top[1] = true
+			}
+			active = top[0] && cond
+			lines[i] = ''
+		} else if (t == '//#else') {
+			if (stack.isEmpty()) {
+				throw new GradleException("${file}:${lineNo}: //#else without //#if")
+			}
+			def top = stack[-1]
+			boolean cond = !top[1]
+			top[1] = true
+			active = top[0] && cond
+			lines[i] = ''
+		} else if (t == '//#endif') {
+			if (stack.isEmpty()) {
+				throw new GradleException("${file}:${lineNo}: //#endif without //#if")
+			}
+			active = stack.remove(stack.size() - 1)[0]
+			lines[i] = ''
+		} else if (t.startsWith('//#')) {
+			throw new GradleException("${file}:${lineNo}: unknown preprocessor directive '${t}'")
+		} else if (!active) {
+			lines[i] = ''
+		}
+	}
+	if (!stack.isEmpty()) {
+		throw new GradleException("${file}: unterminated //#if")
+	}
+	lines.join('\n')
+}
+
+def textExtensions = ['java', 'json', 'fsh', 'vsh', 'glsl']
+def registerPreprocess = { String name, List<File> roots, File outDir ->
+	tasks.register(name) {
+		roots.each { inputs.dir(it).withPathSensitivity(PathSensitivity.RELATIVE) }
+		inputs.property('minecraft', mc)
+		outputs.dir(outDir)
+		doLast {
+			project.delete(outDir)
+			roots.each { File root ->
+				root.eachFileRecurse(FileType.FILES) { File f ->
+					def rel = root.toPath().relativize(f.toPath()).toString()
+					def target = new File(outDir, rel)
+					if (target.exists()) {
+						throw new GradleException("${rel} exists in more than one source root")
+					}
+					target.parentFile.mkdirs()
+					def ext = f.name.contains('.') ? f.name.substring(f.name.lastIndexOf('.') + 1) : ''
+					if (ext in textExtensions) {
+						target.setText(preprocessFile(f), 'UTF-8')
+					} else {
+						java.nio.file.Files.copy(f.toPath(), target.toPath())
+					}
+				}
+			}
+		}
+	}
+}
+
+def javaRoots = [rootProject.file('src/main/java')]
+def resourceRoots = [rootProject.file('src/main/resources')]
+def javaOut = layout.buildDirectory.dir('stabled-src/java').get().asFile
+def resourcesOut = layout.buildDirectory.dir('stabled-src/resources').get().asFile
+def preprocessJava = registerPreprocess('preprocessJava', javaRoots, javaOut)
+def preprocessResources = registerPreprocess('preprocessResources', resourceRoots, resourcesOut)
+
+sourceSets {
+	main {
+		java.srcDirs = [javaOut]
+		resources.srcDirs = [resourcesOut]
+	}
+}
+tasks.named('compileJava') { dependsOn preprocessJava }
+tasks.named('processResources') { dependsOn preprocessResources }
+tasks.matching { it.name == 'sourcesJar' }.configureEach { dependsOn preprocessJava, preprocessResources }
+
+dependencies {
+	minecraft "com.mojang:minecraft:${mc}"
+	mappings legacy.yarn(mc, project.yarn_build)
+	modImplementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+	modImplementation "net.legacyfabric.legacy-fabric-api:legacy-fabric-api:${project.legacy_fabric_api_version}"
+}
+
+processResources {
+	def props = [version: project.version, minecraft: mc]
+	inputs.properties props
+	filesMatching(['fabric.mod.json']) { expand props }
+	// Shared with the modern client and the launcher: the theme list and the Stabled textures.
+	from(rootProject.file('../shared/themes.json')) { into 'assets/stabled' }
+	from(rootProject.file('../client/src/shared/resources/assets/stabled/textures')) { into 'assets/stabled/textures' }
+	from(rootProject.file('../client/src/shared/resources/assets/stabled/icon.png')) { into 'assets/stabled' }
+}
+
+// Minecraft 1.8.9 and 1.9.4 run on Java 8.
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 8
+	it.options.encoding = 'UTF-8'
+}
+java {
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+}

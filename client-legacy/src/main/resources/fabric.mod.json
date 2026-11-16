@@ -1,0 +1,19 @@
+{
+	"schemaVersion": 1,
+	"id": "stabled",
+	"version": "${version}",
+	"name": "Stabled Client",
+	"description": "Stabled menus, settings, FPS display, motion blur, emotes and Discord Presence.",
+	"authors": ["Stabled"],
+	"license": "All-Rights-Reserved",
+	"icon": "assets/stabled/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": ["stabled.legacy.StabledLegacy"]
+	},
+	"mixins": ["stabled.legacy.mixins.json"],
+	"depends": {
+		"fabricloader": ">=0.20.1",
+		"minecraft": "${minecraft}"
+	}
+}

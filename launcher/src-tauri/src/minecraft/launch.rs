@@ -53,8 +53,9 @@ pub fn build(
         ("natives_directory", natives.to_string_lossy().into_owned()),
         ("launcher_name", "Stabled".into()),
         ("launcher_version", env!("CARGO_PKG_VERSION").into()),
-        ("classpath", classpath),
+        ("classpath", classpath.clone()),
         ("classpath_separator", sep.into()),
+        ("user_properties", "{}".into()),
         ("library_directory", paths::libraries_dir().to_string_lossy().into_owned()),
     ]);
     let substitute = |s: &str| -> String {
@@ -68,6 +69,16 @@ pub fn build(
     let mut args: Vec<String> = Vec::new();
     args.push(format!("-Xmx{memory_mb}M"));
     args.push(format!("-Xms{}M", memory_mb.min(1024)));
+    // Before 1.13 (1.8.9, 1.9.4) the version file has a single `minecraftArguments` string and no JVM arguments, so
+    // the launcher supplies the natives path and class path itself.
+    let legacy_game_args = prepared.version_json["minecraftArguments"].as_str();
+    if legacy_game_args.is_some() {
+        args.push(format!("-Djava.library.path={}", natives.display()));
+        args.push("-Dminecraft.launcher.brand=Stabled".into());
+        args.push(format!("-Dminecraft.launcher.version={}", env!("CARGO_PKG_VERSION")));
+        args.push("-cp".into());
+        args.push(classpath);
+    }
     args.extend(rules::expand_arguments(prepared.version_json["arguments"].get("jvm"), &features).iter().map(|a| substitute(a)));
     args.extend(rules::expand_arguments(prepared.fabric_profile["arguments"].get("jvm"), &features).iter().map(|a| substitute(a)));
     if let Some(l) = &prepared.logging_arg {
@@ -102,7 +113,10 @@ pub fn build(
     args.extend(extra_jvm.iter().cloned());
     let main_class = prepared.fabric_profile["mainClass"].as_str().unwrap_or("net.fabricmc.loader.impl.launch.knot.KnotClient");
     args.push(main_class.to_string());
-    args.extend(rules::expand_arguments(prepared.version_json["arguments"].get("game"), &features).iter().map(|a| substitute(a)));
+    match legacy_game_args {
+        Some(line) => args.extend(line.split_whitespace().map(|a| substitute(a))),
+        None => args.extend(rules::expand_arguments(prepared.version_json["arguments"].get("game"), &features).iter().map(|a| substitute(a))),
+    }
     args.extend(rules::expand_arguments(prepared.fabric_profile["arguments"].get("game"), &features).iter().map(|a| substitute(a)));
     Ok((prepared.java.clone(), args))
 }

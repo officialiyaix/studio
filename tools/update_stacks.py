@@ -9,6 +9,10 @@ For each Minecraft version and each performance mod this script:
 and drops anything that fails, recording why. Run it whenever versions are added:
 
     python3 tools/update_stacks.py            # needs network access to Modrinth, Mojang and Fabric
+    python3 tools/update_stacks.py 1.20 1.8.9 # only these versions; the others (and game modes) are kept
+
+Minecraft 1.8.9 and 1.9.4 use Legacy Fabric (meta.legacyfabric.net) and Legacy Fabric API instead of the
+performance stack, which has no builds for them.
 """
 import hashlib
 import io
@@ -25,7 +29,8 @@ CACHE = os.environ.get('STABLED_STACK_CACHE', os.path.join(ROOT, '.stack-cache')
 UA = {'User-Agent': 'stabled-stack-updater (https://github.com/officialiyaix/studio)'}
 LOADER = '0.20.1'
 
-VERSIONS = ['1.20.1', '1.20.2', '1.20.3', '1.20.4', '1.20.5', '1.20.6', '1.21', '1.21.1', '1.21.2', '1.21.3', '1.21.4',
+LEGACY = ['1.8.9', '1.9.4']
+VERSIONS = LEGACY + ['1.20', '1.20.1', '1.20.2', '1.20.3', '1.20.4', '1.20.5', '1.20.6', '1.21', '1.21.1', '1.21.2', '1.21.3', '1.21.4',
             '1.21.5', '1.21.6', '1.21.7', '1.21.8', '1.21.9', '1.21.10', '1.21.11', '26.1', '26.1.1', '26.1.2', '26.2', '26.3']
 
 MODS = [
@@ -36,6 +41,9 @@ MODS = [
     ('ferrite-core', 'FerriteCore', 'Lower memory use', False),
     ('immediatelyfast', 'ImmediatelyFast', 'Faster HUD, text and immediate-mode rendering', False),
     ('entityculling', 'EntityCulling', 'Skips rendering hidden entities and block entities', False),
+]
+LEGACY_MODS = [
+    ('legacy-fabric-api', 'Legacy Fabric API', 'Library most Legacy Fabric mods need', True),
 ]
 BUILTIN = {'minecraft', 'java', 'fabricloader', 'fabric-loader', 'mixinextras', 'fabric'}
 
@@ -123,20 +131,41 @@ def mod_meta(data):
     return j, provided
 
 
+def mod_versions(data):
+    """{mod id: version} for a jar, the ids it provides, and the mods nested inside it."""
+    z = zipfile.ZipFile(io.BytesIO(data))
+    j = json.loads(z.read('fabric.mod.json'))
+    out = {i: j.get('version') or '' for i in (j['id'], *j.get('provides', []))}
+    for n in j.get('jars', []):
+        try:
+            out.update(mod_versions(z.read(n['file'])))
+        except Exception:
+            pass
+    return out
+
+
 def main():
     manifest = get_json('https://piston-meta.mojang.com/mc/game/version_manifest_v2.json')
     urls = {v['id']: v['url'] for v in manifest['versions']}
     rank = {'release': 0, 'beta': 1, 'alpha': 2}
+    only = [a for a in sys.argv[1:] if not a.startswith('-')]
+    for v in only:
+        if v not in VERSIONS:
+            raise SystemExit(f'Unknown version {v}; add it to VERSIONS first')
     all_versions = {slug: get_json(f'https://api.modrinth.com/v2/project/{slug}/version?loaders=%5B%22fabric%22%5D') for slug, *_ in MODS}
+    all_versions.update({slug: get_json(f'https://api.modrinth.com/v2/project/{slug}/version?loaders=%5B%22legacy-fabric%22%5D') for slug, *_ in LEGACY_MODS})
     stacks = []
-    for mc in VERSIONS:
+    for mc in (only or VERSIONS):
+        legacy = mc in LEGACY
         vj = get_json(urls[mc])
-        fabric_profile = f'https://meta.fabricmc.net/v2/versions/loader/{mc}/{LOADER}/profile/json'
-        get_json(fabric_profile)  # fails loudly if Fabric doesn't support this version
+        meta = 'https://meta.legacyfabric.net' if legacy else 'https://meta.fabricmc.net'
+        fabric_profile = f'{meta}/v2/versions/loader/{mc}/{LOADER}/profile/json'
+        get_json(fabric_profile)  # fails loudly if (Legacy) Fabric doesn't support this version
+        loader_tag = 'legacy-fabric' if legacy else 'fabric'
         chosen, notes, provided = [], [], set(BUILTIN)
         metas = {}
-        for slug, title, purpose, required in MODS:
-            cands = [v for v in all_versions[slug] if mc in v['game_versions'] and 'fabric' in v['loaders'] and v['version_type'] != 'alpha']
+        for slug, title, purpose, required in (LEGACY_MODS if legacy else MODS):
+            cands = [v for v in all_versions[slug] if mc in v['game_versions'] and loader_tag in v['loaders'] and v['version_type'] != 'alpha']
             cands.sort(key=lambda v: (rank[v['version_type']], v['date_published']), reverse=False)
             # Sort: releases first, newest first within each channel.
             cands.sort(key=lambda v: (rank[v['version_type']], [-ord(c) for c in v['date_published']]))
@@ -182,7 +211,7 @@ def main():
         chosen = [c for c in chosen if c['modId'] not in drop or c['required']]
         stacks.append({
             'minecraft': mc, 'revision': 1,
-            'loader': {'id': 'fabric', 'version': LOADER},
+            'loader': {'id': 'legacyfabric' if legacy else 'fabric', 'version': LOADER},
             'java': {'component': vj['javaVersion']['component'], 'majorVersion': vj['javaVersion']['majorVersion']},
             'mods': chosen, 'notes': notes,
         })
@@ -190,9 +219,18 @@ def main():
         for n in notes:
             print('         -', n)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
+    data = {'$comment': 'Generated by tools/update_stacks.py. Files are downloaded from Modrinth on the user\'s computer and verified by SHA-512; Stabled does not redistribute them.',
+            'stacks': stacks}
+    if only and os.path.exists(OUT):
+        # Merge: replace or add the requested versions and keep everything else (including game modes).
+        data = json.load(open(OUT))
+        old = {s['minecraft']: s for s in data['stacks']}
+        for st in stacks:
+            st['modes'] = old.get(st['minecraft'], {}).get('modes', {})
+            old[st['minecraft']] = st
+        data['stacks'] = [old[v] for v in VERSIONS if v in old]
     with open(OUT, 'w') as fh:
-        json.dump({'$comment': 'Generated by tools/update_stacks.py. Files are downloaded from Modrinth on the user\'s computer and verified by SHA-512; Stabled does not redistribute them.',
-                   'stacks': stacks}, fh, indent=1)
+        json.dump(data, fh, indent=1)
     print('wrote', OUT)
 
 

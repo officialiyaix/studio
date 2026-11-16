@@ -72,7 +72,11 @@ public abstract class BaseWidget extends AbstractWidget {
 	}
 //#else
 	@Override
+	//#if MC >= 1.20.1
 	protected final void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float a) {
+	//#else
+	public final void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float a) {
+	//#endif
 		this.draw(new Gfx(graphics), mouseX, mouseY, a);
 	//#if MC >= 1.21.11
 		if (this.interactive()) {

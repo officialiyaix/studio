@@ -10,11 +10,16 @@
 # Screenshots (intro, title, world, turning, pause, settings) and logs go to $SMOKE_DIR/<version>/.
 # Requirements: Xvfb, xdotool, ImageMagick (import), python3, curl, a Mesa OpenGL driver; the client built for the
 # version (client/versions/<v>/build/libs) and the launcher built with `cargo build --features dev-tools`.
+#
+# Exits non-zero when the client never reports ready, the intro is not completed, or the logs show loader or
+# mixin errors (for example "Incompatible mods found").
+#
 # Uses an offline development profile, so singleplayer only. Environment:
 #   SMOKE_DIR      output and data directory (default: ./smoke-test)
 #   SMOKE_OPTIONS  extra options.txt lines, e.g. 'preferredGraphicsBackend:"vulkan"' (26.2+)
 #   SMOKE_TAG      suffix for the output folder, e.g. "vulkan" -> <version>-vulkan
 set -u
+FAIL=
 V=${1:?usage: client-smoke-test.sh <minecraft-version>}
 REPO=$(cd "$(dirname "$0")/.." && pwd)
 S=$(mkdir -p "${SMOKE_DIR:-smoke-test}" && cd "${SMOKE_DIR:-smoke-test}" && pwd)
@@ -113,12 +118,12 @@ rm -f $SAVE_DIR/stabled/onboarding.json
 apply_options
 launch menu
 log "launch 1 (menus)"
-wait_log "Stabled Client ready" 240 menu || log "no ready line"
+wait_log "Stabled Client ready" 240 menu || { log "NO READY LINE"; FAIL=1; }
 sleep 25; focus; shot intro
 for i in 1 2 3 4 5; do focus; xdotool key Return; sleep 2; [ $i = 2 ] && shot intro2; done
 sleep 3; shot title
 stop_game
-grep -q '"completed": *true' $SAVE_DIR/stabled/onboarding.json 2>/dev/null && log "intro completed via Finish" || log "INTRO NOT COMPLETED"
+grep -q '"completed": *true' $SAVE_DIR/stabled/onboarding.json 2>/dev/null && log "intro completed via Finish" || { log "INTRO NOT COMPLETED"; FAIL=1; }
 
 # 4. Launch 2: world
 apply_options
@@ -134,6 +139,7 @@ stop_game
 
 # 5. Result
 cp $GAME/logs/latest.log $OUT/latest-world.log 2>/dev/null
-ERR=$(grep -hE "Mixin apply|InvalidInjectionException|InjectionError|MixinTransformerError|Exception in|Stabled: motion blur disabled|Crash report|NoSuchMethodError|NoSuchFieldError|AbstractMethodError" $OUT/game-*.log | head -5)
-[ -n "$ERR" ] && { log "ERRORS:"; echo "$ERR" | tee -a $OUT/run.log; } || log "no errors in logs"
+ERR=$(grep -hE "Mixin apply|InvalidInjectionException|InjectionError|MixinTransformerError|Exception in|Stabled: motion blur disabled|Crash report|NoSuchMethodError|NoSuchFieldError|AbstractMethodError|Incompatible mods found|FormattedException" $OUT/game-*.log | head -5)
+[ -n "$ERR" ] && { log "ERRORS:"; echo "$ERR" | tee -a $OUT/run.log; FAIL=1; } || log "no errors in logs"
+[ -n "$FAIL" ] && { log "FAILED"; exit 1; }
 log "done"

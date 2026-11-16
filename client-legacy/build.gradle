@@ -1,0 +1,10 @@
+// The Stabled client for Minecraft 1.8.9 and 1.9.4 (Legacy Fabric). The modern client (client/) can't target these:
+// they have no official Mojang names, an older GUI and rendering API, and run on Java 8.
+plugins {
+	id 'fabric-loom' version "${loom_version}" apply false
+	id 'legacy-looming' version "${loom_version}" apply false
+}
+
+subprojects {
+	apply from: rootProject.file('gradle/legacy-version.gradle')
+}

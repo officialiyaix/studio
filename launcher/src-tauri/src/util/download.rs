@@ -71,7 +71,10 @@ pub fn is_valid(path: &Path, hash: &Hash, size: Option<u64>) -> bool {
 }
 
 fn allowed_host(url: &str) -> bool {
-    const HOSTS: [&str; 10] = [
+    const HOSTS: [&str; 13] = [
+        "meta.legacyfabric.net",
+        "maven.legacyfabric.net",
+        "repo.legacyfabric.net",
         "piston-meta.mojang.com",
         "piston-data.mojang.com",
         "launchermeta.mojang.com",

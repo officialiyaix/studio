@@ -1,0 +1,26 @@
+pluginManagement {
+	repositories {
+		maven {
+			name = 'Legacy Fabric'
+			url = 'https://maven.legacyfabric.net/'
+		}
+		maven {
+			name = 'Fabric'
+			url = 'https://maven.fabricmc.net/'
+		}
+		mavenCentral()
+		gradlePluginPortal()
+	}
+}
+
+rootProject.name = 'stabled-client-legacy'
+
+// The Stabled client for Minecraft 1.8.9 and 1.9.4 on Legacy Fabric (one subproject per versions/<mc>).
+// Build only some with -Pstabled.versions=1.8.9
+def wanted = (startParameter.projectProperties['stabled.versions'] ?: '').split(',').findAll { it }
+file('versions').listFiles().findAll { it.isDirectory() && new File(it, 'gradle.properties').exists() }.sort { it.name }.each { dir ->
+	if (wanted.isEmpty() || wanted.contains(dir.name)) {
+		include ":mc-${dir.name}"
+		project(":mc-${dir.name}").projectDir = dir
+	}
+}

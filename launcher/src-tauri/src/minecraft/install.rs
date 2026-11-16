@@ -86,10 +86,9 @@ pub async fn prepare(save: &SaveMeta, concurrency: usize, verify_all: bool, emit
     let vdir = version_dir(&stack.minecraft);
     let version_json = load_or_fetch_json(&url, &vdir.join(format!("{}.json", stack.minecraft)), Some(&sha1)).await?;
     let profile_id = stack.fabric_profile_id();
-    let profile_url = format!(
-        "https://meta.fabricmc.net/v2/versions/loader/{}/{}/profile/json",
-        stack.minecraft, stack.loader.version
-    );
+    // Legacy Fabric (1.8.9, 1.9.4) publishes its loader profiles on its own metadata server.
+    let meta_host = if stack.loader.id == "legacyfabric" { "https://meta.legacyfabric.net" } else { "https://meta.fabricmc.net" };
+    let profile_url = format!("{meta_host}/v2/versions/loader/{}/{}/profile/json", stack.minecraft, stack.loader.version);
     let fabric_profile = load_or_fetch_json(&profile_url, &version_dir(&profile_id).join(format!("{profile_id}.json")), None).await?;
 
     // ---- Collect downloads ----
@@ -97,14 +96,31 @@ pub async fn prepare(save: &SaveMeta, concurrency: usize, verify_all: bool, emit
     let mut classpath: Vec<PathBuf> = Vec::new();
     let mut seen: HashSet<String> = HashSet::new();
 
+    // Native libraries (LWJGL 2 and JInput on 1.8.9 and 1.9.4) are unpacked into the natives folder, not put on the
+    // class path: (jar, entries to leave out).
+    let mut natives: Vec<(PathBuf, Vec<String>)> = Vec::new();
+
     // Fabric libraries come first so they take precedence over vanilla copies of the same artifact.
     for lib in fabric_profile["libraries"].as_array().into_iter().flatten() {
         let name = lib["name"].as_str().unwrap_or_default();
+        if !rules::allowed(lib.get("rules"), &[]) {
+            continue;
+        }
+        let base = lib["url"].as_str().unwrap_or("https://maven.fabricmc.net/");
+        if let Some(classifier) = native_classifier(lib) {
+            if !seen.insert(rules::library_key(name)) {
+                continue;
+            }
+            let Some(rel) = rules::maven_path(&format!("{name}:{classifier}")) else { continue };
+            let path = paths::libraries_dir().join(&rel);
+            downloads.push(Download { url: format!("{}/{}", base.trim_end_matches('/'), rel), path: path.clone(), hash: Hash::None, size: None });
+            natives.push((path, native_excludes(lib)));
+            continue;
+        }
         let Some(rel) = rules::maven_path(name) else { continue };
         if !seen.insert(rules::library_key(name)) {
             continue;
         }
-        let base = lib["url"].as_str().unwrap_or("https://maven.fabricmc.net/");
         let path = paths::libraries_dir().join(&rel);
         downloads.push(Download {
             url: format!("{}{}", base.trim_end_matches('/').to_string() + "/", rel),
@@ -121,6 +137,24 @@ pub async fn prepare(save: &SaveMeta, concurrency: usize, verify_all: bool, emit
         }
         if !seen.insert(rules::library_key(name)) {
             continue;
+        }
+        if let Some(classifier) = native_classifier(lib) {
+            let c = &lib["downloads"]["classifiers"][classifier.as_str()];
+            if let Some(rel) = c["path"].as_str() {
+                if let Some(target) = fsx::contained(&paths::libraries_dir(), rel) {
+                    downloads.push(Download {
+                        url: c["url"].as_str().unwrap_or_default().to_string(),
+                        path: target.clone(),
+                        hash: c["sha1"].as_str().map(|h| Hash::Sha1(h.into())).unwrap_or(Hash::None),
+                        size: c["size"].as_u64(),
+                    });
+                    natives.push((target, native_excludes(lib)));
+                }
+            }
+            // Natives-only libraries have no class-path jar.
+            if !lib["downloads"]["artifact"].is_object() {
+                continue;
+            }
         }
         let art = &lib["downloads"]["artifact"];
         let Some(rel) = art["path"].as_str().map(str::to_owned).or_else(|| rules::maven_path(name)) else { continue };
@@ -219,6 +253,13 @@ pub async fn prepare(save: &SaveMeta, concurrency: usize, verify_all: bool, emit
     if !java_exe.is_file() {
         bail!("JAVA", "The Java runtime could not be installed");
     }
+    if !natives.is_empty() {
+        emit(step("natives", "Unpacking native libraries"));
+        let dir = paths::natives_dir().join(&stack.minecraft);
+        for (jar, exclude) in &natives {
+            extract_natives(jar, &dir, exclude)?;
+        }
+    }
 
     // ---- Managed mods (per Save copy, verified) ----
     emit(step("mods", "Installing Stabled components"));
@@ -273,4 +314,42 @@ async fn run_batch(
 pub fn is_installed(save: &SaveMeta) -> bool {
     let Some(stack) = stack::for_version(&save.minecraft_version) else { return false };
     marker(stack).is_file() && java::runtime_version_ok(&stack.java.component) && save.installed_stack.as_deref() == Some(stack.key().as_str())
+}
+
+/// The natives classifier of a pre-1.13 library for this OS (`natives-windows`, `natives-windows-64`, ...).
+fn native_classifier(lib: &Value) -> Option<String> {
+    let c = lib["natives"][rules::os_name()].as_str()?;
+    let arch = if cfg!(target_arch = "x86") { "32" } else { "64" };
+    Some(c.replace("${arch}", arch))
+}
+
+fn native_excludes(lib: &Value) -> Vec<String> {
+    lib["extract"]["exclude"].as_array().into_iter().flatten().filter_map(|e| e.as_str().map(str::to_owned)).collect()
+}
+
+/// Unpacks a natives jar into `dir`, leaving out excluded paths (usually `META-INF/`). Files already there with the
+/// same size are left alone.
+fn extract_natives(jar: &std::path::Path, dir: &std::path::Path, exclude: &[String]) -> AppResult<()> {
+    use std::io::Read;
+    std::fs::create_dir_all(dir)?;
+    let mut zip = zip::ZipArchive::new(std::fs::File::open(jar)?).map_err(|e| crate::error::AppError::new("INSTALL", format!("A native library is damaged: {e}")))?;
+    for i in 0..zip.len() {
+        let mut entry = zip.by_index(i).map_err(|e| crate::error::AppError::new("INSTALL", e.to_string()))?;
+        let name = entry.name().to_string();
+        if entry.is_dir() || exclude.iter().any(|x| name.starts_with(x.as_str())) {
+            continue;
+        }
+        let Some(rel) = entry.enclosed_name() else { continue };
+        let target = dir.join(rel);
+        if std::fs::metadata(&target).map(|m| m.len() == entry.size()).unwrap_or(false) {
+            continue;
+        }
+        if let Some(parent) = target.parent() {
+            std::fs::create_dir_all(parent)?;
+        }
+        let mut bytes = Vec::with_capacity(entry.size() as usize);
+        entry.read_to_end(&mut bytes)?;
+        fsx::write_atomic(&target, &bytes)?;
+    }
+    Ok(())
 }
